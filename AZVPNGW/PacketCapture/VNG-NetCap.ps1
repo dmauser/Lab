@@ -4,8 +4,9 @@
 - Create a Storage Account and Container in the same Resource Group as VPN Gateway.
 #>
 
-Login-AzAccount
-$SubID = (Get-AzSubscription | Out-GridView -Title "Select Subscription ..."-PassThru ).Name
+Connect-AzAccount
+$SubID = (Get-AzSubscription | Out-GridView -Title "Select Subscription ..."-PassThru )
+Set-AzContext -Subscription $SubID.name
 $RG = (Get-AzResourceGroup | Out-GridView -Title "Select an Azure Resource Group ..." -PassThru ).ResourceGroupName
 $VNG = (Get-AzVirtualNetworkGateway -ResourceGroupName $RG).Name | Out-GridView -Title "Select an Azure VNET Gateway ..." -PassThru
 $storeName = (Get-AzStorageAccount -ResourceGroupName $RG | Out-GridView -Title "Select an Azure Storage Account ..." -PassThru ).StorageAccountName
