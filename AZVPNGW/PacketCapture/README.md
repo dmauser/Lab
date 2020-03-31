@@ -1,4 +1,4 @@
-# Azure Virtual Network Gateway Packet Capture (Powershell GUI)
+# Azure Virtual Network Gateway Packet Capture (PowerShell)
 
 ## Introduction
 
