@@ -20,7 +20,8 @@ $seconds = 60*$minutes
 
 #Start packet capture for a VPN gateway
 Write-Host "Starting capture for $VNG Azure VPN Gateway" -ForegroundColor Magenta
-Start-AzVirtualnetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG
+$a = "{`"TracingFlags`": 15,`"MaxPacketBufferSize`": 1500,`"MaxFileSize`": 500,`"Filters`" :[{`"CaptureSingleDirectionTrafficOnly`": false}]}"
+Start-AzVirtualnetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG -FilterData $a
 Write-Host "Wait about $minutes minutes as capture is running on $VNG Azure VPN Gateway" -ForegroundColor Red
 Start-Sleep -Seconds $seconds
 #Stop packet capture for a VPN gateway
