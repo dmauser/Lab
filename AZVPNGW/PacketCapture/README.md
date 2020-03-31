@@ -4,7 +4,7 @@
 
 This is Powershell script the leverages AzVirtualnetworkGatewayPacketCapture cmdlets to facilitate network packet captures on Azure Gateways. More information: [Configure packet captures for VPN gateways](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture). The biggest adavantage of this feature is it allows customers have now to obtain their own Azure VPN Gateway network captures without open a support ticket.
 
-  **Note:** This only works for Azure VPN Gateways and are not applicable for other types of Azure Gateways such as ExpressRoute or Application Gateway.
+  **Note:** This only works for Azure VPN Gateways and is not applicable for other types of Azure Gateways such as ExpressRoute or Application Gateway.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ You can download VNG-NetCap.ps1 or copy and paste script as shown:
 
 <pre lang="...">
 
-<#Pre-requesits:
+<#Prerequesits:
 - Install Azure Powershell Module (http://aka.ms/azps)
 - For now only Powershell 5.1 supported.
 - Create a Storage Account and Container in the same Resource Group as VPN Gateway.
@@ -45,13 +45,12 @@ $seconds = 60*$minutes
 #Start packet capture for a VPN gateway
 Write-Host "Starting capture for $VNG Azure VPN Gateway" -ForegroundColor Magenta
 Start-AzVirtualnetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG
-Start-Sleep -Seconds $seconds
 Write-Host "Wait about $minutes minutes as capture is running on $VNG Azure VPN Gateway" -ForegroundColor Red
+Start-Sleep -Seconds $seconds
 #Stop packet capture for a VPN gateway
 Stop-AzVirtualNetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG -SasUrl $sasurl
 #Script finished
 Write-Host "Process has been completed - Use Storage Explorer and download $VNG network captures on $containerName inside Storage Account $storeName" -ForegroundColor Magenta
-
 </pre>
 
 Sample output when script runs:

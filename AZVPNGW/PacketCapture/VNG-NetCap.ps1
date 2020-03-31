@@ -1,4 +1,4 @@
-<#Pre-requesits:
+<#Prerequesits:
 - Install Azure Powershell Module (http://aka.ms/azps)
 - For now only Powershell 5.1 supported.
 - Create a Storage Account and Container in the same Resource Group as VPN Gateway.
@@ -21,8 +21,8 @@ $seconds = 60*$minutes
 #Start packet capture for a VPN gateway
 Write-Host "Starting capture for $VNG Azure VPN Gateway" -ForegroundColor Magenta
 Start-AzVirtualnetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG
-Start-Sleep -Seconds $seconds
 Write-Host "Wait about $minutes minutes as capture is running on $VNG Azure VPN Gateway" -ForegroundColor Red
+Start-Sleep -Seconds $seconds
 #Stop packet capture for a VPN gateway
 Stop-AzVirtualNetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG -SasUrl $sasurl
 #Script finished
