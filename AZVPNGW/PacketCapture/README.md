@@ -17,7 +17,7 @@ If you need more information about those parameters consult: [Start-AzVirtualnet
 
 ## Prerequisites
 
-- Create a storage account and container on the same Resource Group as your Virtual Network Gateway. For example: capture container under Storage Account dmausercs as shown:
+- Create a storage account and container on the same Resource Group as your Virtual Network Gateway. For example: capture container under Storage Account mausertest as shown:
 
     ![](./media/createcontainer.png)
 
