@@ -8,7 +8,7 @@ ER Local is a new offering that allow customers with ExpressRoute on Peering Loc
 
 For more information about ExpressRoute Local consult: [ExpressRoute Local FAQ](http://aka.ms/ErLocal)
 
-**Note:** There's also couple constrains when you use ExpressRoute Local SKU, please review that documentation carefully before you try to make any change.
+**Note:** There are also couple constrains when you use ExpressRoute Local SKU, please review that documentation carefully before you try to make any change.
 
 For pricing information under Unlimited Data Plan section at [ExpressRoute Local Pricing](http://aka.ms/ErPricing)
 

@@ -51,17 +51,6 @@
                 "description": "Chosen SKU Tier of ExpressRoute circuit. Choose from Premium or Standard SKU tiers."
             }
         },
-        "sku_family": {
-            "defaultValue": "MeteredData",
-            "allowedValues": [
-                "MeteredData",
-                "UnlimitedData"
-            ],
-            "type": "String",
-            "metadata": {
-                "description": "Chosen SKU family of ExpressRoute circuit. Choose from MeteredData or UnlimitedData SKU families. Note: For LOCAL SKU you can leave as Metered but is billed as Unlimited"
-            }
-        },
         "allowClassicOperations": {
             "defaultValue": false,
             "type": "Bool",
@@ -77,9 +66,9 @@
             "name": "[parameters('circuitName')]",
             "location": "[parameters('location')]",
             "sku": {
-                "name": "[concat(parameters('sku_tier'),'_', parameters('sku_family'))]",
+                "name": "[concat(parameters('sku_tier'),'-MeteredData')]",
                 "tier": "[parameters('sku_tier')]",
-                "family": "[parameters('sku_family')]"
+                "family": "MeteredData"
             },
             "properties": {
                 "serviceProviderProperties": {

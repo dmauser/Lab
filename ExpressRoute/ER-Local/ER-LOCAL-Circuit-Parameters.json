@@ -20,9 +20,6 @@
         "sku_tier": {
             "value": "Local"
         },
-        "sku_family": {
-            "value": "MeteredData"
-        },
         "allowClassicOperations": {
             "value": false
         }
