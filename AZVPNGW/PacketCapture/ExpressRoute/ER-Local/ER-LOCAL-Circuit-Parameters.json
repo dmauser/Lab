@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "circuitName": {
+            "value": "Chicago-ER"
+        },
+        "serviceProviderName": {
+            "value": "Megaport"
+        },
+        "peeringLocation": {
+            "value": "Chicago"
+        },
+        "bandwidthInMbps": {
+            "value": 1000
+        },
+        "location": {
+            "value": "northcentralus"
+        },
+        "sku_tier": {
+            "value": "Local"
+        },
+        "sku_family": {
+            "value": "MeteredData"
+        },
+        "allowClassicOperations": {
+            "value": false
+        }
+    }
+}

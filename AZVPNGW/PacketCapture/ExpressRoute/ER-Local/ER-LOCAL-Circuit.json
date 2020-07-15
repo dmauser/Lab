@@ -1,0 +1,94 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "circuitName": {
+            "type": "String",
+            "metadata": {
+                "description": "This is the name of the ExpressRoute circuit"
+            }
+        },
+        "serviceProviderName": {
+            "type": "String",
+            "metadata": {
+                "description": "This is the name of the ExpressRoute Service Provider. It must exactly match one of the Service Providers from List ExpressRoute Service Providers API call. You can get that link by using Powershell command: Get-AzExpressRouteServiceProvider"
+            }
+        },
+        "peeringLocation": {
+            "type": "String",
+            "metadata": {
+                "description": "This is the name of the peering location and not the ARM resource location. It must exactly match one of the available peering locations from List ExpressRoute Service Providers API call. You can get that link by using Powershell command: Get-AzExpressRouteServiceProvider"
+            }
+        },
+        "bandwidthInMbps": {
+            "defaultValue": 1000,
+            "allowedValues":[
+             1000,
+             2000,
+             5000,
+             10000
+            ],
+            "type": "Int",
+            "metadata": {
+                "description": "This is the bandwidth in Mbps of the circuit being created. It must exactly match one of the available bandwidth offers List ExpressRoute Service Providers API call."
+            }
+        },
+        "location": {
+            "type": "String",
+            "metadata": {
+                "description": "Location where Circuit resource would be created."
+            }
+        },
+        "sku_tier": {
+            "defaultValue": "Local",
+            "allowedValues": [
+                "Local",
+                "Standard",
+                "Premium"
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "Chosen SKU Tier of ExpressRoute circuit. Choose from Premium or Standard SKU tiers."
+            }
+        },
+        "sku_family": {
+            "defaultValue": "MeteredData",
+            "allowedValues": [
+                "MeteredData",
+                "UnlimitedData"
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "Chosen SKU family of ExpressRoute circuit. Choose from MeteredData or UnlimitedData SKU families. Note: For LOCAL SKU you can leave as Metered but is billed as Unlimited"
+            }
+        },
+        "allowClassicOperations": {
+            "defaultValue": false,
+            "type": "Bool",
+            "metadata": {
+                "description": "Allow the circuit to interact with classic (RDFE) resources"
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/expressRouteCircuits",
+            "apiVersion": "2015-06-15",
+            "name": "[parameters('circuitName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[concat(parameters('sku_tier'),'_', parameters('sku_family'))]",
+                "tier": "[parameters('sku_tier')]",
+                "family": "[parameters('sku_family')]"
+            },
+            "properties": {
+                "serviceProviderProperties": {
+                    "serviceProviderName": "[parameters('serviceProviderName')]",
+                    "peeringLocation": "[parameters('peeringLocation')]",
+                    "bandwidthInMbps": "[parameters('bandwidthInMbps')]"
+                },
+                "allowClassicOperations": "[parameters('allowClassicOperations')]"
+            }
+        }
+    ]
+}
