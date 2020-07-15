@@ -7,7 +7,8 @@ In this short article we're going go over how to deploy ExpressRoute (ER) LOCAL 
 ER Local is a new offering that allow customers with ExpressRoute on Peering Location closes to Azure Region have unlimited egress from Azure to their On-Premises networks. It is important to check this list page on to check peering location offers ExpressRoute SKU. For more details check:
 
 For more information about ExpressRoute Local consult: [ExpressRoute Local FAQ](http://aka.ms/ErLocal)
-**Note:** There's also couple constrains to use ExpressRoute local, please review that documentation carefully before you try to make any change.
+
+**Note:** There's also couple constrains when you use ExpressRoute Local SKU, please review that documentation carefully before you try to make any change.
 
 For pricing information under Unlimited Data Plan section at [ExpressRoute Local Pricing](http://aka.ms/ErPricing)
 
