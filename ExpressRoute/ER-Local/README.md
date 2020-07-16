@@ -7,12 +7,9 @@ In this post we're going go over how to deploy ExpressRoute (ER) LOCAL SKU over 
 ER Local SKU is a new offering that allow customers with ExpressRoute on a Peering Location close an Azure Region have unlimited egress from Azure to their On-Premises networks. It is important to check which peering location offers ExpressRoute SKU. For more details check: [ExpressRoute connectivity providers](https://docs.microsoft.com/en-us/azure/expressroute/expressroute-locations-providers). Check for the column **Local Azure regions** to validate Location and respective Azure Datacenter is eligible for Local.
 
 <img src="./Peering-Location-Local.png" alt="Peering Location"
-	title="Peering Location" width="820" height="442" />
-
+title="Peering Location" width="820" height="442" />
 
 As an example, Amsterdam and Amsterdam2 are Edge Locations close to West Europe Datacenter. Customer with ExpressRoute only linked reaching VNETs on West Europe Datacenter are eligible to ExpressRoute Local. In the other way around Atlanta does not have a close Azure Regions and customer's with ExpressRoute on that Peering location are not eligible for Local.
-
-
 
 **Note:** There are also couple constrains when you use ExpressRoute Local SKU, please review that documentation carefully before you try to make any change.
 
@@ -191,7 +188,9 @@ Expected output:
 ![](./LAB2-ER-Local-Output2.png)
 
 Over Azure Portal - ExpressRoute -Configuration blade show Local as selected:
-![](./LAB2-ER-Local-Output3.png)
+
+<img src="./LAB2-ER-Local-Output3.png" alt="Peering Location"
+title="Peering Location" width="900" height="294" />
 
 ## Summary
 
