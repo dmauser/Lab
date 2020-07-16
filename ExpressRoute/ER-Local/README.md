@@ -190,6 +190,9 @@ $Circuit.Sku.Family
 Expected output:
 ![](./LAB2-ER-Local-Output2.png)
 
+Over Azure Portal - ExpressRoute -Configuration blade show Local as selected:
+![](./LAB2-ER-Local-Output3.png)
+
 ## Summary
 
 In this guide/lab we went over the process of deploy a new ExpressRoute Circuit using Local SKU via ARM Template or Powershell. Additionally we went over the process to change an existing Circuit from Standard (or Premium) to Local. Two LABs have been made available and you can practice and get familiar with both processes.
