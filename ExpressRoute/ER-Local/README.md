@@ -21,7 +21,7 @@ As an example, Amsterdam and Amsterdam2 are Edge Locations close to West Europe 
 
 ## Deploy ER Local using Custom Template over Azure Portal
 
-**Special Note**: At the time of writing, it is only allowed to create ExpressRoute Local SKU over Azure Portal with circuits starting on 2 Gbps but in reality the requirement is 1 Gbps per documentation (see links above). Therefore, you can use this ExpressRoute template as workaround until that gets fixed over official Azure Portal. Alternatively your can create a 1 Gbps Standard SKU and change SKU to local via Powershell shared on the section below [Change existing ExpressRoute Circuit SKU from Premium or Standard to Local](#Change-existing-ExpressRoute-Circuit-SKU-from-Premium-or-Standard-to-Local).
+**Special Note**: At the time of this writing, it is only allowed to create ExpressRoute Local SKU over Azure Portal with circuits starting on 2 Gbps of bandwidth, but in reality the requirement is 1 Gbps per documentation (see links above). Therefore, you can use this ExpressRoute template as workaround until that gets fixed over official Azure Portal. Alternatively your can create a 1 Gbps Standard SKU and change SKU to local via Powershell shared on the section below [Change existing ExpressRoute Circuit SKU from Premium or Standard to Local](#Change-existing-ExpressRoute-Circuit-SKU-from-Premium-or-Standard-to-Local).
 
 Use the following ARM Template to deploy ER Local:
 
@@ -87,9 +87,9 @@ This option requires that your circuit has at least 1 Gbps. You can change Circu
 
 Over the Portal when you have already an existing ER Circuit as Standard  Local SKU is greyed out. This change can be done over Powershell (demonstrated here) or over CLI.
 
-It is important to note that making this change to local assumes that your ExpressRoute Circuit on a location that supports ExpressRoute local as well as your ExpressRoute is current linked to an ExpressRoute Gateway in supported location. Example, Chicago location is eligible to Local SKU and circuit is current linked to ExpressRoute Gateway in North Central US. More information on [What is ExpressRoute Local SKU](#What-is-ExpressRoute-Local-SKU).
+It is important to note that making this change to Local SKU assumes that your ExpressRoute Circuit is on a location that supports ExpressRoute Local as well as your same circuit is current linked to an ExpressRoute Gateway on supported Azure Region. Example, Chicago location is eligible to Local SKU and my circuit is current linked to ExpressRoute Gateway in North Central US. More information on [What is ExpressRoute Local SKU](#What-is-ExpressRoute-Local-SKU).
 
-Follow the instructions below:
+Follow the instructions below to change from either Premium or Standard to Local:
 
 ```Powershell
 #1. Get Circuit info:
