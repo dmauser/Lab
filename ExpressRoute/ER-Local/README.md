@@ -1,5 +1,25 @@
 # Deploying Local SKU ExpressRoute Circuits
 
+## Contents
+[Introduciton](#introduciton)
+
+[What is ExpressRoute Local SKU](#what-is-expressroute-local-sku)
+
+[Deploy ER Local using Custom Template over Azure Portal](#deploy-er-local-using-custom-template-over-azure-portal)
+
+[Deploy ER Local using ARM Template via Powershell](#deploy-er-local-using-arm-template-via-powershell)
+
+[Change existing ExpressRoute Circuit SKU from Premium or Standard to Local](#change-existing-expressroute-circuit-sku-from-premium-or-standard-to-local)
+
+[Validation of ER Local using Powershell](#validation-of-er-local-using-powershell)
+
+[LAB1 - Deploy a new Local SKU ExpressRoute Circuit](#lab1---deploy-a-new-local-sku-expressroute-circuit)
+
+[LAB2 - Change a current ER Circuit Standard SKU Circuit to Local SKU](#lab2---change-a-current-er-circuit-standard-sku-circuit-to-local-sku)
+
+[Summary](#summary)
+
+## Introduciton
 In this post we're going go over how to deploy ExpressRoute (ER) LOCAL SKU over the Portal or Powershell by using ARM Templates. It also includes a sample parameter file that you can leverage in case you need automate deployment process. On the second session covers how to you change your existing ExpressRoute circuit to LOCAL SKU. We made available also two LABs to practice the deployment in your own subscription.
 
 ## What is ExpressRoute Local SKU
