@@ -1,13 +1,13 @@
-# Deploying ExpressRoute Circuits to Local
+# Deploying Local SKU ExpressRoute Circuits
 
-In this post we're going go over how to deploy ExpressRoute (ER) LOCAL SKU over the Portal or Powershell by using ARM Templates. It also includes a sample parameter file that you can leverage in case you need automate deployment process. On the second session covers how to you change your existing ExpressRoute circuit to LOCAL SKU. We made available also two LAB sessions to pratice the deployment in your own subscription.
+In this post we're going go over how to deploy ExpressRoute (ER) LOCAL SKU over the Portal or Powershell by using ARM Templates. It also includes a sample parameter file that you can leverage in case you need automate deployment process. On the second session covers how to you change your existing ExpressRoute circuit to LOCAL SKU. We made available also two LAB sessions to practice the deployment in your own subscription.
 
 ## What is ExpressRoute LOCAL
 
-ER Local is a new offering that allow customers with ExpressRoute on Peering Location closes to Azure Region have unlimited egress from Azure to their On-Premises networks. It is important to check this list page on to check peering location offers ExpressRoute SKU. For more details check: [ExpressRoute connectivity providers](https://docs.microsoft.com/en-us/azure/expressroute/expressroute-locations-providers). Check for the column **Local Azure regions** to check if your Location and respective Azure Datacenter is elegible for Local.
+ER Local is a new offering that allow customers with ExpressRoute on Peering Location closes to Azure Region have unlimited egress from Azure to their On-Premises networks. It is important to check this list page on to check peering location offers ExpressRoute SKU. For more details check: [ExpressRoute connectivity providers](https://docs.microsoft.com/en-us/azure/expressroute/expressroute-locations-providers). Check for the column **Local Azure regions** to check if your Location and respective Azure Datacenter is eligible for Local.
 
 
- Example, Amsterdam and Amsterdam2 are Edge Locations close to West Europe Datacenter. Customer with ExpressRoute only linked reaching VNETs on West Europe Datacenter are elegible to ExpressRoute Local. In the other way around Atlanta does not have a close Azure Regions customer's with Peering to that Edge location are not elegible for Local:
+ Example, Amsterdam and Amsterdam2 are Edge Locations close to West Europe Datacenter. Customer with ExpressRoute only linked reaching VNETs on West Europe Datacenter are eligible to ExpressRoute Local. In the other way around Atlanta does not have a close Azure Regions customer's with Peering to that Edge location are not eligible for Local:
 
 
 For more information about ExpressRoute Local consult: [ExpressRoute Local FAQ](http://aka.ms/ErLocal)
@@ -166,7 +166,7 @@ Set-AzExpressRouteCircuit -ExpressRouteCircuit $Circuit
 
 #5 Revalidate the change to Local
 $Circuit = Get-AzExpressRouteCircuit -Name "Chicago-ER-STD-to-Local" -ResourceGroupName $RG
-$Circuit.ServiceProviderProperties.BandwidthInMbps 
+$Circuit.ServiceProviderProperties.BandwidthInMbps
 $Circuit.Sku.Tier
 $Circuit.Sku.Family
 
