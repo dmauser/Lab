@@ -174,4 +174,4 @@ $Circuit.Sku.Family
 
 ## Summary
 
-In this lab we went over the process of deploy a new ExpressRoute Circuit using Local SKU via ARM Template or Powershell. Additionally we went over the process to change an existing Circuit from Standard (or Premium) to Local. Two LABs have been made available and you can practice and get familiar with both processes.
+In this guide/lab we went over the process of deploy a new ExpressRoute Circuit using Local SKU via ARM Template or Powershell. Additionally we went over the process to change an existing Circuit from Standard (or Premium) to Local. Two LABs have been made available and you can practice and get familiar with both processes.
