@@ -66,7 +66,7 @@
             "name": "[parameters('circuitName')]",
             "location": "[parameters('location')]",
             "sku": {
-                "name": "[concat(parameters('sku_tier'),'MeteredData')]",
+                "name": "[concat(parameters('sku_tier'),'_','MeteredData')]",
                 "tier": "[parameters('sku_tier')]",
                 "family": "MeteredData"
             },
