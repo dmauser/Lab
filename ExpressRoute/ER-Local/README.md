@@ -85,7 +85,7 @@ This option requires that your circuit has at least 1 Gbps. You can change Circu
 
 Over the Portal when you have already an existing ER Circuit as Standard  Local SKU is greyed out. This change can be done over Powershell (demonstrated here) or over CLI.
 
-It is important to note that making this change to local assumes that your ExpressRoute Circuit on a location that supports ExpressRoute local as well as your ExpressRoute is current linked to an ExpressRoute Gateway in supported location. Example, Chicago location is eligible to Local SKU and circuit is current linked to ExpressRoute Gateway in North Central US.
+It is important to note that making this change to local assumes that your ExpressRoute Circuit on a location that supports ExpressRoute local as well as your ExpressRoute is current linked to an ExpressRoute Gateway in supported location. Example, Chicago location is eligible to Local SKU and circuit is current linked to ExpressRoute Gateway in North Central US. More information on [What is ExpressRoute Local SKU](#What-is-ExpressRoute-Local-SKU).
 
 Follow the instructions below:
 
@@ -156,7 +156,7 @@ $Template = "https://raw.githubusercontent.com/dmauser/Lab/master/ExpressRoute/E
 New-AzResourceGroup -Name $RG -Location 'North Central US' #If you already have Resource Group created on previews LAB, please skip this line.
 New-AzResourceGroupDeployment -ResourceGroupName $RG `
 -TemplateURI $Template `
--circuitName '' `
+-circuitName 'ER-Chicago-Std-Local-Demo' `
 -serviceProviderName 'Megaport' `
 -peeringLocation 'Chicago' `
 -bandwidthInMbps '1000' `
@@ -164,7 +164,7 @@ New-AzResourceGroupDeployment -ResourceGroupName $RG `
 -sku_tier 'Standard'
 
 #3 Dump Circuit relevant info
-$Circuit = Get-AzExpressRouteCircuit -Name "Chicago-ER-STD-to-Local" -ResourceGroupName $RG
+$Circuit = Get-AzExpressRouteCircuit -Name "ER-Chicago-Std-Local-Demo" -ResourceGroupName $RG
 $Circuit.ServiceProviderProperties.BandwidthInMbps 
 $Circuit.Sku.Tier
 $Circuit.Sku.Family
