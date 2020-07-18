@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this a scenario where customer requires a total separated traffic between Production (Prod) and Development (Dev) environments but wants to keep connectivity to On-premises to both environments. That is possible by creating two fully separated Virtual WANs (vWANs).
+This a scenario where customer requires a fully separated traffic between Production (Prod) and Development (Dev) environments but wants to keep connectivity to On-premises to both environments. That is possible by creating two fully separated Virtual WANs (vWANs).
 
 One of the challenges customer may raise on this scenario is the fact when connecting to Virtual WAN Hub (vHUB) there's a fix ASN 65515 and could we accomplish that isolation between both vWANs.
 
