@@ -31,7 +31,7 @@ ER Local SKU is a new offering that allow customers with ExpressRoute on a Peeri
 <img src="./Peering-Location-Local.png" alt="Peering Location"
 title="Peering Location" width="820" height="442" />
 
-As an example, Amsterdam and Amsterdam2 are Edge Locations close to West Europe Datacenter. Customer with ExpressRoute only linked reaching VNETs on West Europe Datacenter are eligible to ExpressRoute Local. In the other way around Atlanta does not have a close Azure Regions and customer's with ExpressRoute on that Peering location are not eligible for Local.
+For example, Amsterdam and Amsterdam2 are Edge Locations close to West Europe Datacenter. Customer with ExpressRoute only linked VNETs on West Europe Datacenter are eligible to ExpressRoute Local. In the other way around Atlanta does not have a close Azure Regions and customer's with ExpressRoute on that Peering location are not eligible for Local.
 
 **Note:** There are also couple constrains when you use ExpressRoute Local SKU, please review that documentation carefully before you try to make any change.
 
