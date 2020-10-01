@@ -200,7 +200,7 @@ $Circuit.Sku.Tier = "Local"
 Set-AzExpressRouteCircuit -ExpressRouteCircuit $Circuit
 
 #5 Revalidate the change to Local
-$Circuit = Get-AzExpressRouteCircuit -Name "Chicago-ER-STD-to-Local" -ResourceGroupName $RG
+$Circuit = Get-AzExpressRouteCircuit -Name "ER-Chicago-Std-Local-Demo" -ResourceGroupName $RG
 $Circuit.ServiceProviderProperties.BandwidthInMbps
 $Circuit.Sku.Tier
 $Circuit.Sku.Family
