@@ -8,10 +8,10 @@ Getting visibility on Azure components is key to better understand how they work
 
 In order to enable IKE Logs for Virtual Network Gateway you need to send the logs to a storage account, log analytics or event hub (3rd party logging applications). That can be done over Azure Monitor via Powershell, CLI or Portal. Below is an on how to enable IKE Logs for Azure Virtual Network Gateway over Portal under Azure Monitor - Diagnostics - Select Resource Group and Virtual Network Gateway (also applicable for Azure Virtual WAN VPN Gateway):
 
-![](.\IKEDiagnosticLog.png)
+![IKE Diagnostic Log Table](./IKEDiagnosticLog.png)
 
 For the scope of this article you have to select at least IKEDiagnosticLog.
-More information on how to enable logs consult: [Diagnostic logs] (https://docs.microsoft.com/en-us/azure/virtual-wan/logs-metrics#diagnostic)
+More information on how to enable logs consult: [Diagnostic logs](https://docs.microsoft.com/en-us/azure/virtual-wan/logs-metrics#diagnostic)
 
 ## IKE logs kusto query
 
