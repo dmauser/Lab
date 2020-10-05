@@ -37,6 +37,8 @@ In case of temporary or permanent connectivity (represented on diagram by Option
 
 Another potential solution for full transitivity between vWAN is to use Cisco AS Override feature which works like "NAT" for ASNs, allowing communication and route exchange between two environments using the same ASN but having a Cisco device doing ASN Override to a different ASN number. (That can be a scope for another article).
 
+A third option would be creating a Site to Site VPN between two vWANs using static routing. That option is explained in details on: [Connect two Virtual WANs to each other over VPN](https://blog.cloudtrooper.net/2020/07/03/connect-two-virtual-wans-to-each-other-over-vpn/).
+
 ## Conclusion
 
 At this time is not possible to customize vWAN ASN to other value than 65515. However, for this type of customer requirement to separate Dev and Prod a different ASN is not required, and  security requirement has been met by having both environment fully isolated, leaving only On-Premises with ability to reach both of them. Also, In case customer needs some kind of temporary connectivity, they can peer VNETs between both two environments.
