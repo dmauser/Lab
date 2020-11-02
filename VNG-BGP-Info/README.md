@@ -78,7 +78,8 @@ In this lab you are going to create two Azure Virtual Network Gateways (VNGs) an
     
     **Output** below shows 10.0.2.0/23 as learned route from peer peer 10.2.0.254 (AS 65050) and 10.0.0.0/23 as advertised route.
     ![VNET1-Gateway BGP info](./vnet1-gateway-bgpinfo.png)
-**VNET2-Gateway side**: *VNG-BGP-Info.ps1 -GatewayName vNet2-Gateway -ResourceGroupName VNG-BGP-LAB*
+
+    **VNET2-Gateway side**: *VNG-BGP-Info.ps1 -GatewayName vNet2-Gateway -ResourceGroupName VNG-BGP-LAB*
 
     **Output** shows 10.0.0.0/23 as learned route from peer peer 10.1.0.254 (AS 65010) and 10.0.2.0/23 as advertised route.
     ![VNET2-Gateway BGP info](./vnet2-gateway-bgpinfo.png)
