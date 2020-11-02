@@ -72,16 +72,16 @@ In this lab you are going to create two Azure Virtual Network Gateways (VNGs) an
 
 ![Network Diagram](./vng-bgp-diagram.png)
 
-1. Deploy template two Azure VPN Gateways with BGP using this ARM template [VNET to VNET connection](https://github.com/Azure/azure-quickstart-templates/tree/master/201-vnet-to-vnet-bgp). Please note, this template creates two VNGs and interconnect VNET1 (10.0.0.0/23)  and VNET2 (10.0.2.0/23) using S2S VPN connection. Please note, this template only creates VNET1 and VNET2 and Spoke VNETs are created on step 3.
-2. Run the script VNG-BGP-Info.ps1 against both VNG Gateways to get information about BGP Peering. Example command and output:
+1. Deploy template two Azure VPN Gateways with BGP using this ARM template [VNET to VNET connection](https://github.com/Azure/azure-quickstart-templates/tree/master/201-vnet-to-vnet-bgp). Please note, this template creates two VNGs and interconnect VNET1 (10.0.0.0/23)  and VNET2 (10.0.2.0/23) using S2S VPN connection. Please note, this template only creates VNET1, VNET2 and VNG Gateways. Spoke VNETs are created on step 3.
+2. Run the script VNG-BGP-Info.ps1 against both Gateways to get information about BGP Peering. Example command and output:
 **VNET1-Gateway side**: *VNG-BGP-Info.ps1 -GatewayName vNet1-Gateway -ResourceGroupName VNG-BGP-LAB*
     
-    **Output** below shows 10.0.2.0/23 as learned route from peer peer 10.2.0.254 (AS 65050) and 10.0.0.0/23 as advertised route.
+    **Output** below shows 10.0.2.0/23 as learned route from peer 10.2.0.254 (AS 65050) and 10.0.0.0/23 as advertised route.
     ![VNET1-Gateway BGP info](./vnet1-gateway-bgpinfo.png)
 
     **VNET2-Gateway side**: *VNG-BGP-Info.ps1 -GatewayName vNet2-Gateway -ResourceGroupName VNG-BGP-LAB*
 
-    **Output** shows 10.0.0.0/23 as learned route from peer peer 10.1.0.254 (AS 65010) and 10.0.2.0/23 as advertised route.
+    **Output** shows 10.0.0.0/23 as learned route from peer 10.1.0.254 (AS 65010) and 10.0.2.0/23 as advertised route.
     ![VNET2-Gateway BGP info](./vnet2-gateway-bgpinfo.png)
 
 3. Create a new Spoke VNET (SPK1-VNET) and peer it with vNET1 to show its address space propagating to the other side via BGP. When creating peering between Spoke and VNET! make sure to check **Use Gateway Transit** on VNET1 and **Use Remote Gateways** on Spoke. Repeat same process and create a new Spoke (SPK2-VNET) to VNET2. Set address space 10.0.4.0/23 to SPK1-VNET and 10.0.6.0/23 to SPK2-VNET. Re-run same commands of step 2 and you will see newer peered VNETs address space showing (green highlight):
