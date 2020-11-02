@@ -6,8 +6,8 @@ This is simple script that dump all BGP routing information for VPN or ExpressRo
 
 ## Known issues
 
-1) **ExpressRoute Gateway** - This script is unable to retrieve learned routes from ExpressRoute Gateways but it is capable to dump BGP peering status and advertised routes. There's a current support ticket open investigating this issue.
-2) **VPN Gateway** - On Active-Active setups and Point to Site (P2S) enabled it takes a long time to dump BGP peers. No current workaround other them disable temporary P2S configuration.
+1) **ExpressRoute Gateway** - This script is unable to retrieve learned routes from ExpressRoute Gateways, but it is capable to dump BGP peering status and advertised routes. There's a current support ticket open investigating this issue.
+2) **VPN Gateway** - On Active-Active setups and Point to Site (P2S) enabled it takes a long time to dump BGP peers. No current workaround other them disable temporarily P2S configuration.
 
 ## Script
 
@@ -15,7 +15,7 @@ Script is available inside the repository as VNG-BGP-Info.ps1 or save the conten
 
 ### Pre-requisites
 
-Ensure your are properly logged in your subscription where VNGs are present. You can validate that by using:
+Ensure you are properly logged in your subscription where VNGs are present. You can validate that by using:
 
 ```powershell
 Add-AzAccount #Logon on your Azure
