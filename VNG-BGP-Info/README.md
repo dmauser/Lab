@@ -1,22 +1,30 @@
-# Script to obtain BGP information from Azure VPN and ExpressRoute Gateways
+# Verify BGP information on Azure VPN and ExpressRoute Gateways
 
 ## Introduction
 
-This is simple script that dump all BGP routing information for VPN or ExpressRoute Virtual Network Gateways (VNG). Please note, this script is not applicable for Virtual WAN VPN or ExpressRoute Gateways. 
+This is simple script that dump all BGP routing information for VPN or ExpressRoute Virtual Network Gateways (VNGs). Please note, this script is not applicable for Virtual WAN VPN or ExpressRoute Gateways.
 
 ## Known issues
 
-1) **ExpressRoute Gateway** - This script is unable to retrieve learned routes from ExpressRoute Gateways but it is capable to dump BGP peering status and advertised routes. There's a current support ticket in Support to address this issue.
-2) **VPN Gateway** - On Active-Active setups and Point to Site enabled it takes a long time to dump BGP peers.
+1) **ExpressRoute Gateway** - This script is unable to retrieve learned routes from ExpressRoute Gateways but it is capable to dump BGP peering status and advertised routes. There's a current support ticket investigating this issue.
+2) **VPN Gateway** - On Active-Active setups and Point to Site (P2S) enabled it takes a long time to dump BGP peers. No current workaround other them disable temporary P2S configuration.
 
-## Script usage ad content
+## Script
 
 Script is available inside the repository as VNG-BGP-Info.ps1 or save the content listed below. It only works as saved as script because it requires you to specify parameters before running it.
 
-### Usage
-VNG-BGP-Info.ps1 -GatewayName VNGName -ResourceGroupName RGName   
+### Pre-requisites
 
-### Script content
+Ensure your are properly logged in your subscription where VNGs are present. You can validate that by using:
+
+```powershell
+Add-AzAccount #Logon on your Azure
+Get-AzContext # Check you have correct Azure Subscription
+Set-AzContext -Subscription <Subscription Name> # Set appropriate Subscription
+```
+
+### Content
+
 ```PowerShell
 #List All Virtual Network Gateways for current Subscription
 #BGP Routing info for Virtual Network Gateway (ExpressRoute or VPN)
@@ -51,9 +59,33 @@ foreach ($Peer in $ValidPeerinfo.Neighbor) {
     Get-AzVirtualNetworkGatewayAdvertisedRoute -ResourceGroupName $ResourceGroupName -VirtualNetworkGatewayName $GatewayName -peer $Peer | Format-Table
 }
 ```
+
+### Usage
+
+Save content above in ps1 file (example: VNG-BGP-Info.ps1) and specify required parameters -GatewayName with VNG Name and -ResourceGroupName with respective VNG's resource group name.
+
+VNG-BGP-Info.ps1 -GatewayName VNGName -ResourceGroupName RGName
+
 ## LAB
 
-1) Deploy template two Azure VPN Gateways using BGP using this ARM template[VNET to VNET connection](https://github.com/Azure/azure-quickstart-templates/tree/master/201-vnet-to-vnet-bgp).
-2) Run the script above against both VNG Gateways to get information about BGP Peering.
+In this lab you are going to create two Azure Virtual Network Gateways (VNGs) and configure a Site-to-Site VPN connection and BGP. You will use VNG-BGP-Info.ps1 script to dump BGP configuration information. See a diagram of this LAB environment as shown:
 
-***Expected Output***
+
+
+1. Deploy template two Azure VPN Gateways using BGP using this ARM template[VNET to VNET connection](https://github.com/Azure/azure-quickstart-templates/tree/master/201-vnet-to-vnet-bgp). Please note, this template creates two VNGs and interconnect VNET1 (10.0.0.0/23)  and VNET2 (10.0.2.0/23) using S2S VPN connection. 
+2. Run the script VNG-BGP-Info.ps1 against both VNG Gateways to get information about BGP Peering. Example command and output:
+**VNET1-Gateway side**: *VNG-BGP-Info.ps1 -GatewayName vNet1-Gateway -ResourceGroupName VNG-BGP-LAB*
+Expected output:
+![VNET1-Gateway BGP info](./vnet1-gateway-bgpinfo.png)
+It shows 10.0.2.0/23 as learned route from peer peer 10.2.0.254 (AS 65050) and 10.0.0.0/23 as advertised route.
+**VNET2-Gateway side**: *VNG-BGP-Info.ps1 -GatewayName vNet2-Gateway -ResourceGroupName VNG-BGP-LAB*
+Expected output:
+![VNET2-Gateway BGP info](./vnet2-gateway-bgpinfo.png)
+It shows 10.0.0.0/23 as learned route from peer peer 10.1.0.254 (AS 65010) and 10.0.2.0/23 as advertised route.
+3. Create a new Spoke VNET (SPK1-VNET) and peering it to vNET1 to show its address space propagating to the other side via BGP. When creating peering between Spoke and VNET! make sure to check **Use Gateway Transit** on VNET1 and **Use Remote Gateways** on Spoke. Repeat same process and create a new Spoke (SPK2-VNET) to VNET2. Set address space 10.0.4.0/23 to SPK1-VNET and 10.0.6.0/23 to SPK2-VNET. Re-run same commands of step 2 and you will see newer peered VNETs address space showing (green highlight):
+**VNET1-Gateway side**
+![VNET1-Gateway BGP info after peering with SPK1](./vnet1-gateway-bgpinfo-spk1.png)
+**VNET2-Gateway side**
+![VNET2-Gateway BGP info after peering with SPK2](./vnet2-gateway-bgpinfo-spk2.png)
+4. (Optional) - Create virtual machines on each VNET and test connectivity.
+5. (Optional/Advanced) - Make both VNGs as active-active, create a secondary VPN connection and reconfigure BGP peerings.
