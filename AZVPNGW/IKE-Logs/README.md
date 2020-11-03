@@ -70,15 +70,15 @@ However, there are some comments on the query below that can help you narrow dow
 
 ## Examples
 
-Below are examples on how to identify common VPN connection issues. You can try those before opening a Support Ticket. After enable VPN Gateway on diagnostics to Log Analytics your can use Virtual Network Gateway blade under Monitoring to run the query above.
+Below are examples on how to identify common VPN connection issues. You can try those before opening a Support Ticket. After enable VPN Gateway on diagnostics to Log Analytics, you can use Virtual Network Gateway blade under Monitoring to run the query above.
 
 ![VNG Monitoring Logs](./VNG-monitoring-logs.png)
 
-On Virtual WAN VPN Gateways you need to open Logs inside Log Analytics workspace.
+For Virtual WAN VPN Gateways you need to open Logs inside Log Analytics workspace blade.
 
 ### Identify IPSec Pre-Shared Key (PSK) mismatch Issues
 
-In the example below incorrect pre-shared key has been assigned in one the sides and here how to identify the issue. The query above got executed by changing only the last to: **| sort by TimeGenerated desc** to bring more recent events to the top.
+In the example below an incorrect pre-shared key has been assigned in one remote VPN device and here how to identify the issue. The query above got executed by changing only the last line to: **| sort by TimeGenerated desc** to bring more recent events to the top.
 
 ![Authentication failed](./shared-key-auth-failed.png)
 
