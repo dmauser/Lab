@@ -78,11 +78,12 @@ For Virtual WAN VPN Gateways you need to open Logs inside Log Analytics workspac
 
 ### Identify IPSec Pre-Shared Key (PSK) mismatch Issues
 
-In the example below an incorrect pre-shared key has been assigned in one remote VPN device and here how to identify the issue. The query above got executed by changing only the last line to: **| sort by TimeGenerated desc** to bring more recent events to the top.
+In the example below an incorrect pre-shared key has been assigned in one remote VPN device and here is how to identify the issue: 
+The query above got executed by changing only the last line to: **| sort by TimeGenerated desc** to bring more recent events to the top.
 
 ![Authentication failed](./shared-key-auth-failed.png)
 
-Few points to keep in mind to assist you on the troubleshooting:
+Few points to keep in mind to assist you on troubleshooting:
 
 - [SEND][SA_INIT] - IKE SA has been initiated by Azure VNG Gateway (IKE INITIATOR)
 - [LOCAL_MSG] - Azure VPN Gateway response for a configuration sent by remote VPN device.
@@ -90,13 +91,13 @@ Few points to keep in mind to assist you on the troubleshooting:
 
 ### Identify IPSec Policy mismatch issues
 
-This is kind tricky to identify because you need to collect information from both sides to determine what is the specific setting causing Policy Mismatch. Because Azure can be the IKE INITIATOR you can extract all policy information as well as what remote VPN device is sending. Sometimes you need to force VPN connection from remote side to show it as IKE Initiator. Below is an example for a sequence where we have Azure as Initiator and remote VPN device as Initiator and we can see what is causing the Policy Mismatch.
+This issue is tricky to identify because you need to collect information from both sides to determine what is the specific setting causing Policy Mismatch. Because Azure can be the IKE initiator, you can extract all IPSec policies information sent (see below all six policies).  To get remote VPN side as Initiator you need to force it in its side by trying to bring IPSec tunnel back up. Below is an example for a sequence where we have Azure as Initiator as well as remote VPN device as Initiator and we can see spot what the specific setting causing the Policy Mismatch.
 
 ![Authentication failed](./policy-mismatch.png)
 
-On the screen above you can get full IPSec Policies from both and compare:
+On the Log Analytics results above you can get full IPSec Policies from both sides and compare them:
 
-Azure VPN Gateway sends by default the following IPSec (Main mode/Phase I) policies:
+**Azure VPN Gateway side** sends by default the following IPSec (Main mode/Phase I) policies:
 - Policy1: Cipher=AES-CBC-256 Integrity=SHA1 DhGroup=DhGroup2
 - Policy2: Cipher=AES-CBC-256 Integrity=SHA256 DhGroup=DhGroup2
 - Policy3: Cipher=AES-CBC-128 Integrity=SHA1 DhGroup=DhGroup2
@@ -106,7 +107,7 @@ Azure VPN Gateway sends by default the following IPSec (Main mode/Phase I) polic
 
 More information about Azure Gateway IPSec policies consult: [IKE Phase 1 (Main Mode) parameters](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-devices#ike-phase-1-main-mode-parameters). Also, you can validate what policies Azure VPN Gateway sends as [Initiator](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-devices#azure-gateway-as-initiator) as well as what can accepts as [Receiver](https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-devices#azure-gateway-as-responder).
 
-Remote VPN sends only a single IPsec policy:
+**Remote VPN device side** sends only a single IPsec policy:
 - Policy1: Cipher=AES-CBC-256 Integrity=SHA256 DhGroup=**DhGroup14**
 
 **Issue/Solution**: main issue is remote VPN device is sending Diffie-Hellman **Group 14** while Azure VPN Gateway expects only **Group 2**. You can resolve this issue by either changing remote VPN device to Group 2 or Group 14 on custom IPSec settings on Azure side to match exactly remote VPN device as shown:
