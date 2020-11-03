@@ -33,7 +33,7 @@ More information on how to enable logs consult: [Diagnostic logs](https://docs.m
 
 Below is a IKE Kusto query that can help extract information from IKEDiagnosticLog in Log Analytics. By default that Kusto query will list IKE logs from the last 30 minutes.
 
-*Note:* the same query has been uploaded to Azure Monitor Community repository under Virtual Network Gateway. Click [here](https://github.com/microsoft/AzureMonitorCommunity/blob/master/Azure%20Services/Virtual%20Network%20Gateways/Queries/Diagnostics/IKE%20log%20events.kql)
+*Note:* the same query has been uploaded to **Azure Monitor Community repository** under **Virtual Network Gateway**. Click [here](https://github.com/microsoft/AzureMonitorCommunity/blob/master/Azure%20Services/Virtual%20Network%20Gateways/Queries/Diagnostics/IKE%20log%20events.kql)
 
 ```kusto
 AzureDiagnostics 
