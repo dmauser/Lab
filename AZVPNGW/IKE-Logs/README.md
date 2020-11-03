@@ -3,10 +3,15 @@
 # Contents
 
 [Introduction](#introduction)
+
 [Prerequisites](#prerequisites)
+
 [IKE logs kusto query](#ike-logs-kusto-query)
+
 [Examples](#examples)
+
 [Identify IPSec Pre-Shared Key (PSK) mismatch issues](#identify-ipsec-pre-shared-key-psk-mismatch-issues)
+
 [Identify IPSec Policy mismatch issues](#identify-ipsec-policy-mismatch-issues)
 
 ## Introduction
