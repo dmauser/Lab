@@ -134,10 +134,10 @@ There's no CLI to initiate vWAN VPN Gateway Network Captures at the time this po
 
 Replace **{{SubscriptionID}}, {{resourceGroupName}} and {{vpnGatewayName}}** with your information. Also you can change **filterData** below to your needs, check [Packet capture filtering capabilities](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture#vpn-gateway-packet-capture-filtering-capabilities) on how you can customize it.
 ```RestAPI
-POST https://management.azure.com/subscriptions/{{SubscriptionID}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.Network/{{vpnGatewayName}}/startPacketCapture?api-version=2020-05-01
+POST https://management.azure.com/subscriptions/{{SubscriptionID}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.Network/vpnGateways/{{vpnGatewayName}}/startPacketCapture?api-version=2020-05-01
 
 {
-  "filterData": "{'TracingFlags': 11,'MaxPacketBufferSize': 120,'MaxFileSize': 500,'Filters': [{'CaptureSingleDirectionTrafficOnly': false}]}"
+  "filterData": ""
 }
 ```
 
@@ -146,7 +146,7 @@ POST https://management.azure.com/subscriptions/{{SubscriptionID}}/resourceGroup
 Replace **{{SubscriptionID}}, {{resourceGroupName}} and {{vpnGatewayName}}** with your information. Specify a **sasUrl** to save packet captures on a blob storage account.
 
 ```RestAPI
-POST https://management.azure.com/subscriptions/{{SubscriptionID}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.Network/{{vpnGatewayName}}/stopPacketCapture?api-version=2020-05-01
+POST https://management.azure.com/subscriptions/{{SubscriptionID}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.Network/vpnGateways/{{vpnGatewayName}}/stopPacketCapture?api-version=2020-05-01
 
 {
   "sasUrl": "Add your SAS URL to save packet capture"
