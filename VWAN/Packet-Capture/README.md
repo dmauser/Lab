@@ -106,7 +106,7 @@ Write-Host "Blob container :" $StgContainerName
 
 One of the points to keep in mind is vWAN VPN Gateways are Active-Active by design as shown:
 
-![VPN Gateway Instances](./vpngatewayinstances.png)
+![VPN Gateway Instances](./vpngatewayinstances.png){ width=50% }
 
 Therefore you have to download two captures from each respective VPN Gateway instance. In Storage Explorer will look like as shown below, where will have folder for each instance (INT0 and INT1) with the folder being a time stamp when capture is saved inside the Blob storage container gwcapture:
 
@@ -118,7 +118,7 @@ In the example below, during the capture I ran 10 pings from connected VNET VM (
 
 Remove VPN device is only configured to INT1 and in this case even after retrieve both instances captures ICMP pings only show up on instance 1 (INT1) as shown below:
 
-![Single Tunnel Network Capture](./single-tunnel-capture.png)
+![Single Tunnel Network Capture](./single-tunnel-capture.png){ width=70% }
 
 ### Scenario 2: Active-Active tunnel traffic (BGP)
 
