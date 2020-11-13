@@ -106,7 +106,7 @@ Write-Host "Blob container :" $StgContainerName
 
 One of the points to keep in mind is vWAN VPN Gateways are Active-Active by design as shown:
 
-![VPN Gateway Instances](./vpngatewayinstances.png){: width=50% }
+![VPN Gateway Instances](./vpngatewayinstances.png)
 
 Therefore you have to download two captures from each respective VPN Gateway instance. In Storage Explorer will look like as shown below, where will have folder for each instance (INT0 and INT1) with the folder being a time stamp when capture is saved inside the Blob storage container gwcapture:
 
