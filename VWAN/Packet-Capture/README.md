@@ -1,15 +1,15 @@
-# Azure Virtual WAN VPN Gateway Packet Capture (PowerShell)
+# Azure Virtual WAN VPN Gateway Packet Capture
 
 ## Introduction
 
-Visibility is always good when you want to understand what is happening or troubleshoot issues over Site-to-Site VPN connections. In this post, I am going over how to leverage a Powershell script the leverages [Start-AzVpnGatewayPacketCapture](https://docs.microsoft.com/en-us/powershell/module/az.network/start-azvpngatewaypacketcapture?view=azps-5.0.0) and [Stop-AzVpnGatewayPacketCapture](https://docs.microsoft.com/en-us/powershell/module/az.network/stop-azvpngatewaypacketcapture?view=azps-5.0.0) cmdlets to facilitate network packet captures on Azure Virtual WAN (vWAN) VPN Gateways. The script below also creates a SAS URL to be used during the process of saving VPN Gateway captures to a blob storage account.
+Visibility is always good when you want to understand what is happening or troubleshoot issues over Site-to-Site VPN connections. In this post, I am going over how to leverage a Powershell script that uses [Start-AzVpnGatewayPacketCapture](https://docs.microsoft.com/en-us/powershell/module/az.network/start-azvpngatewaypacketcapture?view=azps-5.0.0) and [Stop-AzVpnGatewayPacketCapture](https://docs.microsoft.com/en-us/powershell/module/az.network/stop-azvpngatewaypacketcapture?view=azps-5.0.0) cmdlets to facilitate network packet captures on Azure Virtual WAN (vWAN) VPN Gateways. The script below also creates a SAS URL to be used during the process of saving VPN Gateway captures to a blob storage account.
 
 **Note:** This script only works for Azure Virtual Wan VPN Gateways in case you want to capture over Virtual Network VPN Gateway please the references:
 
 - [Azure Virtual Network Gateway Packet Capture](https://github.com/dmauser/Lab/tree/master/AZVPNGW/PacketCapture)
 - [Configure packet captures for VPN gateways](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture)
 
-## Script
+## PowerShell script
 
 Script is available inside the repository as PacketCapture.ps1 or can save the content listed below and make modifications based on your needs based on instructions/comments added inside the script.
 
@@ -122,17 +122,17 @@ Remove VPN device is only configured to INT1 and in this case even after retriev
 
 ### Scenario 2: Active-Active tunnel traffic (BGP)
 
-In this second scenario, we have an active-active tunnel (two IPSec tunnels) to both vWAN gateway instances (INT0 and INT1) using BGP you may see traffic split between both tunnels. That is an expected behavior, see example below of the same ICMP ping above but now using both tunnels:
+In this second scenario, we have an active-active tunnel (two IPSec tunnels) to both vWAN gateway instances (INT0 and INT1) using BGP. You should expect traffic split between both tunnels because that is an expected behavior, see example below of the same ICMP ping above but now using both tunnels:
 
 ![Dual Tunnel Network Capture](./active-active-tunnels-bgp.png)
 
-### REST API Example:
+### REST API Example
 
 There's no CLI to initiate vWAN VPN Gateway Network Captures at the time this post got created. In the example below, you can use REST API for the same process:
 
 **Start VPN Gateway packet capture:**
 
-Replace **{{SubscriptionID}}, {{resourceGroupName}} and {{vpnGatewayName}}** with your information. Also you can change **filterData** below to your needs, check [Packet capture filtering capabilities](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture#vpn-gateway-packet-capture-filtering-capabilities)
+Replace **{{SubscriptionID}}, {{resourceGroupName}} and {{vpnGatewayName}}** with your information. Also you can change **filterData** below to your needs, check [Packet capture filtering capabilities](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture#vpn-gateway-packet-capture-filtering-capabilities) on how you can customize it.
 ```RestAPI
 POST https://management.azure.com/subscriptions/{{SubscriptionID}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.Network/{{vpnGatewayName}}/startPacketCapture?api-version=2020-05-01
 
