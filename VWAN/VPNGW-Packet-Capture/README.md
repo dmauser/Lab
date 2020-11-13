@@ -4,7 +4,7 @@
 
 Visibility is always good when you want to understand what is happening or troubleshoot issues over Site-to-Site VPN connections. In this post, I am going over how to leverage a Powershell script that uses [Start-AzVpnGatewayPacketCapture](https://docs.microsoft.com/en-us/powershell/module/az.network/start-azvpngatewaypacketcapture?view=azps-5.0.0) and [Stop-AzVpnGatewayPacketCapture](https://docs.microsoft.com/en-us/powershell/module/az.network/stop-azvpngatewaypacketcapture?view=azps-5.0.0) cmdlets to facilitate network packet captures on Azure Virtual WAN (vWAN) VPN Gateways. The script below also creates a SAS URL to be used during the process of saving VPN Gateway captures to a blob storage account.
 
-**Note:** This script only works for Azure Virtual Wan VPN Gateways in case you want to capture over Virtual Network VPN Gateway please the references:
+**Note:** This script only works for vWAN VPN Gateways in case you want to capture over Virtual Network VPN Gateway, please check:
 
 - [Azure Virtual Network Gateway Packet Capture](https://github.com/dmauser/Lab/tree/master/AZVPNGW/PacketCapture)
 - [Configure packet captures for VPN gateways](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture)
