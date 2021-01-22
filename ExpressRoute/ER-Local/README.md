@@ -40,9 +40,7 @@ For example, Amsterdam and Amsterdam2 are Edge Locations close to West Europe Da
 
 ## Deploy ER Local using Custom Template over Azure Portal
 
-**Special Note**: At the time of this writing, it is only allowed to create ExpressRoute Local SKU over Azure Portal with circuits starting on 2 Gbps of bandwidth, but in reality the requirement is 1 Gbps per documentation (see links above). Therefore, you can use this ExpressRoute template as workaround until that gets fixed over official Azure Portal. Alternatively your can create a 1 Gbps Standard SKU and change SKU to local via Powershell shared on the section below [Change existing ExpressRoute Circuit SKU from Premium or Standard to Local](#Change-existing-ExpressRoute-Circuit-SKU-from-Premium-or-Standard-to-Local).
-
-Use the following ARM Template to deploy ER Local:
+You can use Azure Portal or the following ARM Template to deploy ER Local:
 
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2Flab%2Fmaster%2FExpressRoute%2FER-Local%2FER-LOCAL-Circuit.json)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2Flab%2Fmaster%2FExpressRoute%2FER-Local%2FER-LOCAL-Circuit.json)
