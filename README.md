@@ -15,3 +15,6 @@ List of contents:
 - [vWAN VPN Gateway Packet Capture](https://github.com/dmauser/Lab/tree/master/vWAN-vpn-gateway-packet-capture)
 - Sample script showing how to migrate Spoke VNET from traditional HUB/Spoke to vWAN HUB (coming soon)
 - [Azure Virtual Network Gateway IKE Logs](https://github.com/dmauser/Lab/tree/master/VPN-gateway-IKE-logs)
+
+## Private Link 
+- [Private Link resources](https://github.com/dmauser/PrivateLink)
