@@ -1,32 +1,23 @@
-# Labs, content and sample Scripts
+# UDR behavior when using ExpressRoute Fastpath
 
-**Topics covered:**
+## Environment:
 
-- [Azure VPN Gateway](#AzureVPNGateway)
-- [ExpressRoute](#ExpressRoute)
-- [Azure Virtual WAN (VWAN)](#AzureVirtualWANVWAN)
-- [Private Link](#PrivateLink)
-- [Azure Files](#AzureFiles)
-- [Azure Virtual Network](#AzureVirtualNetwork)
+OnPrem - 10.40.0.0/20
+Azure HUB - 10.50.0.0/20
+	• NVA - 10.50.2.5 
+	• VM - 10.50.4.4
+Azure Spoke VNET - 10.50.16.0/20
+	• VM - 10.50.16.4
 
-## Azure VPN Gateway
-- [Verify BGP information on Azure VPN and ExpressRoute Gateways](https://github.com/dmauser/Lab/tree/master/ER-and-VPN-Gateway-BGP-info)
-- [Azure Virtual Network Gateway IKE Logs](https://github.com/dmauser/Lab/tree/master/VPN-gateway-IKE-logs)
+UDR added to ER GW Subnet
+	- 10.50.4.0/24 - Next Hop 10.50.2.5
+10.50.16.0/20 - Next Hop 10.50.2.5
 
-## ExpressRoute
-- [Deploying Local SKU ExpressRoute Circuits](https://github.com/dmauser/Lab/tree/master/ExpressRoute-local)
-- [Verify BGP information on Azure VPN and ExpressRoute Gateways](https://github.com/dmauser/Lab/tree/master/ER-and-VPN-Gateway-BGP-info)
+## Observations
 
-## Azure Virtual WAN (VWAN)
-- [Multiple Virtual WANs (Prod and Dev)](https://github.com/dmauser/Lab/tree/master/vWAN-split-dev-and-prod-design)
-- [vWAN VPN Gateway Packet Capture](https://github.com/dmauser/Lab/tree/master/vWAN-vpn-gateway-packet-capture)
-- Sample script showing how to migrate Spoke VNET from traditional HUB/Spoke to vWAN HUB (coming soon)
-- [Azure Virtual Network Gateway IKE Logs](https://github.com/dmauser/Lab/tree/master/VPN-gateway-IKE-logs)
+1) When assigning UDR on Gateway Subnet it will not turn off FastPath as whole.
+2) UDR assigned on GW Subnet towards a Subnet address space under Hub VNET is ignored (Expected). I added UDR targeting a subnet /24 inside Hub VNET towards a NVA and it does not work. Traffic hits VM behind NVA directly.
+3) UDR towards Spoke VNET using Hub NVA it works fine (Expected because Spoke VNET it will always goes over ER GW).
+​4) Disabled Fast Path on (2) and  UDR works:
 
-## Private Link 
-- [Private Link resources](https://github.com/dmauser/PrivateLink)
-
-##  Azure Files
-- [Network performance considerations when using Azure Files over Private Endpoint](https://github.com/dmauser/azure-files-netperf)
-
-## Azure Virtual Network
+## Conclusion

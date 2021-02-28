@@ -16,7 +16,7 @@ Script is available inside the repository as VNG-BGP-Info.ps1 or save the conten
 
 Ensure you are properly logged in your subscription where VNGs are present. You can validate that by using:
 
-```powershell
+```Powershell
 Add-AzAccount #Logon on your Azure
 Get-AzContext # Check you have correct Azure Subscription
 Set-AzContext -Subscription <Subscription Name> # Set appropriate Subscription
