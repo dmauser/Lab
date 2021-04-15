@@ -284,7 +284,6 @@ az network routeserver update --resource-group $rg --name $hubname-rs --allow-b2
 - Option 1 ER Gatweay and Circuit are in the same subscription:
 
 ```Bash
-
 erid=$(az network express-route show -n $ercircuit -g $errg --query id -o tsv) 
 az network vpn-connection create --name Connection-to-$ercircuit \
 --resource-group $rg --vnet-gateway1 $hubname-ergw \
@@ -295,7 +294,6 @@ az network vpn-connection create --name Connection-to-$ercircuit \
 - Option 2 using Authorization Key (ER Gateway and ER Circuit are in different Subscriptions)
 
 ```Bash
-
 # Obtain ER Circuit Resource ID
 erid="ER ResourceID from other Subscription" 
 # Add authorization key and attach
@@ -324,7 +322,7 @@ Access both Public IPs and use default username and password (root/opnsense). Th
 
 **2) System\Firmware\Plugins**
 
-Add **os-frr** plugin that is going to be used for BGP.
+Add **os-frr** (The FRRouting Protocol Suite) plugin that is going to be used for BGP.
 
 ### Steps below on opn-nva1 only  
 
@@ -357,7 +355,7 @@ Repeat the same process above for 172.16.0.0/12 and 10.0.0.0/8. Final routes sho
 
 **Note:** Don't forget to apply changes.
 
-**3) **
+**3) Firewall: NAT: Outbound**
 
 Change to mode to: **Hybrid outbound NAT rule generation
 (automatically generated rules are applied after manual rules)** and **Apply Changes**.
@@ -376,11 +374,11 @@ Modify existing rule to allow any traffic. Edit and change **Source** from **LAN
 
 **5) Routing: General**
 
-**Note** If you don't see **Routing** make sure you have install os-frr plugin as shown on Step 2 in [Configure OPNsense via Web interface]() and refresh the browser.
+**Note** If you don't see **Routing** make sure you have install os-frr (	The FRRouting Protocol Suite) plugin as shown on Step 2 in [Configure OPNsense via Web interface]() and refresh the browser.
 
 Click on **Enable** and hit save.
 
-**5) Routing: BGP - General Tab**
+**6) Routing: BGP (General Tab)**
 
 | Setting  | Value  |
 |---|---|
@@ -388,12 +386,119 @@ Click on **Enable** and hit save.
 | BGP AS Number | 65002 |
 | Network | 0.0.0.0/0  |
 
-## Validations
+**7) Routing: BGP (General Tab)**
 
+Obtain Route Server IPs by running this CLI command:
 ```Bash
-# Validations
+az network routeserver list --resource-group $rg --query '{IPs:[].virtualRouterIps}'
+```
+Output shows both Route Server IPs:
+```Json
+{
+  "IPs": [
+    [
+      "172.16.139.4",
+      "172.16.139.5"
+    ]
+  ]
+}
+```
+Add BGP neighbors:
 
-#IP info
+| Setting  | Value  |
+|---|---|
+| Peer-IP | 172.16.139.4   |
+| Remote AS | 65515 |
+| Multi-Hop | Checked  |
+
+Repeat exact same process to second Route Server IP: 172.16.139.5.
+
+Go back to **General Tab** and hit **Save**.
+
+**8) Routing: Diagnostics: General (Running config tab)**
+
+Ensure BGP configuration is correct. It should match the config below:
+
+```Text
+Current configuration:
+!
+frr version 7.4
+frr defaults traditional
+hostname OPNsense.localhost
+log syslog critical
+!
+router bgp 65002
+ no bgp ebgp-requires-policy
+ neighbor 172.16.139.4 remote-as 65515
+ neighbor 172.16.139.4 ebgp-multihop 255
+ neighbor 172.16.139.5 remote-as 65515
+ neighbor 172.16.139.5 ebgp-multihop 255
+ !
+ address-family ipv4 unicast
+  network 0.0.0.0/0
+ exit-address-family
+!
+line vty
+!
+end
+```
+
+**9) System: High Availability: Settings**
+
+| Setting  | Value  |
+|---|---|
+| Synchronize Config to IP | 	172.16.136.70 **(1)** |
+| Remote System Username | root |
+| Remote System Password | opnsense (or newer OPNsense password) |
+| Dashboard | Checked |
+| Firewall Rules | Checked |
+| NAT | Checked |
+| Static Routes | Checked |
+| FRR | Checked |
+
+**Note(1):** to dump ensure your LAN secondary of OPNSense run the following CLI commands:
+```bash
+#opn-nva2
+az network nic show -g $rg --name $nva2-Trusted-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+
+```
+
+
+
+## Connectivity validation
+
+Note that NSG locks down access only from Public IP parsed during its creation process.
+```Bash
+#VMs Public IPs
+echo $hubname-vm - $(az network public-ip show --name $hubname-vm-pip --resource-group $rg --query "ipAddress" -o tsv) \
+$spoke1name-vm - $(az network public-ip show --name $spoke1name-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
+$spoke2name-vm - $(az network public-ip show --name $spoke2name-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv)
+```
+
+### Azure VMs
+
+### On-Premises
+
+## Routing validation
+
+### OPNSense
+
+**BGP Status (Routing: Diagnostics: BGP - Summary Tab)**
+```Bash
+IPv4 Unicast Summary:
+BGP router identifier 172.16.136.69, local AS number 65002 vrf-id 0
+BGP table version 3
+RIB entries 2, using 384 bytes of memory
+Peers 2, using 29 KiB of memory
+
+Neighbor        V         AS   MsgRcvd   MsgSent   TblVer  InQ OutQ  Up/Down State/PfxRcd   PfxSnt
+172.16.139.4    4      65515         7         8        0    0    0 00:04:01            1        2
+172.16.139.5    4      65515         7         8        0    0    0 00:04:02            1        2
+
+Total number of neighbors 2
+```
+```Bash
+#Azure Hub and Spoke VMs Effective Routes
 az network nic show --resource-group $rg -n $hubname-vm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $hubname-vm-nic -o table
 
@@ -402,14 +507,9 @@ az network nic show-effective-route-table --resource-group $rg -n $spoke1name-vm
 
 az network nic show --resource-group $rg -n $spoke2name-vm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $spoke2name-vm-nic -o table
+```
 
-#VMs Public IPs
-echo Hub-vm - $(az network public-ip show --name Hub-vm-pip --resource-group $rg --query "ipAddress" -o tsv) \
-SpokeA-vm - $(az network public-ip show --name SpokeA-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
-AZVNVA1 - $(az network public-ip show --name SpokeB-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
-opn-nva1 - $(az network public-ip show --name OPN-NVA1-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
-opn-nva1 - $(az network public-ip show --name OPN-NVA1-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) 
-
+```Bash
 # Check ER/VPN GW learned / advertised routes
 # Azure ER
 az network vnet-gateway list-bgp-peer-status -g $rg -n $hubname-ergw -o table
