@@ -1,5 +1,12 @@
 # Forced Tunneling of Internet traffic through Active-Active OPNsense Firewalls using Azure Route Server
 
+**In this article**
+- [Introduction](#Introduction)
+- [Configuration](#Configuration)
+- [OPNsense configuration](#OPNsenseconfiguration)
+- [Connectivity validation](#Connectivityvalidation)
+- [Routing validation](#Routingvalidation)
+
 ## Introduction
 
 The main goal of this article to how to use Azure for Internet Breakout (force tunnel of Internet) to On-premises network. This article is divided with the following scenarios by Forced Tunneling of Internet traffic through Active-Active NVAs.
@@ -439,6 +446,11 @@ az network nic show -g $rg --name $nva2-Trusted-nic --query "ipConfigurations[].
 
 ```
 
+On the same screen click **Perform synchronization** that you can find besides: Configuration Synchronization Settings (XMLRPC Sync). That should bring you to: System: High Availability: Status screen.
+Click in Synchronize to push configuration from opn-nva1 to opn-nva2 as shown:
+
+![Firewall: NAT: Outbound](./images/opn-system-ha-status.png)
+
 ## Connectivity validation
 
 Note that NSG locks down access only from Public IP parsed during its creation process.
@@ -471,8 +483,10 @@ Neighbor        V         AS   MsgRcvd   MsgSent   TblVer  InQ OutQ  Up/Down Sta
 
 Total number of neighbors 2
 ```
+
+**Azure Hub and Spoke VMs Effective Routes**
+
 ```Bash
-#Azure Hub and Spoke VMs Effective Routes
 az network nic show --resource-group $rg -n $hubname-vm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $hubname-vm-nic -o table
 
@@ -483,10 +497,13 @@ az network nic show --resource-group $rg -n $spoke2name-vm-nic --query "ipConfig
 az network nic show-effective-route-table --resource-group $rg -n $spoke2name-vm-nic -o table
 ```
 
+**Check ER Gateway learned and advertised routes**
+
 ```Bash
-# Check ER/VPN GW learned / advertised routes
-# Azure ER
+# BGP peer status
 az network vnet-gateway list-bgp-peer-status -g $rg -n $hubname-ergw -o table
+
+# Adverstised routes
 ips=$(az network vnet-gateway list-bgp-peer-status -g $rg -n $hubname-ergw --query 'value[].{ip:neighbor}' -o tsv)
 array=($ips)
 for ip in "${array[@]}"
@@ -494,14 +511,16 @@ for ip in "${array[@]}"
   echo Advertised routes to peer $ip
   az network vnet-gateway list-advertised-routes -g $rg -n $hubname-ergw -o table --peer $(az network vnet-gateway list-bgp-peer-status -g $rg -n $hubname-ergw --query 'value[1].{ip:neighbor}' -o tsv)
   done
-az network vnet-gateway list-learned-routes -g $rg -n $hubname-ergw -o table
 
-#Route Server config
-# RS instance IPs
-az network routeserver list --resource-group $rg --query '{IPs:[].virtualRouterIps}' 
-# RS BGP Peerings
+# Learned routes
+az network vnet-gateway list-learned-routes -g $rg -n $hubname-ergw -o table
+```
+**Check Route Server (RS) learned and advertised routes**
+
+```Bash
+# BGP peer status
 az network routeserver peering list --resource-group $rg --routeserver $hubname-rs -o table 
-# RS advertised routes to NVA1 and NVA2
+# Adverstised routes
 array=($nva1 $nva2)
 for nva in "${array[@]}"
   do
@@ -511,7 +530,7 @@ for nva in "${array[@]}"
   --routeserver $hubname-rs 
   done
 
-# RS learned routes
+# Learned routes
 array=($nva1 $nva2)
 for nva in "${array[@]}"
   do
@@ -520,8 +539,10 @@ for nva in "${array[@]}"
   --name $nva \
   --routeserver $hubname-rs 
   done
+```
 
-#ExpressRoute Circuit Route Table
+**ExpressRoute circuit route table**
+```Bash
 # Primary Circuit
 az network express-route list-route-tables --path primary -n $ercircuit -g $errg  --peering-name AzurePrivatePeering -o table
 # Secondary Circuit
