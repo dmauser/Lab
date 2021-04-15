@@ -4,8 +4,9 @@
 - [Introduction](#Introduction)
 - [Configuration](#Configuration)
 - [OPNsense configuration](#OPNsense-configuration)
-- [Connectivity validation](#Connectivity-validation)
 - [Routing validation](#Routing-validation)
+- [Connectivity validation](#Connectivity-validation)
+
 
 ## Introduction
 
@@ -451,20 +452,6 @@ Click in Synchronize to push configuration from opn-nva1 to opn-nva2 as shown:
 
 ![Firewall: NAT: Outbound](./images/opn-system-ha-status.png)
 
-## Connectivity validation
-
-Note that NSG locks down access only from Public IP parsed during its creation process.
-```Bash
-#VMs Public IPs
-echo $hubname-vm - $(az network public-ip show --name $hubname-vm-pip --resource-group $rg --query "ipAddress" -o tsv) \
-$spoke1name-vm - $(az network public-ip show --name $spoke1name-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
-$spoke2name-vm - $(az network public-ip show --name $spoke2name-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv)
-```
-
-### Azure VMs
-
-### On-Premises
-
 ## Routing validation
 
 ### OPNSense
@@ -548,3 +535,32 @@ az network express-route list-route-tables --path primary -n $ercircuit -g $errg
 # Secondary Circuit
 az network express-route list-route-tables --path secondary -n $ercircuit -g $errg  --peering-name AzurePrivatePeering -o table
 ```
+
+## Connectivity validation
+
+Note that NSG locks down access only from Public IP parsed during its creation process.
+```Bash
+#VMs Public IPs
+echo $hubname-vm - $(az network public-ip show --name $hubname-vm-pip --resource-group $rg --query "ipAddress" -o tsv) \
+$spoke1name-vm - $(az network public-ip show --name $spoke1name-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
+$spoke2name-vm - $(az network public-ip show --name $spoke2name-vm-pip --resource-group $rg -o tsv --query "ipAddress" -o tsv)
+
+## OPN NVAs Public IPs
+echo $nva1 - $(az network public-ip show --name $nva1-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
+$nva2 - $(az network public-ip show --name $nva2-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) 
+```
+For the context of this LAB my OPN nvas public IPs are:
+
+| OPNSense name | Public IP Address |
+|---|---|
+| opn-nva1 | 20.189.31.180
+| opn-nva2 | 20.189.31.196
+
+### Azure VMs
+
+**Hub-vm**
+
+Below is the output when an Internet access is attempted from hub-vm where you see the local IP and when attempt to access ifconfig.io and ipconfig.io (that is required to trigger Load Balancer to trigger 5 tuple has and balance traffic between both OPNSense NVAs)
+![Hub-vm outbound Internet traffic](./images/hub-vm-out.png)
+
+### On-Premises
