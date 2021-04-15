@@ -281,7 +281,7 @@ az network routeserver update --resource-group $rg --name $hubname-rs --allow-b2
 
 **Create ExpressRoute(ER) Gateway connection to ER Circuit**
 
-- Option 1 ER Gatweay and Circuit are in the same subscription:
+- (Option 1) ER Gatweay and Circuit are in the same subscription:
 
 ```Bash
 erid=$(az network express-route show -n $ercircuit -g $errg --query id -o tsv) 
@@ -291,7 +291,7 @@ az network vpn-connection create --name Connection-to-$ercircuit \
 --routing-weight 0
 ```
 
-- Option 2 using Authorization Key (ER Gateway and ER Circuit are in different Subscriptions)
+- (Option 2) using Authorization Key (ER Gateway and ER Circuit are in different Subscriptions)
 
 ```Bash
 # Obtain ER Circuit Resource ID
@@ -328,57 +328,50 @@ Add **os-frr** (The FRRouting Protocol Suite) plugin that is going to be used fo
 
 On opn-nva1 only make the following changes. Later those changes will replicated automatically to opn-nva2.
 
-**1) System: Gateways: Single** 
+Here is a table with all settings to be configured:
 
-Add new Gateway for the LAN:
+**1) System Gateways and Routes**
 
-| Setting  | Value   |
-|---|---|
-|  Name | LANGW   |
-| Interface  | LAN   |
-| IP address | 172.16.136.65 |
+| Section | Setting  | Value   |
+|---|---|---|
+|  **System: Gateways: Single** || And new Gateway |
+||  Name | LANGW   |
+|| Interface  | LAN   |
+|| IP address | 172.16.136.65 |
+|  **System: Routes: Configuration** || Add rules for RF1918 address spaces |
+||  Network Address | 192.168.0.0/16  |
+|| Gateway  | LANGW - 172.16.136.65   |
+||  Network Address | 172.16.0.0/12   |
+|| Gateway  | LANGW - 172.16.136.65   |
+||  Network Address | 10.0.0.0/8   |
+|| Gateway  | LANGW - 172.16.136.65   |
 
-**Note:** Don't forget to apply changes after save.
-
-**2) System: Routes: Configuration** 
-
-Make sure RFC 1918 route to LAN interface. Add the following three routes:
-
-| Setting  | Value   |
-|---|---|
-|  Network Address | 192.168.0.0/16   |
-| Gateway  | LANGW - 172.16.136.65   |
-
-Repeat the same process above for 172.16.0.0/12 and 10.0.0.0/8. Final routes should look like:
+Final routes should look like:
 
 ![System: Routes: Configuration](./images/opn-system-routes.png)
 
-**Note:** Don't forget to apply changes.
-
-**3) Firewall: NAT: Outbound**
+**2) Firewall: NAT: Outbound**
 
 Change to mode to: **Hybrid outbound NAT rule generation
 (automatically generated rules are applied after manual rules)** and **Apply Changes**.
 
-Click **Add** nFirewall: NAT: Outboundew rule and leave all default settings and hit **Save**. That will allow anything that goes out WAN interface use source NAT (SNAT).
+Click **Add** Firewall: NAT: Outbound rule and leave all default settings and hit **Save**. That will allow anything that goes out WAN interface use source NAT (SNAT).
 
 ![Firewall: NAT: Outbound](./images/opn-firewall-nat-outbound.png)
 
 **Note:** Don't forget to apply changes.
 
-**4) Firewall: Rules: LAN**
+**3) Firewall: Rules: LAN**
 
 Modify existing rule to allow any traffic. Edit and change **Source** from **LAN net** to **Any** and save.
 
 ![Firewall: Rules: LAN*](./images/opn-firewall-rules-lan.png)
 
-**5) Routing: General**
-
-**Note** If you don't see **Routing** make sure you have install os-frr (	The FRRouting Protocol Suite) plugin as shown on Step 2 in [Configure OPNsense via Web interface]() and refresh the browser.
+**4) Routing: General**
 
 Click on **Enable** and hit save.
 
-**6) Routing: BGP (General Tab)**
+**5) Routing: BGP (General Tab)**
 
 | Setting  | Value  |
 |---|---|
@@ -386,7 +379,7 @@ Click on **Enable** and hit save.
 | BGP AS Number | 65002 |
 | Network | 0.0.0.0/0  |
 
-**7) Routing: BGP (General Tab)**
+**6) Routing: BGP (General Tab)**
 
 Obtain Route Server IPs by running this CLI command:
 ```Bash
@@ -415,7 +408,7 @@ Repeat exact same process to second Route Server IP: 172.16.139.5.
 
 Go back to **General Tab** and hit **Save**.
 
-**8) Routing: Diagnostics: General (Running config tab)**
+**7) Routing: Diagnostics: General (Running config tab)**
 
 Ensure BGP configuration is correct. It should match the config below:
 
@@ -447,7 +440,7 @@ end
 
 | Setting  | Value  |
 |---|---|
-| Synchronize Config to IP | 	172.16.136.70 **(1)** |
+| Synchronize Config to IP | 	172.16.136.70 **(*)** |
 | Remote System Username | root |
 | Remote System Password | opnsense (or newer OPNsense password) |
 | Dashboard | Checked |
@@ -456,14 +449,12 @@ end
 | Static Routes | Checked |
 | FRR | Checked |
 
-**Note(1):** to dump ensure your LAN secondary of OPNSense run the following CLI commands:
+**(Note):** to ensure your LAN secondary of OPNSense run the following CLI commands:
 ```bash
 #opn-nva2
 az network nic show -g $rg --name $nva2-Trusted-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 
 ```
-
-
 
 ## Connectivity validation
 
