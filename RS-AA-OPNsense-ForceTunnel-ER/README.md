@@ -369,46 +369,29 @@ Modify existing rule to allow any traffic. Edit and change **Source** from **LAN
 
 **4) Routing: General**
 
-Click on **Enable** and hit save.
+| Section | Setting  | Value   |
+|---|---|---|
+|  **Routing: General** |
+||  Enable | Checked (Save)   |
+|  **Routing: BGP (General Tab)** ||  |
+|| Enable | Checked   |
+|| BGP AS Number | 65002 |
+|| Network | 0.0.0.0/0  |
+|  **Routing: BGP (Neighbors Tab)** || Add an entry for each Route Server IP |
+|| Peer-IP | 172.16.139.4 **(*)**  |
+|| Remote AS | 65515 |
+|| Multi-Hop | Checked  |
+|| Peer-IP | 172.16.139.5   |
+|| Remote AS | 65515 |
+|| Multi-Hop | Checked  |
 
-**5) Routing: BGP (General Tab)**
-
-| Setting  | Value  |
-|---|---|
-| Enable | Checked   |
-| BGP AS Number | 65002 |
-| Network | 0.0.0.0/0  |
-
-**6) Routing: BGP (General Tab)**
-
-Obtain Route Server IPs by running this CLI command:
+**Note(1)** Obtain Route Server IPs by running this CLI command:
 ```Bash
 az network routeserver list --resource-group $rg --query '{IPs:[].virtualRouterIps}'
 ```
-Output shows both Route Server IPs:
-```Json
-{
-  "IPs": [
-    [
-      "172.16.139.4",
-      "172.16.139.5"
-    ]
-  ]
-}
-```
-Add BGP neighbors:
+**Note(2):** Go back to **General Tab** and hit **Save**.
 
-| Setting  | Value  |
-|---|---|
-| Peer-IP | 172.16.139.4   |
-| Remote AS | 65515 |
-| Multi-Hop | Checked  |
-
-Repeat exact same process to second Route Server IP: 172.16.139.5.
-
-Go back to **General Tab** and hit **Save**.
-
-**7) Routing: Diagnostics: General (Running config tab)**
+**5) Routing: Diagnostics: General (Running config tab)**
 
 Ensure BGP configuration is correct. It should match the config below:
 
@@ -436,7 +419,7 @@ line vty
 end
 ```
 
-**9) System: High Availability: Settings**
+**6) System: High Availability: Settings**
 
 | Setting  | Value  |
 |---|---|
@@ -449,7 +432,7 @@ end
 | Static Routes | Checked |
 | FRR | Checked |
 
-**(Note):** to ensure your LAN secondary of OPNSense run the following CLI commands:
+**(Note):** Get LAN IP for opn-nva2 by running the following CLI commands:
 ```bash
 #opn-nva2
 az network nic show -g $rg --name $nva2-Trusted-nic --query "ipConfigurations[].privateIpAddress" -o tsv
