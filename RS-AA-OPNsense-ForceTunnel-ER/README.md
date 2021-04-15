@@ -3,9 +3,9 @@
 **In this article**
 - [Introduction](#Introduction)
 - [Configuration](#Configuration)
-- [OPNsense configuration](#OPNsenseconfiguration)
-- [Connectivity validation](#Connectivityvalidation)
-- [Routing validation](#Routingvalidation)
+- [OPNsense configuration](#OPNsense-configuration)
+- [Connectivity validation](#Connectivity-validation)
+- [Routing validation](#Routing-validation)
 
 ## Introduction
 
