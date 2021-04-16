@@ -484,6 +484,8 @@ az network nic show --resource-group $rg -n $spoke2name-vm-nic --query "ipConfig
 az network nic show-effective-route-table --resource-group $rg -n $spoke2name-vm-nic -o table
 ```
 
+Expected output:
+
 **Check ER Gateway learned and advertised routes**
 
 ```Bash
@@ -558,9 +560,13 @@ For the context of this LAB my OPN nvas public IPs are:
 
 ### Azure VMs
 
-**Hub-vm**
-
-Below is the output when an Internet access is attempted from hub-vm where you see the local IP and when attempt to access ifconfig.io and ipconfig.io (that is required to trigger Load Balancer to trigger 5 tuple has and balance traffic between both OPNSense NVAs)
+Below is the output when an Internet access is attempted from hub-vm where you see the local IP 172.16.136.132 and when attempt to access ifconfig.io and ipconfig.io. That is required to trigger Load Balancer to trigger five-tuple hash.\ and balance traffic between both OPNSense NVAs (more information in [Azure Load Balancer distribution modes](https://docs.microsoft.com/en-us/azure/load-balancer/distribution-mode-concepts))
 ![Hub-vm outbound Internet traffic](./images/hub-vm-out.png)
 
+You can repeat the same steps on Spoke VMs and you should expect similar results.
+
 ### On-Premises
+
+Because now 0/0 (default route) is propagated to On-Premises from OPNsense via Azure Route Server and ExpressRoute you can also see exact same exact behavior. In this case, On-premises VM local IP is 192.168.1.3 and is also going out to Internet via both OPNsense NVAs in Azure.
+
+![On-premises-vm outbound Internet traffic](./images/onprem-vm-out.png)
