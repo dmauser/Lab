@@ -6,30 +6,32 @@
 - [OPNsense configuration](#OPNsense-configuration)
 - [Routing validation](#Routing-validation)
 - [Connectivity validation](#Connectivity-validation)
+- [Close out](#Close-out)
 
 ## Introduction
 
-The main goal of this article to how to use Azure for Internet Breakout (force tunnel of Internet) to On-premisesnetwork. This article is divided with the following scenarios by Forced Tunneling of Internet traffic through Active-Active NVAs.
+The main goal of this article to how to use Azure for Internet Breakout (force tunnel of the Internet) to On-premises network. This article is divided into the following scenarios by Forced Tunneling of Internet traffic through Active-Active NVAs.
 
-This article describes how this force tunneling is configured in an Azure Hub-Spoke with a pair of Active-Active OPNsense Firewall Network Virtual Appliances (NVAs), each , and an Internal Load Balancer (ILB) directing East-West traffic. On-premises is connected to Azure by ExpressRoute. By configuring the OPNsense to originate default route (0/0), and by introducing Azure Route Server to reflect this default route, customers will be able to force on-premises Internet bound traffic through the OPNsense firewalls.
+This article describes how this force tunneling is configured in an Azure Hub-Spoke with a pair of Active-Active OPNsense Firewall Network Virtual Appliances (NVAs), each and an Internal Load Balancer (ILB) directing East-West traffic. On-premises is connected to Azure by ExpressRoute. By configuring the OPNsense to originate the default route (0/0), and by introducing Azure Route Server to reflect this default route, customers will be able to force On-premises Internet-bound traffic through the OPNsense firewalls.
 
-This article has been inspired on this great Fortinet article authored by Heather Sze: [Forced Tunneling of Internet traffic through Active-Active Fortinet Firewalls using Azure Route Server
-](https://github.com/hsze/RS-AA-Fortinet-ForceTunnel/blob/main/README.md)
+>This article has been inspired on this great Fortinet article authored by Heather Sze: [Forced Tunneling of Internet traffic through Active-Active Fortinet Firewalls using Azure Route Server
+](https://github.com/hsze/RS-AA-Fortinet-ForceTunnel/blob/main/README.md).
 
-It **important** to note a special difference of this article compared with Fortinet solution, in this scenario with OPNsense NVAs each instance has an instance level Public IP (ILPIP) because, first is required to the OPN Bootstrap provisioning OPSense to complete. Also, ILPIP has a better allocation for SNAT ports compared to single Public IP Load Balancer which requires you to setup outbound rules based on Azure Load Balancer recommendations found in: [Using Source Network Address Translation (SNAT) for outbound connections](https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-outbound-connections).
+It is **important** to note a special difference of this article compared with the Fortinet solution, in this scenario with OPNsense NVAs each instance has an instance level Public IP (ILPIP) because first is required to the OPN Bootstrap provisioning OPSense to complete. Also, ILPIP has a better allocation for SNAT ports compared to a single Public IP Load Balancer which requires you to setup outbound rules based on Azure Load Balancer recommendations found in [Using Source Network Address Translation (SNAT) for outbound connections](https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-outbound-connections).
+
+>**Cost**: estimated daily cost for this LAB is around $7 US dollars (USD)
 
 ![Use Case for Force Tunneling](./images/main-use-case-default-internet.png)
 
-
 ## Concepts
 
-1. A default route (0/0) MUST be propagated via BGP to on-premises across ExpressRoute, in order to attract Internet traffic from on-premises through Azure. Customers have unsuccessfully tried to define a static route at on-premises border router pointing to ExpressRoute circuit, but this fails because although the traffic may enter the customer edge ExpressRoute circuit interface, it will be dropped upstream at the MSEE (Microsoft Edge Routers) which has no awareness of 0/0.
-2. Both OPNsenses (Active-Active) will originate the default route by redistributing the static route to 0/0 (default route) into BGP.
+1. A default route (0/0) MUST be propagated via BGP to On-premises across ExpressRoute, to attract Internet traffic from On-premises through Azure. Customers have unsuccessfully tried to define a static route at On-premises border router pointing to ExpressRoute circuit, but this fails because although the traffic may enter the customer edge ExpressRoute circuit interface, it will be dropped upstream at the MSEE (Microsoft Edge Routers) which has no awareness of 0/0.
+2. Both OPNsense NVAs (Active-Active) will originate the default route by redistributing the static route to 0/0 (default route) into BGP.
 3. Azure Route Server will learn this default route sourced by OPNsense through eBGP.
 4. ExpressRoute Gateway will learn this default route through iBGP peering with the Route Server. ExpressRoute Gateway will see Next Hop as the OPNsense NVAs’ peer IP, not Route Server.
-5. ExpressRoute Gateway will propagate the default route to on-premises across ExpressRoute Private Peering, via MSEE.
+5. ExpressRoute Gateway will propagate the default route to On-premises across ExpressRoute Private Peering, via MSEE.
 6. On-premises thus learns of default route from Azure, and will route Internet traffic to Azure and the OPNsense NVAs.
-7. As in the standard Active-Active OPNsense design, Protected VNETs and Spoke subnets will have UDR pointing to ILB, for either East-West or North-South traffic. The use of the Load Balancer does NOT change for this Active-Active OPNsense configuration. Furthermore, User-Defined Routes are still required at GatewaySubnet pointing to ILB to ensure sticky, symmetrical flow path for East-West traffic.
+7. In Active-Active OPNsense design, Protected VNETs and Spoke subnets will have UDR pointing to ILB, for either East-West or North-South traffic. The use of the Load Balancer does NOT change for this Active-Active OPNsense configuration. Furthermore, User-Defined Routes are still required at GatewaySubnet pointing to ILB to ensure sticky, symmetrical flow path for East-West traffic.
 
 
 ## Configuration
@@ -118,6 +120,7 @@ az network vnet subnet update --name vmsubnet --resource-group $rg --vnet-name $
 ```
 
 **Create ExpressRoute Gateway**
+
 ```bash
 az network public-ip create --name $hubname-ergw-pip --resource-group $rg --location $location
 az network vnet-gateway create --name $hubname-ergw --resource-group $rg --location $location --public-ip-address $hubname-ergw-pip --vnet $hubname-vnet --gateway-type "ExpressRoute" --sku "Standard" --no-wait
@@ -140,6 +143,7 @@ az network express-route create \
 az network express-route show -n $ercircuit -g $errg --query serviceKey -o tsv
 #NOTE: using service key output, start ExpressRoute provisioning with your Service Provider 
 ```
+
 **Deploy OPNsense behind Load Balancer**
 
 1) Create NVA ILB
@@ -179,8 +183,7 @@ for vm in "${array[@]}"
   done
 ```
 
-4) Configure UDR to disable BGP propagation external NVA NICs
-Disable BGP propagtion on External Subnet (Reason: because NVAs learns Route Server routes and insert them OPN NVAs on external nic causing route loops).
+4) Configure UDR to disable BGP propagation external NVA NICs. Disable BGP propagation on External Subnet (Reason: because NVAs learns Route Server routes and insert them OPN NVAs on external nic causing route loops).
 
 ```Bash
 az network route-table create --name rt-external-subnet --resource-group $rg  --location $location --disable-bgp-route-propagation
@@ -195,8 +198,8 @@ echo "Type username and password to be used when deploying VMS"
 read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Echo $password to ensure you type password correctly.
 ```
 2) Create Public IP, NICs and VMs for each VNET
+
 ```bash
- 
 az network public-ip create --name $hubname-vm-pip --resource-group $rg --location $location --allocation-method Dynamic
 az network nic create --resource-group $rg -n $hubname-vm-nic --location $location --subnet protected --vnet-name $hubname-vnet --public-ip-address $hubname-vm-pip 
 az vm create -n $hubname-vm -g $rg --image UbuntuLTS --size Standard_B1s --admin-username $username --admin-password $password --nics $hubname-vm-nic --no-wait --location $location
@@ -208,7 +211,6 @@ az vm create -n $spoke1name-vm -g $rg --image UbuntuLTS --size Standard_B1s --ad
 az network public-ip create --name $spoke2name-vm-pip --resource-group $rg --location $location --allocation-method Dynamic
 az network nic create --resource-group $rg -n $spoke2name-vm-nic --location $location --subnet vmsubnet --vnet-name $spoke2name-vnet --public-ip-address $spoke2name-vm-pip 
 az vm create -n $spoke2name-vm -g $rg --image UbuntuLTS --size Standard_B1s --admin-username $username --admin-password $password --nics $spoke2name-vm-nic --no-wait --location $location
-
 ```
 
 3) Configure UDR to VMs use NVA for Internet (default route) and specific Spoke VNET CIDRs to force east-west traffic via NVA Load Balancer. It also creates Public IP exception for SSH access.
@@ -247,8 +249,6 @@ az network route-table route create --resource-group $rg --name Route-to-hubprot
 --address-prefix $hubprotectedcidr \
 --next-hop-type VirtualAppliance \
 --next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
-
-
 az network route-table route create --resource-group $rg --name Exception --route-table-name rt-$spoke1name \
 --address-prefix $mypip/32 \
 --next-hop-type Internet
@@ -264,10 +264,29 @@ az network route-table route create --resource-group $rg --name Route-to-$spoke1
 --address-prefix $spoke1cird \
 --next-hop-type VirtualAppliance \
 --next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
+az network route-table route create --resource-group $rg --name Route-to-hubprotected --route-table-name rt-$spoke1name \
+--address-prefix $hubprotectedcidr \
+--next-hop-type VirtualAppliance \
+--next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
 az network route-table route create --resource-group $rg --name Exception --route-table-name rt-$spoke2name \
 --address-prefix $mypip/32 \
 --next-hop-type Internet
 az network vnet subnet update -n vmsubnet -g $rg --vnet-name $spoke2name-vnet --route-table rt-$spoke2name
+```
+
+4) UDR on GatewaySubnet to allow symmetric traffic between On-premises and VMs in Spoke VNETs.
+
+```bash
+az network route-table create --name rt-gwsubnet --resource-group $rg --location $location
+az network route-table route create --resource-group $rg --name Route-to-$spoke1name --route-table-name rt-gwsubnet \
+--address-prefix $spoke1cird \
+--next-hop-type VirtualAppliance \
+--next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
+az network route-table route create --resource-group $rg --name Route-to-$spoke2name --route-table-name rt-gwsubnet \
+--address-prefix $spoke2cird \
+--next-hop-type VirtualAppliance \
+--next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
+az network vnet subnet update -n gatewaysubnet -g $rg --vnet-name $hubname-vnet --route-table rt-gwsubnet
 ```
 
 **Deploy Route Server**
@@ -340,6 +359,7 @@ az network vpn-connection create --name Connection-to-$ercircuit \
 echo opn-nva1 - $(az network public-ip show --name OPN-NVA1-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
 opn-nva2 - $(az network public-ip show --name OPN-NVA2-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) 
 ```
+
 ### Configure OPNsense via Web interface
 
 Access both Public IPs and use default username and password (root/opnsense). Than, configure the following:
@@ -414,9 +434,11 @@ Modify existing rule to allow any traffic. Edit and change **Source** from **LAN
 || Multi-Hop | Checked  |
 
 **Note(1)** Obtain Route Server IPs by running this CLI command:
+
 ```Bash
 az network routeserver list --resource-group $rg --query '{IPs:[].virtualRouterIps}'
 ```
+
 **Note(2):** Go back to **General Tab** and hit **Save**.
 
 **5) Routing: Diagnostics: General (Running config tab)**
@@ -508,7 +530,6 @@ Expected output:
 
 ![Azure VMs effective route table](./images/vm-effective-route-table.png)
 
-
 **Check ER Gateway learned and advertised routes**
 
 ```Bash
@@ -557,11 +578,13 @@ for nva in "${array[@]}"
   --routeserver $hubname-rs 
   done
 ```
+
 Output example of learned routes on both Route Server instances from opn-nva1:
 
 ![Route Server learned routes](./images/route-server-learned-routes.png)
 
 **ExpressRoute circuit route table**
+
 ```Bash
 # Primary Circuit
 az network express-route list-route-tables --path primary -n $ercircuit -g $errg  --peering-name AzurePrivatePeering -o table
@@ -579,6 +602,7 @@ Example of expected output of primary ExpressRoute Circuit:
 ## Connectivity validation
 
 Note that NSG locks down access only from Public IP parsed during its creation process.
+
 ```Bash
 #VMs Public IPs
 echo $hubname-vm - $(az network public-ip show --name $hubname-vm-pip --resource-group $rg --query "ipAddress" -o tsv) \
@@ -589,6 +613,7 @@ $spoke2name-vm - $(az network public-ip show --name $spoke2name-vm-pip --resourc
 echo $nva1 - $(az network public-ip show --name $nva1-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
 $nva2 - $(az network public-ip show --name $nva2-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) 
 ```
+
 For the context of this LAB my OPN nvas public IPs are:
 
 | OPNsense name | Public IP Address |
@@ -606,19 +631,29 @@ You can repeat the same steps on Spoke VMs and you should expect similar results
 
 ### On-Premises
 
-Because now 0/0 (default route) is propagated to On-Premises from OPNsense via Azure Route Server and ExpressRoute you can also see exact same exact behavior. In this case, On-premisesVM local IP is 192.168.1.3 and is also going out to Internet via both OPNsense NVAs in Azure.
+Because now 0/0 (default route) is propagated to On-Premises from OPNsense via Azure Route Server and ExpressRoute you can also see the same behavior. In this case, On-premises VM local IP is 192.168.1.3 and is also going out to the Internet via both OPNsense NVAs in Azure.
 
 ![On-premises-vm outbound Internet traffic](./images/onprem-vm-out.png)
 
 ### Consideration on Internet (default route) traffic patterns
 
-It is important to note that traffic from Azure VMs (HUB and Spokes) versus On-Premises via ExpressRoute. While Azure VMs use UDR 0/0 (default route) to NVAs Internal Load Balancer (ILB), traffic from On-Premises will enter the Hub-VNET via ExpressRoute Gateway. Note there is no UDR set at GatewaySubnet to 0/0 next hop NVAs ILB because that is currently not supported. Therefore, traffic leaving ExpressRoute Gateway send traffic directly each one of the OPNsense NVA instance and BGP will load share the traffic by leveraging ECMP.
+It is important to note that traffic from Azure VMs (HUB and Spokes) versus On-Premises via ExpressRoute. While Azure VMs use UDR 0/0 (default route) to NVAs Internal Load Balancer (ILB), traffic from On-Premises will enter the Hub-VNET via ExpressRoute Gateway. Note there is no UDR set at GatewaySubnet to 0/0 next-hop NVAs ILB because that is currently not supported. Therefore, traffic leaving ExpressRoute Gateway to send traffic directly to each one of the OPNsense NVA instances and BGP will load share the traffic by leveraging ECMP.
 
-On th diagram below the green dotted lines show traffic flow to Internet via ILB from Azure VMs (Hub and Spokes) and black dotted lines show traffic from On-premises.
+On the diagram below the green dotted lines show traffic flow to Internet via ILB from Azure VMs (Hub and Spokes) and black dotted lines show traffic from On-premises.
 
 ![Internet traffic pattern](./images/internet-traffic-pattern.png)
 
-## Lab clean up
+## Close out
 
-1) Remove Server by running the following CLI command:
+In this lab, you learned how to properly configure default route(0/0) propagation to On-premises using Active-Active OPNsense NVAs via eBGP and Azure Route Server. This solution allows Internet Breakout in Azure for on-premises and VMs on VNETs (Hub and Spokes).
 
+### Final task:  remove all resources
+
+Run the following CLI commands:
+
+```Bash
+az network routeserver peering delete --resource-group $rg --routeserver $hubname-rs --name $nva1 --yes
+az network routeserver peering delete --resource-group $rg --routeserver $hubname-rs --name $nva2 --yes
+az network routeserver delete -g $rg -n $hubname-rs --yes
+az group delete -g $rg --no-wait --yes
+```
