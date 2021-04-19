@@ -10,7 +10,7 @@
 
 ## Introduction
 
-The main goal of this article to how to use Azure for Internet Breakout (force tunnel of the Internet) to On-premises network. This article is divided into the following scenarios by Forced Tunneling of Internet traffic through Active-Active NVAs.
+The main goal of this article is to demonstrate how to use Azure for Internet Breakout (force tunnel of the Internet) to On-premises network. This article is divided into the following scenarios by Forced Tunneling of Internet traffic through Active-Active NVAs.
 
 This article describes how this force tunneling is configured in an Azure Hub-Spoke with a pair of Active-Active OPNsense Firewall Network Virtual Appliances (NVAs), each and an Internal Load Balancer (ILB) directing East-West traffic. On-premises is connected to Azure by ExpressRoute. By configuring the OPNsense to originate the default route (0/0), and by introducing Azure Route Server to reflect this default route, customers will be able to force On-premises Internet-bound traffic through the OPNsense firewalls.
 
