@@ -33,6 +33,7 @@ It is **important** to note a special difference of this article compared with t
 6. On-premises thus learns of default route from Azure, and will route Internet traffic to Azure and the OPNsense NVAs.
 7. In Active-Active OPNsense design, Protected VNETs and Spoke subnets will have UDR pointing to ILB, for either East-West or North-South traffic. The use of the Load Balancer does NOT change for this Active-Active OPNsense configuration. Furthermore, User-Defined Routes are still required at GatewaySubnet pointing to ILB to ensure sticky, symmetrical flow path for East-West traffic.
 
+>**REMEMBER** when propagating 0/0 can have unintended consequences, as you are announcing to the world comes as me as default route!"
 
 ## Configuration
 
