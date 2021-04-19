@@ -99,10 +99,10 @@ az network vnet peering create -g $rg -n $spoke2name-to-$hubname --vnet-name $sp
 Alternatively you can deploy Azure Bastion on HUB VNET to access Azure VMs and remove Hub and spoke VMs Public IPs.
 
 ```Bash
-az network nsg create --resource-group $rg --name nsg-restric-ssh --location $location
+az network nsg create --resource-group $rg --name nsg-restrict-ssh --location $location
 az network nsg rule create \
     --resource-group $rg \
-    --nsg-name nsg-restric-ssh \
+    --nsg-name nsg-restrict-ssh \
     --name AllowSSHRule \
     --direction Inbound \
     --priority 100 \
@@ -113,9 +113,9 @@ az network nsg rule create \
     --access Allow \
     --protocol Tcp \
     --description "Allow inbound SSH"
-az network vnet subnet update --name protected --resource-group $rg --vnet-name $hubname-vnet --network-security-group nsg-restric-ssh
-az network vnet subnet update --name vmsubnet --resource-group $rg --vnet-name $spoke1name-vnet --network-security-group nsg-restric-ssh
-az network vnet subnet update --name vmsubnet --resource-group $rg --vnet-name $spoke2name-vnet --network-security-group nsg-restric-ssh
+az network vnet subnet update --name protected --resource-group $rg --vnet-name $hubname-vnet --network-security-group nsg-restrict-ssh
+az network vnet subnet update --name vmsubnet --resource-group $rg --vnet-name $spoke1name-vnet --network-security-group nsg-restrict-ssh
+az network vnet subnet update --name vmsubnet --resource-group $rg --vnet-name $spoke2name-vnet --network-security-group nsg-restrict-ssh
 
 ```
 
