@@ -292,6 +292,10 @@ az network route-table route create --resource-group $rg --name Route-to-$spoke2
 --address-prefix $spoke2cird \
 --next-hop-type VirtualAppliance \
 --next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
+az network route-table route create --resource-group $rg --name Route-to-protected-hub --route-table-name rt-gwsubnet \
+--address-prefix $hubprotectedcidr \
+--next-hop-type VirtualAppliance \
+--next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
 az network vnet subnet update -n gatewaysubnet -g $rg --vnet-name $hubname-vnet --route-table rt-gwsubnet
 ```
 
