@@ -59,6 +59,7 @@ spoke1vmsubnet="10.137.0.0/24"
 spoke2name="SpokeB"
 spoke2cird="10.136.0.0/16"
 spoke2vmsubnet="10.136.0.0/24"
+onpremvnetcird="192.168.1.0/24"
 ercircuit="er-dallas-circuit" # Replace with your ER Circuit Name
 errg="ER-Ciruits" # set ER Circuit Resource Group
 erauthorizationkey="" #set ER Authorization Key (Optional)
@@ -229,6 +230,10 @@ az network route-table route create --resource-group $rg --name Route-to-$spoke1
 --next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
 az network route-table route create --resource-group $rg --name Route-to-$spoke2name --route-table-name rt-$hubname \
 --address-prefix $spoke2cird \
+--next-hop-type VirtualAppliance \
+--next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
+az network route-table route create --resource-group $rg --name Route-to-$onpremname --route-table-name rt-$hubname \
+--address-prefix $onpremvnetcird \
 --next-hop-type VirtualAppliance \
 --next-hop-ip-address $(az network lb show -g $rg --name nvahalb --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
 az network route-table route create --resource-group $rg --name Exception --route-table-name rt-$hubname \
