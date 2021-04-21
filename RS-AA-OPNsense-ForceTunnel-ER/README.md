@@ -59,6 +59,7 @@ spoke1vmsubnet="10.137.0.0/24"
 spoke2name="SpokeB"
 spoke2cird="10.136.0.0/16"
 spoke2vmsubnet="10.136.0.0/24"
+onpremname="onprem"
 onpremvnetcird="192.168.1.0/24"
 ercircuit="er-dallas-circuit" # Replace with your ER Circuit Name
 errg="ER-Ciruits" # set ER Circuit Resource Group
