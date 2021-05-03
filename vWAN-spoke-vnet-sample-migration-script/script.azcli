@@ -28,7 +28,7 @@ onpremasn="65003"
 onprembgpaddr="169.254.21.1"
 
 ##vWAN
-hubname=scus-vhub
+vhubname=scus-vhub
 vwan=vwan
 vwan_hub1_prefix=172.16.10.0/24
 
@@ -71,9 +71,15 @@ az network vnet subnet update --name vmsubnet --resource-group $rg --vnet-name $
 az network vnet subnet update --name internal --resource-group $rg --vnet-name $onpremname-vnet --network-security-group nsg-restrict-ssh
 
 
+#Create Active-Acive VPN Gateway
+az deployment group create --name $hubname-vpngw --resource-group $rg \
+--template-uri https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 vnetName=$hubname-vnet \
+--no-wait
+
 # vwan and hubs
 az network vwan create -n $vwan -g $rg -l $location --branch-to-branch-traffic true --type Standard
-az network vhub create -n $hubname -g $rg --vwan $vwan -l $location --address-prefix $vwan_hub1_prefix
+az network vhub create -n $vhubname -g $rg --vwan $vwan -l $location --address-prefix $vwan_hub1_prefix
 
 #Create VPN gateway
-az network vpn-gateway create -n hubvpn1 -g $rg -l $location --vhub hub1 --asn 65515
+az network vpn-gateway create -n hubvpn1 -g $rg -l $location --vhub c --asn 65515
