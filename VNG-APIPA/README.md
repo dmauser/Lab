@@ -22,9 +22,6 @@ Please note that optional values not specified during deployment will default to
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FVNG-APIPA%2Fvng-apipa.json)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FVNG-APIPA%2Fvng-apipa.json)
 
-https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json
-
-
 ## CLI
 
 Example of CLI command to deploy A/A VPN Gateway:
@@ -46,5 +43,9 @@ Example of deploying over Powershell:
 ```Powershell
 $RG = "LAB" #Resource Group
 $Template = "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json"
-New-AzResourceGroupDeployment -ResourceGroupName $RG -TemplateParameterUri $Template
+New-AzResourceGroupDeployment -ResourceGroupName $RG -TemplateParameterUri $Template `
+-gatewayName "vpngw" `
+-gatewaySku "VpnGw1" `
+-vnetName "vNetName" `
+-asn "65001"
 ```
