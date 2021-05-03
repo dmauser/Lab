@@ -7,9 +7,9 @@
 
 ## Parameters
 
-- **gatewayName** (required) - VPN gateway name.
-- **gatewaySku** (required) - gateway size. Allowed values: VpnGw1 (default), VpnGw2, VpnGw3, VpnGw4, VpnGw5).
-- **vnetName** (required) -  existing virtual network name.
+- **gatewayName** **(required)** - VPN gateway name.
+- **gatewaySku** **(required)** - gateway size. Allowed values: VpnGw1 (default), VpnGw2, VpnGw3, VpnGw4, VpnGw5).
+- **vnetName** **(required)** -  existing virtual network name.
 - **vpnGatewayGeneration** (optional) specify VPN gateway generation. Allowed values Generation1 (default) or Generation2.
 - **asn** (optional) BGP AS number (default: 65515)
 - **customBgpIpAddresses1** (optional) custom BGP APIPA address for first VPN gateway instance (default 169.254.21.2).
