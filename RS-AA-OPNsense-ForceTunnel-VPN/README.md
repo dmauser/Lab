@@ -1,4 +1,4 @@
-# Forced Tunneling of Internet traffic through Active-Active OPNsense Firewalls using Azure Route Server (ExpressRoute)
+# Forced Tunneling of Internet traffic through Active-Active OPNsense Firewalls using Azure Route Server (VPN)
 
 **In this article**
 - [Introduction](#Introduction)
@@ -10,16 +10,26 @@
 
 ## Introduction
 
-The main goal of this article is to demonstrate how to use Azure for Internet Breakout (force tunnel of the Internet) to On-premises network. This article describes how this force tunneling is configured in an Azure Hub-Spoke with a pair of Active-Active OPNsense Firewall Network Virtual Appliances (NVAs), each and an Internal Load Balancer (ILB) directing East-West traffic. On-premises is connected to Azure by ExpressRoute. By configuring the OPNsense to originate the default route (0/0), and by introducing Azure Route Server to reflect this default route, customers will be able to force On-premises Internet-bound traffic through the OPNsense firewalls.
+The main goal of this article is to demonstrate how to use Azure for Internet Breakout (force tunnel of the Internet) to On-premises network. This article is divided into the following scenarios by Forced Tunneling of Internet traffic through Active-Active NVAs.
 
->This article has been inspired on this great Fortinet article authored by Heather Sze: [Forced Tunneling of Internet traffic through Active-Active Fortinet Firewalls using Azure Route Server
-](https://github.com/hsze/RS-AA-Fortinet-ForceTunnel/blob/main/README.md).
+1 - On-premises using Site-to-Site IPSec VPN
+2 - User VPN connecting to Azure Virtual Network Gateway (also known as Point to Site VPN)
 
-It is **important** to note a special difference of this article compared with the Fortinet solution, in this scenario with OPNsense NVAs each instance has an instance level Public IP (ILPIP) because first is required to the OPN Bootstrap provisioning OPSense to complete. Also, ILPIP has a better allocation for SNAT ports compared to a single Public IP Load Balancer which requires you to setup outbound rules based on Azure Load Balancer recommendations found in [Using Source Network Address Translation (SNAT) for outbound connections](https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-outbound-connections).
+In general, this article describes how this force tunneling is configured in an Azure Hub-Spoke with a pair of Active-Active OPNsense Firewall Network Virtual Appliances (NVAs), each and an Internal Load Balancer (ILB) directing East-West traffic. Specifically for both VPN scenarios (Site to Site and Point to Site), by configuring the OPNsense to originate the default route (0/0), and by introducing Azure Route Server to reflect this default route, customers will be able to force On-premises remote site and user VPN to use Internet-bound traffic through the OPNsense firewalls.
 
->**Cost**: estimated daily cost for this LAB is around $7 US dollars (USD)
+In case you want to validate this Lab over ExpressRoute please consult this Lab: 
+
+>**Cost**: estimated daily cost for this LAB is around $8 US dollars (USD)
 
 ![Use Case for Force Tunneling](./images/main-use-case-default-internet.png)
+
+
+## Special considerations for Azure VPN Gateway
+
+There are two special considerations for this Lab to work properly with Azure VPN Gateway.
+
+1- You have to provision your VPN Gateway as Active/Active to work with Azure Route Server. More information: [About Azure Route Server (Preview) support for ExpressRoute and Azure VPN](https://docs.microsoft.com/en-us/azure/route-server/expressroute-vpn-support)
+2 - Azure VPN Gateway does not propagate default route (0.0.0.0/0) remote branches connected via S2S VPN as well P2S VPN. In that case you need to split 0.0.0.0/0 in two networks 0.0.0.0/1 and 128.0.0.0/1.
 
 ## Concepts
 
