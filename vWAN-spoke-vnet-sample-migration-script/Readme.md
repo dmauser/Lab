@@ -35,3 +35,6 @@ az network vhub connection create -g $VWANRG -n $SPKVNETName --vhub-name $VHUB -
 az network vhub connection delete -g $VWANRG -n $SPKVNETName --vhub-name $VHUB
 az network vnet peering update -g $SPKRG -n $SPKPeeringName --vnet-name $SPKVNETName --set UseRemoteGateways=True
 ```
+
+## Lab
+

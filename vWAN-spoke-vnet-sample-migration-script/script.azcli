@@ -1,16 +1,25 @@
 # Part of this script has been based on: https://github.com/erjosito/azcli/blob/master/vwan.azcli
 # Variables
 rg=vwan-migrate-lab
-vwan=vwan
 location=southcentralus
-hubname=scus-vhub
 password=Microsoft123!
 username=$(whoami)
 vm_size=Standard_B1s
 nva_size=Standard_B2ms
-vwan_hub1_prefix=172.16.10.0/24
+mypip=$(curl ifconfig.io -s) # or replace with your home public ip, example mypip="1.1.1.1" (required for Cloud Shell deployments)
 
-#On-prem
+##Azure Hub
+hubname="Hub"
+hubvnetcidr="10.10.0.0/24"
+hubinternalcidr="10.10.0.0/25"
+hubGatewaySubnet="10.10.0.128/27"
+
+##Azure Spoke
+spoke1name="SpokeA"
+spoke1cird="10.10.0.0/24"
+spoke1vmsubnet="10.10.0.0/25"
+
+##On-prem
 onpremname=onprem
 onpremvnetcird="192.168.0.0/23"
 onpreminternalcidr="192.168.1.0/24"
@@ -18,9 +27,49 @@ onpremexternalcidr="192.168.0.0/29"
 onpremasn="65003"
 onprembgpaddr="169.254.21.1"
 
+##vWAN
+hubname=scus-vhub
+vwan=vwan
+vwan_hub1_prefix=172.16.10.0/24
 
 # Start: create RT
-az group create -n $rg -l $location
+
+#Create VNETs and Subnets
+#Build Networks Hub and Spoke Networks
+# HUB VNET
+az group create --name $rg --location $location --output none
+az network vnet create --resource-group $rg --name $hubname-vnet --location $location --address-prefixes $hubvnetcidr --subnet-name internal --subnet-prefix $hubinternalcidr  --output none
+az network vnet subnet create --address-prefix $hubGatewaySubnet --name GatewaySubnet --resource-group $rg --vnet-name $hubname-vnet --output none
+#Spoke1 VNET
+az network vnet create --resource-group $rg --name $spoke1name-vnet --location $location --address-prefixes $spoke1cird --subnet-name vmsubnet --subnet-prefix $spoke1vmsubnet --output none
+#Simulated On-Prem
+az network vnet create --resource-group $rg --name $onpremname-vnet --location $location --address-prefixes $onpremcird --subnet-name external --subnet-prefix $onpremexternalcidr --output none
+az network vnet subnet create --address-prefix $onpreminternalcidr --name internal --resource-group $rg --vnet-name $onpremname-vnet --output none
+
+#Create VNET Peerings between HUB and Spokes
+# Hub to Spoke1 (UseRemoteGateways and Transit enabled)
+az network vnet peering create -g $rg -n $hubname-to-$spoke1name --vnet-name $hubname-vnet --allow-vnet-access --allow-forwarded-traffic --allow-gateway-transit  --remote-vnet $(az network vnet show -g $rg -n $spoke1name-vnet --query id --out tsv) --output none
+az network vnet peering create -g $rg -n $spoke1name-to-$hubname --vnet-name $spoke1name-vnet --allow-vnet-access --allow-forwarded-traffic --use-remote-gateways --remote-vnet $(az network vnet show -g $rg -n $hubname-vnet  --query id --out tsv) --output none
+
+#(Optional) UDR to restrict SSH access to Azure VMs from your Public IP only:
+az network nsg create --resource-group $rg --name nsg-restrict-ssh --location $location
+az network nsg rule create \
+    --resource-group $rg \
+    --nsg-name nsg-restrict-ssh \
+    --name AllowSSHRule \
+    --direction Inbound \
+    --priority 100 \
+    --source-address-prefixes $mypip/32 \
+    --source-port-ranges '*' \
+    --destination-address-prefixes '*' \
+    --destination-port-ranges 22 \
+    --access Allow \
+    --protocol Tcp \
+    --description "Allow inbound SSH"
+az network vnet subnet update --name internal --resource-group $rg --vnet-name $hubname-vnet --network-security-group nsg-restrict-ssh
+az network vnet subnet update --name vmsubnet --resource-group $rg --vnet-name $spoke1name-vnet --network-security-group nsg-restrict-ssh
+az network vnet subnet update --name internal --resource-group $rg --vnet-name $onpremname-vnet --network-security-group nsg-restrict-ssh
+
 
 # vwan and hubs
 az network vwan create -n $vwan -g $rg -l $location --branch-to-branch-traffic true --type Standard
