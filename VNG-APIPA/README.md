@@ -1,4 +1,4 @@
-# ARM Template to deploy Azure Virtual Network Gateway (VPN) with APIPA
+# ARM Template to deploy Azure VPN gateway with APIPA
 
 ## Concepts
 
@@ -19,8 +19,10 @@ Please note that optional values not specified during deployment will default to
 
 ## Portal
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2Fopnazure%2Fmaster%2Fazuredeploy.json)
-[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2Fopnazure%2Fmaster%2Fazuredeploy.json)
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FVNG-APIPA%2Fvng-apipa.json)
+[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FVNG-APIPA%2Fvng-apipa.json)
+
+https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json
 
 
 ## CLI
@@ -32,7 +34,7 @@ $hubname=Hub #deploy VNG on Hub
 $rg=Lab #specify resource group name
 
 az deployment group create --name $hubname-vpngw --resource-group $rg \
---template-file apipa.json \
+--template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
 --parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 vnetName=$hubname-vnet \
 --no-wait
 ```
@@ -43,6 +45,6 @@ Example of deploying over Powershell:
 
 ```Powershell
 $RG = "LAB" #Resource Group
-$Template = "URI"
+$Template = "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json"
 New-AzResourceGroupDeployment -ResourceGroupName $RG -TemplateParameterUri $Template
 ```
