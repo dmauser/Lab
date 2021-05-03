@@ -1,19 +1,24 @@
-# Migrating Spoke VNET from traditional Hub to Azure Virtual WAN Hub
+# Migrating Spoke VNET to Azure Virtual WAN Hub
+
+## Concepts
+
+![Migration flow](./SPK-Migrate-to-VWANHUB.png)
+
+## Sample script
 
 ```bash
-# 
 # Pre-Requisite
 az extension add --name virtual-wan 
 
 # 1) Define Variables (Resource Groups, SpokeVNET, VWANHUB, VWAN VNET Connnection Name)
 # SpokeVNET variables – replace <> with your values.
-SPKRG=$'VYOS-LAB' #Spoke VNET Resource Group
-SPKVNETName=$'VYOS-LAB-VNET' #Spoke VNET Name
+SPKRG='' #Spoke VNET Resource Group
+SPKVNETName='' #Spoke VNET Name
 vnetid=$(az network vnet show -g $SPKRG -n $SPKVNETName --query id --out tsv) #Spoke VNET ResourceID to be migrated to vWAN and used in step 3.
-SPKPeeringName=$'VYOS-to-BGP-VNET' #Name of current peering using UseRemoteGateways=True that is connected to original HUB.
+SPKPeeringName='' #Name of current peering using UseRemoteGateways=True that is connected to original HUB.
 # vWAN HUB variables
-VWANRG=$'VWAN-LAB' #vWAN Hub Resource Group Name
-VHUB=$'SCUS-HUB' #vWAN Hub Name
+VWANRG='' #vWAN Hub Resource Group Name
+VHUB='' #vWAN Hub Name
 
 # 2) Set UseRemoteGateways Gateways to false 
 az network vnet peering update -g $SPKRG -n $SPKPeeringName --vnet-name $SPKVNETName --set UseRemoteGateways=False
