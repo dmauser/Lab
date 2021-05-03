@@ -8,7 +8,8 @@
 
 ```bash
 # Pre-Requisite
-az extension add --name virtual-wan 
+az extension add --name virtual-wan
+az extension update --name virtual-wan
 
 # 1) Define Variables (Resource Groups, SpokeVNET, VWANHUB, VWAN VNET Connnection Name)
 # SpokeVNET variables – replace <> with your values.

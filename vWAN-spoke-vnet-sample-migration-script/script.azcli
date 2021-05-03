@@ -1,0 +1,30 @@
+# Part of this script has been based on: https://github.com/erjosito/azcli/blob/master/vwan.azcli
+# Variables
+rg=vwan-migrate-lab
+vwan=vwan
+location=southcentralus
+hubname=scus-vhub
+password=Microsoft123!
+username=$(whoami)
+vm_size=Standard_B1s
+nva_size=Standard_B2ms
+vwan_hub1_prefix=172.16.10.0/24
+
+#On-prem
+onpremname=onprem
+onpremvnetcird="192.168.0.0/23"
+onpreminternalcidr="192.168.1.0/24"
+onpremexternalcidr="192.168.0.0/29"
+onpremasn="65003"
+onprembgpaddr="169.254.21.1"
+
+
+# Start: create RT
+az group create -n $rg -l $location
+
+# vwan and hubs
+az network vwan create -n $vwan -g $rg -l $location --branch-to-branch-traffic true --type Standard
+az network vhub create -n $hubname -g $rg --vwan $vwan -l $location --address-prefix $vwan_hub1_prefix
+
+#Create VPN gateway
+az network vpn-gateway create -n hubvpn1 -g $rg -l $location --vhub hub1 --asn 65515
