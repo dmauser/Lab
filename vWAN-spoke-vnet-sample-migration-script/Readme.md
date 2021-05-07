@@ -1,29 +1,25 @@
-<!-- vscode-markdown-toc -->
-* 1. [Concepts](#Concepts)
-* 2. [Sample script](#Samplescript)
-* 3. [Lab](#Lab)
+# Migrating Spoke VNET to Azure Virtual WAN Hub
 
-<!-- vscode-markdown-toc-config
-	numbering=true
-	autoSave=true
-	/vscode-markdown-toc-config -->
-<!-- /vscode-markdown-toc --># Migrating Spoke VNET to Azure Virtual WAN Hub
+## Contents
+[Concepts](#Concepts)
 
+[Sample script](#Samplescript)
 
+[Lab](#Lab)
 
-##  1. <a name='Concepts'></a>Concepts
+## Concepts
 
 For customers transitioning from traditional Hub/Spoke to Azure Virtual WAN (vWAN) the script below helps you to automate the migration process to move a Spoke VNET from traditional Hub to vWAN Hub. Below are important points  to consider:
 
-1. First, the script does not remove original peering from Hub but disables **UseRemoteGateway flag to false**. This allows potential dependencies from SpokeVNET to the original Hub to be kept and gives some room to customers to roll back in case the connection to On-premises via vWAN Hub does not work as expected. Also, original peering to traditional the Hub is kept in case there are shared services being used such as DNS and Active Directory domain controllers.
-2. Second, the script creates a **VNET connection to vWAN Hub**, and the expectation is the traffic flow to On-Prem goes over vWAN Hub. During the lab (see below) using BGP+IPSec the traffic transition took around 20-30 seconds.
-3. Third (optional) in case traffic does not flow via vWAN to On-Prem as expected customer can run the third part of the script to roll back the configuration. The script deletes the VNET connection to vHUB and changes back to the original VNET peering by setting **UseRemoteGateway flag to true**.
-4. Keep in mind this script is very simplistic and you may need to account for other dependencies that need to be mapped during the transition between traditional Hub to vWAN Hub.
-5. Although this lab covers BGP over IPSec Tunnels from On-Prem to Traditional Hub and vWAN Hub, the **same idea works for ExpressRoute connectivity** to either both Hubs (traditional and vWAN) or a mix of ExpressRoute with BGP+IPSec tunnels to either one of the Hubs. **Please note** that IPSec VPN with static routing requires changes on On-Premises VPN devices to make the  transition.
+1. First, the script does not remove original peering from Hub but disables **UseRemoteGateway flag to false**. This allows potential dependencies from Spoke VNET to the original Hub to be kept and gives some room to customers to roll back in case the connection to On-premises via vWAN Hub does not work as expected. Also, original peering to traditional the Hub is kept in case there are shared services being used such as DNS and Active Directory domain controllers.
+2. Second, the script creates a **VNET connection to vWAN Hub**, and the expectation is the traffic flow to On-premises goes over vWAN Hub. During the lab (see below) using BGP+IPSec the traffic transition took around 20-30 seconds.
+3. Third (optional) in case traffic does not flow via vWAN to On-premises as expected customer can run the third part of the script to roll back the configuration. The script deletes the VNET connection to vHUB and changes back to the original VNET peering by setting **UseRemoteGateway flag to true**.
+4. Keep in mind this script is very simplistic and you may need to account for other dependencies that need to be mapped during the Spoke VNET transition between traditional Hub to vWAN Hub.
+5. Although this lab covers BGP over IPSec Tunnels from On-premises to Traditional Hub and vWAN Hub, the **same idea works for ExpressRoute connectivity** to either both Hubs (traditional and vWAN) or a mix of ExpressRoute with BGP+IPSec tunnels to either one of the Hubs. **Please note** that IPSec VPN with static routing requires changes on On-Premises VPN devices to make the  transition.
 
 ![Migration flow](./SPK-Migrate-to-VWANHUB.png)
 
-##  2. <a name='Samplescript'></a>Sample script
+## Sample script
 
 **Prerequisites**
 
@@ -69,7 +65,7 @@ az network vhub connection delete -g $vwanrg -n $spkvnetname --vhub-name $vhubna
 az network vnet peering update -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname --set UseRemoteGateways=True
 ```
 
-##  3. <a name='Lab'></a>Lab
+## Lab
 
 ```bash
 # Variables
@@ -115,7 +111,7 @@ az network vnet create --resource-group $rg --name $hubname-vnet --location $loc
 az network vnet subnet create --address-prefix $hubGatewaySubnet --name GatewaySubnet --resource-group $rg --vnet-name $hubname-vnet --output none
 #Spoke VNET
 az network vnet create --resource-group $rg --name $spoke1name-vnet --location $location --address-prefixes $spoke1cird --subnet-name vmsubnet --subnet-prefix $spoke1vmsubnet --output none
-#Simulated On-Prem
+#Simulated On-premises
 az network vnet create --resource-group $rg --name $onpremname-vnet --location $location --address-prefixes $onpremvnetcird --subnet-name external --subnet-prefix $onpremexternalcidr --output none
 az network vnet subnet create --address-prefix $onpreminternalcidr --name internal --resource-group $rg --vnet-name $onpremname-vnet --output none
 
@@ -203,7 +199,7 @@ az network local-gateway create --gateway-ip-address $(az network public-ip show
 --asn $onpremasn \
 --bgp-peering-address $onprembgpaddr
 
-# Create VPN Connection from Hub VPN Gateway to On-Prem NVA
+# Create VPN Connection from Hub VPN Gateway to On-premises NVA
 az network vpn-connection create --name to-$onpremname \
 --resource-group $rg \
 --vnet-gateway1 $hubname-vpngw \
