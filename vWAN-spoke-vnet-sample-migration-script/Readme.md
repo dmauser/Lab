@@ -3,7 +3,7 @@
 ## Contents
 [Concepts](#Concepts)
 
-[Sample script](#Samplescript)
+[Sample script](#sample-script)
 
 [Lab](#Lab)
 
