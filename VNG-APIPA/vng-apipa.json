@@ -23,7 +23,7 @@
                 "description": "The SKU for the VPN Gateway. Cannot be Basic SKU."
             }
         },
-        "Active-Active": {
+        "active-active": {
             "type": "string",
             "defaultValue": "Disabled",
             "allowedValues": [
@@ -95,7 +95,7 @@
             }
         },
         {
-            "condition": "[equals(parameters('Active-Active'),'Enabled')]",
+            "condition": "[equals(parameters('active-active'),'Enabled')]",
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('PublicIPName2')]",
@@ -110,7 +110,7 @@
             }
         },
         {
-            "condition": "[equals(parameters('Active-Active'),'Enabled')]",
+            "condition": "[equals(parameters('active-active'),'Enabled')]",
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "name": "[variables('AAgwname')]",
@@ -175,7 +175,7 @@
             }
         },
         {
-            "condition": "[equals(parameters('Active-Active'),'Disabled')]",
+            "condition": "[equals(parameters('active-active'),'Disabled')]",
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "name": "[parameters('gatewayName')]",

@@ -25,22 +25,43 @@ Please note that optional values not specified during deployment will default to
 
 ## CLI
 
-Example of CLI command to deploy A/A VPN Gateway and specify APIPA BGP for both instances:
+**Example 1** - Deploy A/A VPN Gateway and specify APIPA BGP for both instances on exiting VNET:
 
 ```bash
 #variables
-$hubname=Hub #deploy VNG on Hub
-$rg=Lab #specify resource group name
+hubname=Hub #deploy VNG on Hub
+rg=Lab-vngapipa #specify resource group name
+vnetname=$hubname-vnet #Existing VNET name on Lab-vngapipa resource group.
 
 az deployment group create --name $hubname-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
---parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$hubname-vnet customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
+--no-wait
+```
+
+**Example 2** - Deploy A/A VPN Gateway and specify APIPA BGP on new VNET:
+
+```bash
+#variables
+hubname=Hub #deploy VNG on Hub
+rg=Lab-vngapipa #specify resource group name
+vnetname=$hubname-vnet #VNET name on Lab-vngapipa resource group.
+location=southcentralus #specify Azure region
+vnetcidr="10.0.0.0/24"
+GatewaySubnet="10.0.0.0/28"
+
+#Commands to deploy
+az group create --name $rg --location $location --output none
+az network vnet create --resource-group $rg --name $hubname-vnet --location $location --address-prefixes $vnetcidr --subnet-name GatewaySubnet --subnet-prefix $GatewaySubnet
+az deployment group create --name $hubname-vpngw --resource-group $rg \
+--template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
 --no-wait
 ```
 
 ## PowerShell
 
-Example of deploying over Powershell:
+Example of deploying over Powershell VPN Gateway Active-Active over existing VNET:
 
 ```Powershell
 $RG = "LAB" #Resource Group
