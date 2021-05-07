@@ -7,9 +7,10 @@
 
 ## Parameters
 
-- **gatewayName** **(required)** - VPN gateway name.
+- **gatewayName** **(required)** - VPN gateway name. 
 - **gatewaySku** **(required)** - gateway size. Allowed values: VpnGw1 (default), VpnGw2, VpnGw3, VpnGw4, VpnGw5).
 - **vnetName** **(required)** -  existing virtual network name.
+- **active-active** - Disable (default) deploys VPN Gateway as Active/Passive. Enabled Deploys VPN Gateway as Active/Active.
 - **vpnGatewayGeneration** (optional) specify VPN gateway generation. Allowed values Generation1 (default) or Generation2.
 - **asn** (optional) BGP AS number (default: 65515)
 - **customBgpIpAddresses1** (optional) custom BGP APIPA address for first VPN gateway instance (default 169.254.21.2).
@@ -24,7 +25,8 @@ Please note that optional values not specified during deployment will default to
 
 ## CLI
 
-Example of CLI command to deploy A/A VPN Gateway:
+Example of CLI command to deploy A/A VPN Gateway and specify APIPA BGP for both instances:
+
 ```bash
 #variables
 $hubname=Hub #deploy VNG on Hub
@@ -32,7 +34,7 @@ $rg=Lab #specify resource group name
 
 az deployment group create --name $hubname-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
---parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 vnetName=$hubname-vnet customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$hubname-vnet customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
 --no-wait
 ```
 
@@ -47,5 +49,6 @@ New-AzResourceGroupDeployment -ResourceGroupName $RG -TemplateParameterUri $Temp
 -gatewayName "vpngw" `
 -gatewaySku "VpnGw1" `
 -vnetName "vNetName" `
+-active-active "Enabled" `
 -asn "65001"
 ```
