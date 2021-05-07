@@ -10,5 +10,5 @@ az group create --name $rg --location $location --output none
 az network vnet create --resource-group $rg --name $vnetname --location $location --address-prefixes $vnetcidr --subnet-name GatewaySubnet --subnet-prefix $GatewaySubnet
 az deployment group create --name $rg-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
---parameters gatewayName=vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIPAddresses_1=169.254.21.2 customBgpIPAddresses_2=169.254.21.4 \
+--parameters gatewayName=vpngw gatewaySku=VpnGw1 activeActive=$enabled vnetName=$vnetname customBgpIPAddresses_1=169.254.21.2 customBgpIPAddresses_2=169.254.21.4 \
 --no-wait
