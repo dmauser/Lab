@@ -1,3 +1,17 @@
+
+# Example 1 - Deploy A/A VPN Gateway and specify APIPA BGP for both instances on exiting VNET:
+#variables
+hubname=spk #deploy VPN Gateway in a Hub
+rg=SPK-VNET1 #specify resource group name
+vnetname=$hubname-vnet1 #Existing VNET name on Lab-vngapipa resource group.
+
+az deployment group create --name $hubname-vpngw --resource-group $rg \
+--template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 activeActive=Enabled vnetName=$vnetname customBgpIPAddresses_1=169.254.21.2 customBgpIPAddresses_2=169.254.21.4 \
+--no-wait
+
+# Example 2 - Deploy A/A VPN Gateway and specify APIPA BGP on new Virtual Network (VNET):
+
 #variables
 rg=Lab-vngapipa #specify resource group name
 vnetname=hub-vnet #VNET name on Lab-vngapipa resource group.
