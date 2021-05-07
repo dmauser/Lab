@@ -4,7 +4,7 @@
 
 For customers transitioning from traditional Hub/Spoke to Azure Virtual WAN (vWAN) the script below helps you to automate the migration process to move a Spoke VNET from traditional Hub to vWAN Hub. Below are important points  to consider:
 
-1. First, the script does not remove original peering from Hub but disables **UseRemoteGateway flag to false**. This allows potential dependencies from SpokeVNET to the original Hub to be kept and gives some room to customers to roll back in case the connection to On-premises via vWAN Hub does not work as expected.
+Hub1. First, the script does not remove original peering from Hub but disables **UseRemoteGateway flag to false**. This allows potential dependencies from SpokeVNET to the original Hub to be kept and gives some room to customers to roll back in case the connection to On-premises via vWAN Hub does not work as expected. Also, original peering to the traditional Hub is kept in case there are shared services being used such as DNS and Active Directory domain controllers.
 2. Second, the script creates a **VNET connection to vWAN Hub**, and the expectation is the traffic flow to On-Prem goes over vWAN Hub. During the lab (see below) using BGP+IPSec the traffic transition took around 20-30 seconds.
 3. Third (optional) in case traffic does not flow via vWAN to On-Prem as expected customer can run the third part of the script to roll back the configuration. The script deletes the VNET connection to vHUB and changes back to the original VNET peering by setting **UseRemoteGateway flag to true**.
 4. Keep in mind this script is very simplistic and you may need to account for other dependencies that need to be mapped during the transition between traditional Hub to vWAN Hub.
