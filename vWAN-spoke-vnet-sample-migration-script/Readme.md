@@ -33,13 +33,14 @@ vwanrg=<vWAN resource group name> #vWAN Hub Resource Group Name
 vhubname=<vWAN Hub Name> # Replace with your vWAN Hub Name
 ```
 
-1) Set UseRemoteGateways flag to false 
+Run steps below 1 and 2 to connect Spoke VNET to vWAN by keeping original VNET peering to traditional Hub.
 
+1. Set UseRemoteGateways flag to false 
 ```Bash
 az network vnet peering update -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname --set UseRemoteGateways=False
 ```
 
-2) Configure VWAN HUB Virtual Network Connection
+2. Configure VWAN HUB Virtual Network Connection
 
 ```Bash
 #Note: For simplification of the process $spkvnetname is used as connection Name for vhubname. If you need specify a new name just add a new variable for that.
@@ -48,10 +49,10 @@ az network vhub connection create -g $vwanrg -n $spkvnetname --vhub-name $vhubna
 
 **Migration completes here**
 
-3) Rolling back the original config (Remove vHUB VNET Connection and re-enables original peering to UseRemoteGateways to true)
+3. (Optional) Rolling back the original config. It removes vHUB VNET Connection and re-enables original peering to UseRemoteGateways to true.
+**NOTE**: Use only if previous steps did not work and you want to revert traffic back to original HUB.
 
 ```Bash
-# ***NOTE***: Use only if previous steps did not work and you want to revert traffic back to original HUB.
 az network vhub connection delete -g $vwanrg -n $spkvnetname --vhub-name $vhubname --yes
 az network vnet peering update -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname --set UseRemoteGateways=True
 ```
@@ -146,11 +147,7 @@ az network vpn-gateway create -n $vhubname-vpn1 -g $rg -l $location --vhub $vhub
 
 #Deploy Azure VMs on Spoke VNETs and On-Premises
 
-#1) Set username and password variables via prompt.
-echo "Type username and password to be used when deploying VMS"
-read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Echo $password to ensure you type password correctly.
-
-#2) Deploy VMs
+# Deploy VMs
 #SpokeVM
 az network public-ip create --name $spoke1name-vm-pip --resource-group $rg --location $location --allocation-method Dynamic
 az network nic create --resource-group $rg -n $spoke1name-vm-nic --location $location --subnet vmsubnet --vnet-name $spoke1name-vnet --public-ip-address $spoke1name-vm-pip 
