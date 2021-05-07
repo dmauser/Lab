@@ -36,7 +36,7 @@ vnetname=$hubname-vnet #Existing VNET name on Lab-vngapipa resource group.
 
 az deployment group create --name $hubname-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
---parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIPAddresses_1=169.254.21.2 customBgpIPAddresses_2=169.254.21.4 \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 activeActive=Enabled vnetName=$vnetname customBgpIPAddresses_1=169.254.21.2 customBgpIPAddresses_2=169.254.21.4 \
 --no-wait
 ```
 
