@@ -2,8 +2,9 @@
 
 ## Concepts
 
-1. This template deploys Active-Active Azure VPN Gateway with APIPA and can be provisioned also over CLI and Powershell.
-2. This script requires Virtual Network and Gateway Subnet previous created.
+1. This template deploys Active-Passive or Active-Active Azure VPN Gateway with APIPA.
+2. It requires Virtual Network and GatewaySubnet previously created.
+3. It can be provisioned over Portal, CLI and Powershell.
 
 ## Parameters
 
