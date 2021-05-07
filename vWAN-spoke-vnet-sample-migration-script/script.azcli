@@ -3,8 +3,6 @@ rg=vwan-migrate-lab
 location=southcentralus
 sharedkey=Msft123Msft123
 mypip=$(curl ifconfig.io -s) # or replace with your home public ip, example mypip="1.1.1.1" (required for Cloud Shell deployments
-#Define username and password variables
-read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Use command 'echo $password' to ensure you type password correctly.
 
 ##Azure Hub
 hubname="Hub"
@@ -29,6 +27,10 @@ onprembgpaddr="169.254.21.1"
 vhubname=scus-vhub
 vwan=vwan
 vwan_hub1_prefix=172.16.10.0/24
+
+#Define username and password variables
+read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Use command 'echo $password' to ensure you type password correctly.
+
 
 # Start: create RT
 
@@ -123,7 +125,6 @@ az network vnet subnet update -n internal -g $rg --vnet-name $onpremname-vnet --
 # Hub to Spoke1 (UseRemoteGateways and Transit enabled)
 az network vnet peering create -g $rg -n $hubname-to-$spoke1name --vnet-name $hubname-vnet --allow-vnet-access --allow-forwarded-traffic --allow-gateway-transit  --remote-vnet $(az network vnet show -g $rg -n $spoke1name-vnet --query id --out tsv) --output none
 az network vnet peering create -g $rg -n $spoke1name-to-$hubname --vnet-name $spoke1name-vnet --allow-vnet-access --allow-forwarded-traffic --use-remote-gateways --remote-vnet $(az network vnet show -g $rg -n $hubname-vnet  --query id --out tsv) --output none
-
 
 # Create Local Network Gateway with OnPrem info
 az network local-gateway create --gateway-ip-address $(az network public-ip show --name $onpremname-nva-PublicIP --resource-group $rg -o tsv --query "ipAddress" -o tsv) \
@@ -284,4 +285,7 @@ az network vhub connection create -g $vwanrg -n $spkvnetname --vhub-name $vhubna
 # ***NOTE***: Use only if previous steps did not work and you want to revert traffic back to original HUB.
 az network vhub connection delete -g $vwanrg -n $spkvnetname --vhub-name $vhubname --yes
 az network vnet peering update -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname --set UseRemoteGateways=True
-```
+
+az network vnet peering show -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname 
+
+az network vhub connection show -g $vwanrg -n $spkvnetname --vhub-name $vhubname

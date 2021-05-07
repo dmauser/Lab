@@ -32,7 +32,7 @@ $rg=Lab #specify resource group name
 
 az deployment group create --name $hubname-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
---parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 vnetName=$hubname-vnet \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 vnetName=$hubname-vnet customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
 --no-wait
 ```
 

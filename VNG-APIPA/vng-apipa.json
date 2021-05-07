@@ -6,7 +6,7 @@
             "type": "string",
             "defaultValue": "vpngw",
             "metadata": {
-                "description": "The shared key used to establish connection between the two vNet Gateways."
+                "description": "The shared key used to establish connection between the two vNet Gateways. When you choose Active/Active an AA it will be added in front of the name"
             }
         },
         "gatewaySku": {
@@ -21,6 +21,17 @@
             ],
             "metadata": {
                 "description": "The SKU for the VPN Gateway. Cannot be Basic SKU."
+            }
+        },
+        "Active-Active": {
+            "type": "string",
+            "defaultValue": "Disabled",
+            "allowedValues": [
+                "Disabled",
+                "Enabled"
+            ],
+            "metadata": {
+                "description": "Disabled deployd VPN Gateway as Active/Passive. Enabled Deploys VPN Gateway as Active/Active"
             }
         },
         "vpnGatewayGeneration": {
@@ -41,13 +52,19 @@
             },
             "defaultValue": "65515"
         },
-        "customBgpIpAddresses1": {
+        "customBgpIPAddresses_1": {
             "defaultValue": "169.254.21.2",
-            "type": "String"
+            "type": "String",
+            "metadata": {
+                "description": "Set first APIPA BGP Address"
+            }
         },
-        "customBgpIpAddresses2": {
+        "customBgpIPAddresses_2": {
             "defaultValue": "169.254.21.4",
-            "type": "String"
+            "type": "String",
+            "metadata": {
+                "description": "Set second APIPA BGP Address (this is ignored when Active-Active is set to Disabled)"
+            }
         },
         "vnetName": {
             "type": "string",
@@ -59,7 +76,8 @@
     "variables": {
         "location": "[resourceGroup().location]",
         "PublicIPName1": "[concat(parameters('gatewayName'),'-pip1')]",
-        "PublicIPName2": "[concat(parameters('gatewayName'),'-pip2')]"
+        "PublicIPName2": "[concat(parameters('gatewayName'),'-pip2')]",
+        "AAgwname": "[concat(parameters('gatewayName'),'-AA')]"
     },
     "resources": [
         {
@@ -70,9 +88,14 @@
             "comments": "This is the public IP for vNet Gateway 2",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
-           }
+           },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional" 
+            }
         },
         {
+            "condition": "[equals(parameters('Active-Active'),'Enabled')]",
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('PublicIPName2')]",
@@ -80,12 +103,17 @@
             "comments": "This is the public IP for vNet Gateway 2",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional" 
             }
         },
         {
+            "condition": "[equals(parameters('Active-Active'),'Enabled')]",
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworkGateways",
-            "name": "[parameters('gatewayName')]",
+            "name": "[variables('AAgwname')]",
             "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('PublicIPName1'))]",
@@ -131,20 +159,66 @@
                     "asn": "[parameters('asn')]",
                     "bgpPeeringAddresses": [
                         {
-                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gatewayName')),'/ipConfigurations/Ipconfig1')]",
+                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways',variables('AAgwname')),'/ipConfigurations/Ipconfig1')]",
                             "customBgpIpAddresses": [
-                                "[parameters('customBgpIpAddresses1')]"
+                                "[parameters('customBgpIPAddresses_1')]"
                             ]
                         },
                         {
-                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gatewayName')),'/ipConfigurations/Ipconfig2')]",
+                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways',variables('AAgwname')),'/ipConfigurations/Ipconfig2')]",
                             "customBgpIpAddresses": [
-                                "[parameters('customBgpIpAddresses2')]"
+                                "[parameters('customBgpIPAddresses_2')]"
                             ]
                         }
                     ]                        
                 }
             }
-        }
+        },
+        {
+            "condition": "[equals(parameters('Active-Active'),'Disabled')]",
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[parameters('gatewayName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('PublicIPName1'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "Ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnetName'),'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIPName1'))]"
+                            }
+                        }
+                    }
+                ],
+                "gatewayType": "Vpn",
+                "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
+                "sku": {
+                     "name": "[parameters('gatewaySku')]",
+                    "tier": "[parameters('gatewaySku')]"
+                },
+                "vpnType": "RouteBased",
+                "enableBgp": true,
+                "activeActive": false,
+                "bgpSettings": {
+                    "asn": "[parameters('asn')]",
+                    "bgpPeeringAddresses": [
+                        {
+                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gatewayName')),'/ipConfigurations/Ipconfig1')]",
+                            "customBgpIpAddresses": [
+                                "[parameters('customBgpIPAddresses_1')]"
+                            ]
+                        }
+                    ]                        
+                }
+            }
+        }        
     ] 
 }
