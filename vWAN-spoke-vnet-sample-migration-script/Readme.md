@@ -1,6 +1,17 @@
-# Migrating Spoke VNET to Azure Virtual WAN Hub
+<!-- vscode-markdown-toc -->
+* 1. [Concepts](#Concepts)
+* 2. [Sample script](#Samplescript)
+* 3. [Lab](#Lab)
 
-## Concepts
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc --># Migrating Spoke VNET to Azure Virtual WAN Hub
+
+
+
+##  1. <a name='Concepts'></a>Concepts
 
 For customers transitioning from traditional Hub/Spoke to Azure Virtual WAN (vWAN) the script below helps you to automate the migration process to move a Spoke VNET from traditional Hub to vWAN Hub. Below are important points  to consider:
 
@@ -12,7 +23,7 @@ For customers transitioning from traditional Hub/Spoke to Azure Virtual WAN (vWA
 
 ![Migration flow](./SPK-Migrate-to-VWANHUB.png)
 
-## Sample script
+##  2. <a name='Samplescript'></a>Sample script
 
 **Prerequisites**
 
@@ -58,7 +69,7 @@ az network vhub connection delete -g $vwanrg -n $spkvnetname --vhub-name $vhubna
 az network vnet peering update -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname --set UseRemoteGateways=True
 ```
 
-## Lab
+##  3. <a name='Lab'></a>Lab
 
 ```bash
 # Variables
