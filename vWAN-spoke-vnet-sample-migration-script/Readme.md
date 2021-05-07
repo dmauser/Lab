@@ -2,17 +2,27 @@
 
 ## Concepts
 
+For customer transitioning from traditional Hub/Spoke to Azure Virtual WAN (vWAN) the script below helps you to automate the migration process to move a Spoke VNET from traditional Hub to vWAN Hub. Few points below to consider:
+
+1. First, script does not remove original peering from Hub but disabled **UseRemoteGateway flag to false**. This allows potential dependencies from SpokeVNET to original Hub to be kept and give some room to customers to roll back in case connection to vWAN Hub does not work as expected.
+2. Second, script creates a **VNET connection to vWAN (Hub)** and expectation traffic flow to On-Prem should go over vWAN Hub.
+3. Third (optional) in case traffic does not flow via vWAN to On-Prem as expected customer can ran third part of the script to roll back the configuration. Script deletes VNET connection to vHUB and changes back original VNET peering **UseRemoteGateway flag to true**.
+4. Keep in mind this script is very simplistic and you may need to account for other dependencies that needs to be mapped during the transition between traditional Hub to vWAN Hub.
+
 ![Migration flow](./SPK-Migrate-to-VWANHUB.png)
 
 ## Sample script
 
+**Prerequisites**
+
 ```bash
-# Pre-Requisite
 az extension add --name virtual-wan 
 # or update
 az extension update --name virtual-wan
+```
 
-# 1) Define Variables (Resource Groups, SpokeVNET, VWANHUB, VWAN VNET Connnection Name)
+**Define Variables** (Resource Groups, SpokeVNET, VWANHUB, VWAN VNET Connnection Name)
+```Bash
 # SpokeVNET variables – replace <> below with your values.
 spkrg=<resource group name>
 spkvnetname=$spoke1name-vnet #Spoke VNET Name
@@ -20,18 +30,27 @@ vnetid=$(az network vnet show -g $spkrg -n $spoke1name-vnet --query id --out tsv
 spkpeeringname=<peering name> #Name of current peering using UseRemoteGateways=True that is connected to original HUB.
 # vWAN HUB variables - replace below with your values.
 vwanrg=<vWAN resource group name> #vWAN Hub Resource Group Name
-vhubname=< #vWAN Hub Name>
+vhubname=<vWAN Hub Name> # Replace with your vWAN Hub Name
+```
 
-# 2) Set UseRemoteGateways Gateways to false 
+1) Set UseRemoteGateways flag to false 
+
+```Bash
 az network vnet peering update -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname --set UseRemoteGateways=False
+```
 
-# 3) Configure VWAN HUB Virtual Network Connection.
+2) Configure VWAN HUB Virtual Network Connection
+
+```Bash
 #Note: For simplification of the process $spkvnetname is used as connection Name for vhubname. If you need specify a new name just add a new variable for that.
 az network vhub connection create -g $vwanrg -n $spkvnetname --vhub-name $vhubname --remote-vnet $vnetid
+```
 
-# <Migration completes here>
+**Migration completes here**
 
-# Rolling back the original config (Remove vhub VNET Connection and re-enables original peering to UseRemoteGateways to true)
+3) Rolling back the original config (Remove vHUB VNET Connection and re-enables original peering to UseRemoteGateways to true)
+
+```Bash
 # ***NOTE***: Use only if previous steps did not work and you want to revert traffic back to original HUB.
 az network vhub connection delete -g $vwanrg -n $spkvnetname --vhub-name $vhubname --yes
 az network vnet peering update -g $spkrg -n $spkpeeringname --vnet-name $spkvnetname --set UseRemoteGateways=True
@@ -46,7 +65,8 @@ location=southcentralus
 sharedkey=Msft123Msft123
 mypip=$(curl ifconfig.io -s) # or replace with your home public ip, example mypip="1.1.1.1" (required for Cloud Shell deployments
 #Define username and password variables
-read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Use command 'echo $password' to ensure you type password correctly.
+username=azureadmin  #replace with your values
+password=Msft123Msft123 #replace with your values
 
 ##Azure Hub
 hubname="Hub"
@@ -229,7 +249,7 @@ az network public-ip show -g $rg -n Hub-vpngw-pip1 --query ipAddress -o tsv
 #                  Uncheck: Blowfish, 3DES, CAST128
 # Hash algorithms: SHA256   
 #  PFS key group: off    
-#  Lifetime: 27000	                
+#  Lifetime: 27000               
 
 ## Create Tunnel to Virtual WAN
 # Get Azure VPN Gateway Public IPs:
