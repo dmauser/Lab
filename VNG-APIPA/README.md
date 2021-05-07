@@ -1,14 +1,14 @@
-# ARM Template to deploy Azure VPN gateway with APIPA
+# ARM Template to deploy Azure VPN gateway with custom BGP IP (APIPA)
 
 ## Concepts
 
-1. This template deploys Active-Passive or Active-Active Azure VPN Gateway with APIPA.
+1. This template deploys Active-Passive or Active-Active Azure VPN Gateway with with custom BGP IP (APIPA).
 2. It requires Virtual Network and GatewaySubnet previously created.
 3. It can be provisioned over Portal, CLI and Powershell.
 
 ## Parameters
 
-- **gatewayName** **(required)** - VPN gateway name. 
+- **gatewayName** **(required)** - VPN gateway name.
 - **gatewaySku** **(required)** - gateway size. Allowed values: VpnGw1 (default), VpnGw2, VpnGw3, VpnGw4, VpnGw5).
 - **vnetName** **(required)** -  existing virtual network name.
 - **active-active** - Disable (default) deploys VPN Gateway as Active/Passive. Enabled Deploys VPN Gateway as Active/Active.
@@ -30,20 +30,19 @@ Please note that optional values not specified during deployment will default to
 
 ```bash
 #variables
-hubname=Hub #deploy VNG on Hub
+hubname=Hub #deploy VPN Gateway in a Hub
 rg=Lab-vngapipa #specify resource group name
 vnetname=$hubname-vnet #Existing VNET name on Lab-vngapipa resource group.
 
 az deployment group create --name $hubname-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
---parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
+--parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIPAddresses_1=169.254.21.2 customBgpIPAddresses_2=169.254.21.4 \
 --no-wait
 ```
 
-**Example 2** - Deploy A/A VPN Gateway and specify APIPA BGP on new VNET:
+**Example 2** - Deploy A/A VPN Gateway and specify APIPA BGP on new Virtual Network (VNET):
 
 ```bash
-#variables
 #variables
 rg=Lab-vngapipa #specify resource group name
 vnetname=hub-vnet #VNET name on Lab-vngapipa resource group.
