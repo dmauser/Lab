@@ -2,7 +2,7 @@
 
 ## Concepts
 
-1. This template deploys Active-Active Azure VPN Gateway with APIPA to help provisioning on automated labs.
+1. This template deploys Active-Active Azure VPN Gateway with APIPA and can be provisioned also over CLI and Powershell.
 2. This script requires Virtual Network and Gateway Subnet previous created.
 
 ## Parameters
@@ -16,7 +16,7 @@
 - **customBgpIpAddresses1** (optional) custom BGP APIPA address for first VPN gateway instance (default 169.254.21.2).
 - **customBgpIpAddresses2** (optional) custom BGP APIPA address for second VPN gateway instance (default 169.254.21.4).
 
-Please note that optional values not specified during deployment will default to their respective values.
+Please note that optional values not specified during deployment will default to their respective values. Also, keep in mind they are case sensitive when using bash (Enabled is different from enabled).
 
 ## Portal
 
@@ -43,6 +43,7 @@ az deployment group create --name $hubname-vpngw --resource-group $rg \
 
 ```bash
 #variables
+#variables
 rg=Lab-vngapipa #specify resource group name
 vnetname=hub-vnet #VNET name on Lab-vngapipa resource group.
 location=southcentralus #specify Azure region
@@ -52,9 +53,9 @@ GatewaySubnet="10.0.0.0/28"
 #Commands to deploy
 az group create --name $rg --location $location --output none
 az network vnet create --resource-group $rg --name $vnetname --location $location --address-prefixes $vnetcidr --subnet-name GatewaySubnet --subnet-prefix $GatewaySubnet
-az deployment group create --name $hubname-vpngw --resource-group $rg \
+az deployment group create --name $rg-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
---parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
+--parameters gatewayName=vpngw gatewaySku=VpnGw1 activeActive=Enabled vnetName=$vnetname customBgpIPAddresses_1=169.254.21.2 customBgpIPAddresses_2=169.254.21.4 \
 --no-wait
 ```
 
