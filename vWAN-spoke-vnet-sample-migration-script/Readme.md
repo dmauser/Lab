@@ -13,7 +13,7 @@ For customers transitioning from traditional Hub/Spoke to Azure Virtual WAN (vWA
 
 1. First, the script does not remove original peering from Hub but disables **UseRemoteGateway flag to false**. This allows potential dependencies from Spoke VNET to the original Hub to be kept and gives some room to customers to roll back in case the connection to On-premises via vWAN Hub does not work as expected. Also, original peering to the tradition hub allows access to shared services such as DNS, Active Directory domain controllers or others.
     
-        Note: UseRemoteGateway is also known as Use the remote virtual network's gateway on VNET peering configuration on Azure Portal.
+    **Note:** **UseRemoteGateway** is also known as **Use the remote virtual network's gateway** on VNET peering configuration on Azure Portal.
 
 2. Second, the script creates a **VNET connection to vWAN Hub**, and the expectation is the traffic flow to On-premises goes over vWAN Hub. During the lab (see below) using BGP+IPSec the traffic transition took around 20-30 seconds.
 3. Third (optional) in case traffic does not flow via vWAN to On-premises as expected customer can run the third part of the script to roll back the configuration. The script deletes the VNET connection to vHUB and changes back to the original VNET peering by setting **UseRemoteGateway flag to true**. That transition back to the original Hub takes around 90 seconds because of the remove process of the vWAN VNET connection has to be completed before enabling UseRemoteGateway flag back to true.
