@@ -43,16 +43,15 @@ az deployment group create --name $hubname-vpngw --resource-group $rg \
 
 ```bash
 #variables
-hubname=Hub #deploy VNG on Hub
 rg=Lab-vngapipa #specify resource group name
-vnetname=$hubname-vnet #VNET name on Lab-vngapipa resource group.
+vnetname=hub-vnet #VNET name on Lab-vngapipa resource group.
 location=southcentralus #specify Azure region
 vnetcidr="10.0.0.0/24"
 GatewaySubnet="10.0.0.0/28"
 
 #Commands to deploy
 az group create --name $rg --location $location --output none
-az network vnet create --resource-group $rg --name $hubname-vnet --location $location --address-prefixes $vnetcidr --subnet-name GatewaySubnet --subnet-prefix $GatewaySubnet
+az network vnet create --resource-group $rg --name $vnetname --location $location --address-prefixes $vnetcidr --subnet-name GatewaySubnet --subnet-prefix $GatewaySubnet
 az deployment group create --name $hubname-vpngw --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/Lab/master/VNG-APIPA/vng-apipa.json" \
 --parameters gatewayName=$hubname-vpngw gatewaySku=VpnGw1 active-active=enabled vnetName=$vnetname customBgpIpAddresses1=169.254.21.2 customBgpIpAddresses2=169.254.21.4 \
