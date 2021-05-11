@@ -44,6 +44,20 @@
                 "description": "Select VPn Gateway Generation."
             }
         },
+      "NsgLockdownByPublicIP": {
+          "type": "string",
+          "allowedValues": [
+              "yes",
+              "no"
+          ]
+      },
+      "MyPublicIP": {
+          "type": "string",
+          "defaultValue": "null",
+          "metadata": {
+            "description": "Optional in case you answer no for Lock Down Public IP, but required in case you selected yes. Please use curl ifconfig.io to get your Public IP address"
+            }
+      },   
         "location": {
             "type": "string",
             "metadata": {
@@ -53,9 +67,13 @@
         }
     },
     "variables": {
-         "OnPrem": {
+        "networkSecurityGroupName": "default-udr",
+        "_artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
+        "nsgtemplateURI": "[concat(uri(variables('_artifactsLocation'),'nsg.json'))]",
+        "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
+        "OnPrem": {
             "name": "[concat(parameters('Environment'),'-OnPrem')]",
-            "vnetname": "[concat(parameters('Environment'),'-OnPrem-vnet')]",
+            "vnetname": "[concat(variables('OnPrem').name,'-vnet')]",
             "addressSpacePrefix": "192.168.1.0/24",
             "subnetName": "subnet1",
             "subnetPrefix": "192.168.1.0/25",
@@ -67,7 +85,7 @@
         },
         "Azure": {
             "name": "[concat(parameters('Environment'),'-Az')]",
-            "vnetname": "[concat(parameters('Environment'),'-Az-vnet')]",
+            "vnetname": "[concat(variables('Azure').name,'-vnet')]",
             "addressSpacePrefix": "10.0.0.0/24",
             "subnetName": "subnet1",
             "subnetPrefix": "10.0.0.0/27",
@@ -82,11 +100,43 @@
     },
     "resources": [
         {
+            "type": "Microsoft.Resources/deployments",
+            "name": "nsg",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('nsgtemplateURI')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSecurityGroupName": {
+                        "value": "[variables('networkSecurityGroupName')]"
+                    },
+                    "lockDownbyPublicIP": {
+                        "value": "[parameters('NsgLockdownByPublicIP')]"
+                    },
+                    "MyPublicIP": {
+                        "value": "[parameters('MyPublicIP')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }                  
+                }
+
+            }            
+
+        
+        },
+        {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('OnPrem').vnetname]",
             "location": "[parameters('location')]",
             "comments": "This is the first vNet",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]"
+            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -97,7 +147,10 @@
                     {
                         "name": "[variables('OnPrem').subnetName]",
                         "properties": {
-                            "addressPrefix": "[variables('OnPrem').subnetPrefix]"
+                            "addressPrefix": "[variables('OnPrem').subnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[variables('nsgId')]"
+                            }
                         }
                     },
                     {
@@ -128,7 +181,10 @@
                     {
                         "name": "[variables('Azure').subnetName]",
                         "properties": {
-                            "addressPrefix": "[variables('Azure').subnetPrefix]"
+                            "addressPrefix": "[variables('Azure').subnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[variables('nsgId')]"
+                            }
                         }
                     },
                     {
@@ -177,7 +233,8 @@
             "type": "Microsoft.Network/virtualNetworkGateways",
             "name": "[variables('OnPrem').gatewayName]",
             "location": "[parameters('location')]",
-            "dependsOn": [          
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",                
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('OnPrem').gatewayPublicIPName)]",
                 "[resourceId('Microsoft.Network/virtualNetworks/', variables('OnPrem').name)]"
             ],
@@ -216,6 +273,7 @@
             "name": "[variables('Azure').gatewayName]",
             "location": "[parameters('location')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('Azure').gatewayPublicIPName1)]",
                 "[resourceId('Microsoft.Network/virtualNetworks/', variables('Azure').name)]"
             ],
@@ -255,6 +313,7 @@
             "name": "[variables('OnPrem').connectionName]",
             "location": "[parameters('location')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('OnPrem').gatewayName)]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('Azure').gatewayName)]"
             ],
@@ -278,6 +337,7 @@
             "name": "[variables('Azure').connectionName]",
             "location": "[parameters('location')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('OnPrem').gatewayName)]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('Azure').gatewayName)]"
             ],
