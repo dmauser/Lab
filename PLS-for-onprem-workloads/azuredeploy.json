@@ -45,6 +45,20 @@
                 "description": "Select VPn Gateway Generation."
             }
         },
+      "UDRlockDownbyPublicIP": {
+          "type": "string",
+          "allowedValues": [
+              "yes",
+              "no"
+          ]
+      },
+      "MyPublicIP": {
+          "type": "string",
+          "defaultValue": "null",
+          "metadata": {
+            "description": "Optional in case you answer no for Lock Down Public IP, but required in case you selected yes. Please use curl ifconfig.io to get your Public IP address"
+            }
+      }, 
         "location": {
             "type": "string",
             "metadata": {
@@ -56,8 +70,8 @@
     "variables": {
     "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
     "providerTemplateURI": "[concat(uri(variables('artifactsLocation'),'provider.json'))]",
-    "customer_aTemplateURI": "[uri(variables('artifactsLocation'),concat('customer-a.json'))]",
-    "customer_bTemplateURI": "[uri(variables('artifactsLocation'),concat('customer-b.json'))]"    
+    "customer_aTemplateURI": "[concat(uri(variables('artifactsLocation'),'customer-a.json'))]",
+    "customer_bTemplateURI": "[concat(uri(variables('artifactsLocation'),'customer-b.json'))]"    
     },
     "resources": [
         {
@@ -84,6 +98,12 @@
                     "vpnGatewayGeneration": {
                         "value": "[parameters('vpnGatewayGeneration')]"
                     },
+                    "UDRlockDownbyPublicIP": {
+                        "value": "[parameters('UDRlockDownbyPublicIP')]"
+                    },
+                    "MyPublicIP": {
+                        "value": "[parameters('MyPublicIP')]"
+                    },                                        
                     "location": {
                         "value": "[parameters('location')]"
                     }                  

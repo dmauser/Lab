@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "networkSecurityGroupName": {
+           "type": "string"
+      },
+      "lockDownbyPublicIP": {
+          "type": "string",
+          "allowedValues": [
+              "yes",
+              "no"
+          ]
+      },
+      "MyPublicIP": {
+          "type": "string",
+          "defaultValue": "null",
+          "metadata": {
+            "description": "Optional in case you answer no for Lock Down Public IP, but required in case you selected yes. Please use curl ifconfig.io to get your Public IP address"
+            }
+      },      
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "Location for all resources."
+        }
+      }
+    },
+    "variables": {
+        "mypip": "[concat(parameters('MyPublicIP'),'/32')]"
+    },
+    "resources": [
+      {
+        "condition": "[equals(parameters('lockDownbyPublicIP'), 'no')]", 
+        "apiVersion": "2020-05-01",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[parameters('networkSecurityGroupName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+                "name": "SSH",
+                "properties": {
+                    "priority": 300,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "22"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "condition": "[equals(parameters('lockDownbyPublicIP'),'yes')]",          
+        "apiVersion": "2020-05-01",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[concat(parameters('networkSecurityGroupName'),'-restricted')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+                "name": "SSH",
+                "properties": {
+                    "priority": 300,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "[variables('mypip')]",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "22"
+              }
+            }
+          ]
+        }
+      }
+    ]
+}
