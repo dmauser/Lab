@@ -69,7 +69,7 @@
     "variables": {
         "networkSecurityGroupName": "default-udr",
         "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
-        "udrTemplateURI": "[concat(uri(variables('artifactsLocation'),'udr.json'))]",
+        "udrTemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
         "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
         "OnPrem": {
             "name": "[concat(parameters('Environment'),'-OnPrem')]",
