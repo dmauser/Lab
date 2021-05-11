@@ -68,8 +68,8 @@
     },
     "variables": {
         "networkSecurityGroupName": "default-udr",
-        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
-        "udrTemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
+        "_artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
+        "nsgtemplateURI": "[concat(uri(variables('_artifactsLocation'),'nsg.json'))]",
         "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
         "OnPrem": {
             "name": "[concat(parameters('Environment'),'-OnPrem')]",
@@ -81,9 +81,8 @@
             "gatewaySubnetPrefix": "192.168.1.128/27",
             "gatewayPublicIPName": "[concat(parameters('Environment'),'-OnPrem-GW-pip')]",
             "connectionName": "OnPrem-to-Az",
-            "asn": 65002,
-            "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', variables('OnPrem').vnetname)]",
-            "subnetRef": "[concat(variables('OnPrem').vnetId, '/subnets/', variables('OnPrem').subnetName)]"        },
+            "asn": 65002
+        },
         "Azure": {
             "name": "[concat(parameters('Environment'),'-Az')]",
             "vnetname": "[concat(variables('Azure').name,'-vnet')]",
@@ -107,7 +106,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('udrTemplateURI')]",
+                    "uri": "[variables('nsgtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
