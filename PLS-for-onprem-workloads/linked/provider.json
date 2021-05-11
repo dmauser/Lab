@@ -148,7 +148,7 @@
                         "properties": {
                             "addressPrefix": "[variables('OnPrem').subnetPrefix]",
                             "networkSecurityGroup": {
-                                "id": "[variables('OnPrem').nsgId]"
+                                "id": "[variables('nsgId')]"
                             }
                         }
                     },
@@ -180,7 +180,7 @@
                         "properties": {
                             "addressPrefix": "[variables('Azure').subnetPrefix]",
                             "networkSecurityGroup": {
-                                "id": "[variables('Azure').nsgId]"
+                                "id": "[variables('nsgId')]"
                             }
                         }
                     },
