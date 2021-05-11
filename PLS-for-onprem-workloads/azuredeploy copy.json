@@ -68,10 +68,7 @@
         }
     },
     "variables": {
-    "networkSecurityGroupName": "default-udr",
-    "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
     "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
-    "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
     "providerTemplateURI": "[concat(uri(variables('artifactsLocation'),'provider.json'))]",
     "customer_aTemplateURI": "[concat(uri(variables('artifactsLocation'),'customer-a.json'))]",
     "customer_bTemplateURI": "[concat(uri(variables('artifactsLocation'),'customer-b.json'))]"    
@@ -82,9 +79,6 @@
             "name": "deploy-provider",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'nsg')]"
-            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -116,34 +110,6 @@
                 }
 
             }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "name": "nsg",
-            "apiVersion": "2020-10-01",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('nsgtemplateURI')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "networkSecurityGroupName": {
-                        "value": "[variables('networkSecurityGroupName')]"
-                    },
-                    "lockDownbyPublicIP": {
-                        "value": "[parameters('NsgLockdownByPublicIP')]"
-                    },
-                    "MyPublicIP": {
-                        "value": "[parameters('MyPublicIP')]"
-                    },
-                    "location": {
-                        "value": "[parameters('location')]"
-                    }                  
-                }
-
-            }
-        }            
-
+        }
     ]
 }
