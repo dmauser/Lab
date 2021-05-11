@@ -15,6 +15,7 @@
         },
         "sharedKey": {
             "type": "securestring",
+             "defaultValue": "@password@",
             "metadata": {
                 "description": "The shared key used to establish connection between the two vNet Gateways."
             }
@@ -53,15 +54,15 @@
         }
     },
     "variables": {
-    "artifactsLocation": "https://raw.githubusercontent.com/dmauser/lab/PLS-for-onprem-workloads/linked/",
-    "providerTemplateURI": "[uri(variables('artifactsLocation'), concat('provider.json'))]",
-    "customer_aTemplateURI": "[uri(variables('artifactsLocation'), concat('customer-a.json'))]",
-    "customer_bTemplateURI": "[uri(variables('artifactsLocation'), concat('customer-b.json'))]"    
+    "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
+    "providerTemplateURI": "[uri(variables('artifactsLocation'),concat('provider.json'))]",
+    "customer_aTemplateURI": "[uri(variables('artifactsLocation'),concat('customer-a.json'))]",
+    "customer_bTemplateURI": "[uri(variables('artifactsLocation'),concat('customer-b.json'))]"    
     },
     "resources": [
         {
             "condition": "[equals(parameters('Environment'), 'Provider')]",
-            "name": "[concat('Provision',parameters('Environment'))]",
+            "name": "[concat('Provision-',parameters('Environment'))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "location": "[parameters('location')]",
@@ -72,10 +73,14 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    
+                    "Environment":"[parameters('Environment')]",
+                    "sharedKey":"[parameters('sharedKey')]",
+                    "gatewaySku": "[parameters('gatewaySku')]",
+                    "vpnGatewayGeneration":"[parameters('vpnGatewayGeneration')]",
+                    "location":"[parameters('location')]"                    
                 }
 
             }
         }
-
     ]
+}
