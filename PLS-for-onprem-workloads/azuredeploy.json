@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Environment": {
+            "type": "string",
+            "allowedValues": [
+                "Provider",
+                "Cx-A",
+                "Cx-B"
+            ],
+            "metadata": {
+                "description": "The shared key used to establish connection between the two vNet Gateways."
+            }
+        },
+        "sharedKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The shared key used to establish connection between the two vNet Gateways."
+            }
+        },
+        "gatewaySku": {
+            "type": "string",
+            "defaultValue": "VpnGw1",
+            "allowedValues": [
+                "VpnGw1",
+                "VpnGw2",
+                "VpnGw3",
+                "VpnGw4",
+                "VpnGw5"
+            ],
+            "metadata": {
+                "description": "The SKU for the VPN Gateway. Cannot be Basic SKU."
+            }
+        },
+        "vpnGatewayGeneration": {
+            "type": "string",
+            "defaultValue": "Generation1",
+            "allowedValues": [
+                "Generation1",
+                "Generation2"
+            ],
+            "metadata": {
+                "description": "Select VPn Gateway Generation."
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of the resources"
+            },
+            "defaultValue": "[resourceGroup().location]"
+        }
+    },
+    "variables": {
+    "artifactsLocation": "https://raw.githubusercontent.com/dmauser/lab/PLS-for-onprem-workloads/linked/",
+    "providerTemplateURI": "[uri(variables('artifactsLocation'), concat('provider.json'))]",
+    "customer_aTemplateURI": "[uri(variables('artifactsLocation'), concat('customer-a.json'))]",
+    "customer_bTemplateURI": "[uri(variables('artifactsLocation'), concat('customer-b.json'))]"    
+    },
+    "resources": [
+        {
+            "condition": "[equals(parameters('Environment'), 'Provider')]",
+            "name": "[concat('Provision',parameters('Environment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('providerTemplateURI')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    
+                }
+
+            }
+        }
+
+    ]
