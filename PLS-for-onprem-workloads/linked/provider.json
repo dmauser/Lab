@@ -44,7 +44,7 @@
                 "description": "Select VPn Gateway Generation."
             }
         },
-      "UDRlockDownbyPublicIP": {
+      "UdrLockdownByPublicIP": {
           "type": "string",
           "allowedValues": [
               "yes",
@@ -115,7 +115,7 @@
                         "value": "[variables('networkSecurityGroupName')]"
                     },
                     "lockDownbyPublicIP": {
-                        "value": "[parameters('UDRlockDownbyPublicIP')]"
+                        "value": "[parameters('UdrLockdownByPublicIP')]"
                     },
                     "MyPublicIP": {
                         "value": "[parameters('MyPublicIP')]"
