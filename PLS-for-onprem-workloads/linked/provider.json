@@ -235,6 +235,7 @@
             "name": "[variables('OnPrem').gatewayName]",
             "location": "[parameters('location')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",                
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('OnPrem').gatewayPublicIPName)]",
                 "[resourceId('Microsoft.Network/virtualNetworks/', variables('OnPrem').name)]"
             ],
@@ -273,6 +274,7 @@
             "name": "[variables('Azure').gatewayName]",
             "location": "[parameters('location')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('Azure').gatewayPublicIPName1)]",
                 "[resourceId('Microsoft.Network/virtualNetworks/', variables('Azure').name)]"
             ],
@@ -312,6 +314,7 @@
             "name": "[variables('OnPrem').connectionName]",
             "location": "[parameters('location')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('OnPrem').gatewayName)]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('Azure').gatewayName)]"
             ],
@@ -335,6 +338,7 @@
             "name": "[variables('Azure').connectionName]",
             "location": "[parameters('location')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('OnPrem').gatewayName)]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('Azure').gatewayName)]"
             ],
