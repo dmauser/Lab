@@ -68,11 +68,11 @@
         }
     },
     "variables": {
-    "networkSecurityGroupName": "default-udr",
-    "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
+    "nsgname": "default-udr",
     "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
     "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
     "providerTemplateURI": "[concat(uri(variables('artifactsLocation'),'provider.json'))]",
+    "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('nsgname'))]",
     "customer_aTemplateURI": "[concat(uri(variables('artifactsLocation'),'customer-a.json'))]",
     "customer_bTemplateURI": "[concat(uri(variables('artifactsLocation'),'customer-b.json'))]"    
     },
@@ -82,14 +82,14 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "properties": {
-                "mode": "Incremental",
+                "mode": "Complete",
                 "templateLink": {
                     "uri": "[variables('nsgtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "networkSecurityGroupName": {
-                        "value": "[variables('networkSecurityGroupName')]"
+                        "value": "[variables('nsgname')]"
                     },
                     "lockDownbyPublicIP": {
                         "value": "[parameters('NsgLockdownByPublicIP')]"
@@ -105,7 +105,6 @@
             }
         },
         {
-            "condition": "[equals(parameters('Environment'), 'Provider')]",
             "name": "deploy-provider",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
