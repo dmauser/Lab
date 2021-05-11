@@ -102,7 +102,7 @@
     "resources": [
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "DeployNSG",
+            "name": "[variables('networkSecurityGroupName')]",
             "apiVersion": "2020-10-01",
             "properties": {
                 "mode": "Incremental",
@@ -135,7 +135,9 @@
             "name": "[variables('OnPrem').vnetname]",
             "location": "[parameters('location')]",
             "comments": "This is the first vNet",
-            "dependsOn": "[variables('networkSecurityGroupName')]",
+            "dependsOn": [
+                "[variables('networkSecurityGroupName')]"
+            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
