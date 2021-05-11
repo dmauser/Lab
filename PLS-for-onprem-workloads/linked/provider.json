@@ -169,7 +169,9 @@
             "name": "[variables('Azure').vnetname]",
             "location": "[parameters('location')]",
             "comments": "This is the second vNet",
-            "dependsOn": "[variables('networkSecurityGroupName')]",
+            "dependsOn": [
+                "[concat('deploy-',variables('networkSecurityGroupName'))]"
+            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
