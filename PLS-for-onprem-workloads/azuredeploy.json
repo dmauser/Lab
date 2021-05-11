@@ -55,17 +55,16 @@
     },
     "variables": {
     "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
-    "providerTemplateURI": "[uri(variables('artifactsLocation'),concat('provider.json'))]",
+    "providerTemplateURI": "[concat(uri(variables('artifactsLocation'),'provider.json'))]",
     "customer_aTemplateURI": "[uri(variables('artifactsLocation'),concat('customer-a.json'))]",
     "customer_bTemplateURI": "[uri(variables('artifactsLocation'),concat('customer-b.json'))]"    
     },
     "resources": [
         {
             "condition": "[equals(parameters('Environment'), 'Provider')]",
-            "name": "[concat('Provision-',parameters('Environment'))]",
+            "name": "deploy-provider",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
-            "location": "[parameters('location')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -73,11 +72,21 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "Environment":"[parameters('Environment')]",
-                    "sharedKey":"[parameters('sharedKey')]",
-                    "gatewaySku": "[parameters('gatewaySku')]",
-                    "vpnGatewayGeneration":"[parameters('vpnGatewayGeneration')]",
-                    "location":"[parameters('location')]"                    
+                    "Environment": {
+                        "value": "[parameters('Environment')]"
+                    },
+                    "sharedKey": {
+                        "value": "[parameters('sharedKey')]"
+                    },
+                    "gatewaySku": {
+                        "value": "[parameters('gatewaySku')]"
+                    },
+                    "vpnGatewayGeneration": {
+                        "value": "[parameters('vpnGatewayGeneration')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }                  
                 }
 
             }
