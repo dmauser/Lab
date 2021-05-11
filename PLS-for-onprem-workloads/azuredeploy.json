@@ -103,13 +103,7 @@
                     },
                     "vpnGatewayGeneration": {
                         "value": "[parameters('vpnGatewayGeneration')]"
-                    },
-                    "NsgLockdownByPublicIP": {
-                        "value": "[parameters('NsgLockdownByPublicIP')]"
-                    },
-                    "MyPublicIP": {
-                        "value": "[parameters('MyPublicIP')]"
-                    },                                        
+                    },                                  
                     "location": {
                         "value": "[parameters('location')]"
                     }                  
