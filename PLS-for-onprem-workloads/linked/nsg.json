@@ -20,9 +20,7 @@
         }
       }
     },
-    "variables": {
-        "mypip": "[concat(parameters('MyPublicIP'),'/32')]"
-    },
+    "variables": {},
     "resources": [
       {   
         "apiVersion": "2020-05-01",
