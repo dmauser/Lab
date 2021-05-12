@@ -67,7 +67,7 @@
         }
     },
     "variables": {
-    "nsgname": "[concat(parameters('Environment'),'-default-udr')]",
+    "nsgname": "[concat(parameters('Environment'),'-default-nsg')]",
     "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
     "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
          "OnPrem": {
@@ -142,7 +142,8 @@
                     {
                         "name": "[variables('OnPrem').subnetName]",
                         "properties": {
-                            "addressPrefix": "[variables('OnPrem').subnetPrefix]"
+                            "addressPrefix": "[variables('OnPrem').subnetPrefix]",
+                            "networkSecurityGroup": "[reference(resourceId('Microsoft.Resources/deployments','nsg'), '2020-05-01').outputs.nsgResourceID.value]"
                         }
                     },
                     {
@@ -160,6 +161,9 @@
             "name": "[variables('Azure').name]",
             "location": "[parameters('location')]",
             "comments": "This is the second vNet",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'nsg')]"
+            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [

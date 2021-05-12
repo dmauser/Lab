@@ -55,7 +55,6 @@
     "variables": {
          "OnPrem": {
             "name": "[concat(parameters('Environment'),'-OnPrem')]",
-            "vnetname": "[concat(parameters('Environment'),'-OnPrem-vnet')]",
             "addressSpacePrefix": "192.168.1.0/24",
             "subnetName": "subnet1",
             "subnetPrefix": "192.168.1.0/25",
@@ -67,7 +66,6 @@
         },
         "Azure": {
             "name": "[concat(parameters('Environment'),'-Az')]",
-            "vnetname": "[concat(parameters('Environment'),'-Az-vnet')]",
             "addressSpacePrefix": "10.0.0.0/24",
             "subnetName": "subnet1",
             "subnetPrefix": "10.0.0.0/27",
@@ -84,7 +82,7 @@
         {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('OnPrem').vnetname]",
+            "name": "[variables('OnPrem').name]",
             "location": "[parameters('location')]",
             "comments": "This is the first vNet",
             "properties": {
@@ -112,12 +110,9 @@
         {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('Azure').vnetname]",
+            "name": "[variables('Azure').name]",
             "location": "[parameters('location')]",
             "comments": "This is the second vNet",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'nsg')]"
-            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -188,7 +183,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('OnPrem').vnetname, 'GatewaySubnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('OnPrem').name, 'GatewaySubnet')]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('OnPrem').gatewayPublicIPName)]"
@@ -227,7 +222,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('Azure').vnetname, 'GatewaySubnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('Azure').name, 'GatewaySubnet')]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('Azure').gatewayPublicIPName1)]"

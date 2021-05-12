@@ -82,14 +82,14 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "properties": {
-                "mode": "Complete",
+                "mode": "Incremental",
                 "templateLink": {
                     "uri": "[variables('nsgtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "networkSecurityGroupName": {
-                        "value": "[variables('nsgname')]"
+                        "value": "[concat(parameters('Environment'),variables('nsgname'))]"
                     },
                     "lockDownbyPublicIP": {
                         "value": "[parameters('NsgLockdownByPublicIP')]"
