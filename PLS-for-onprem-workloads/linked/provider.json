@@ -13,15 +13,22 @@
                 "description": "Deploy each environment individually as Provider, Customer A and Customer B."
             }
         },
+        "VmadminUsername": {
+            "type": "string"
+        },
+        "VmadminPassword": {
+            "type": "secureString"
+        },
         "sharedKey": {
             "type": "securestring",
+            "defaultValue": "@password@",
             "metadata": {
                 "description": "The shared key used to establish connection between the two vNet Gateways."
             }
         },
         "gatewaySku": {
             "type": "string",
-            "defaultValue": "VpnGw2",
+            "defaultValue": "VpnGw1",
             "allowedValues": [
                 "VpnGw1",
                 "VpnGw2",
@@ -70,6 +77,7 @@
     "nsgname": "[concat(parameters('Environment'),'-default-nsg')]",
     "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
     "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
+    "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vm.json'))]",
          "OnPrem": {
             "name": "[concat(parameters('Environment'),'-OnPrem')]",
             "addressSpacePrefix": "192.168.1.0/24",
@@ -96,7 +104,7 @@
         }
     },
     "resources": [
-{
+        {
             "name": "nsg",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
@@ -115,6 +123,42 @@
                     },
                     "MyPublicIP": {
                         "value": "[parameters('MyPublicIP')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }                  
+                }
+
+            }
+        },
+        {
+            "name": "onprem-vm",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('OnPrem').name)]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmtemplateURI')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "adminUsername": {
+                        "value": "[parameters('VmadminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('VmadminPassword')]"
+                    },
+                    "subnetName": {
+                        "value": "[variables('OnPrem').subnetName]"
+                    },
+                    "virtualNetworkId": {
+                        "value": "[resourceId('Microsoft.Network/virtualNetworks/', variables('OnPrem').name)]"
+                    },
+                    "virtualMachineName": {
+                        "value": "[concat(parameters('Environment'),'onprem-lxvm')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
