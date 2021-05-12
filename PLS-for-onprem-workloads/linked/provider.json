@@ -143,7 +143,9 @@
                         "name": "[variables('OnPrem').subnetName]",
                         "properties": {
                             "addressPrefix": "[variables('OnPrem').subnetPrefix]",
-                            "networkSecurityGroup": "[reference(resourceId('Microsoft.Resources/deployments','nsg'), '2020-05-01').outputs.nsgResourceID.value]"
+                            "networkSecurityGroup": {
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments','nsg'), '2020-05-01').outputs.nsgResourceID.value]"
+                            }                        
                         }
                     },
                     {
@@ -174,7 +176,10 @@
                     {
                         "name": "[variables('Azure').subnetName]",
                         "properties": {
-                            "addressPrefix": "[variables('Azure').subnetPrefix]"
+                            "addressPrefix": "[variables('Azure').subnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments','nsg'), '2020-05-01').outputs.nsgResourceID.value]"
+                            }
                         }
                     },
                     {
