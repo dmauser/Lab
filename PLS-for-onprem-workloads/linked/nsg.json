@@ -32,6 +32,7 @@
     },
     "resources": [
       {
+        "condition": "[equals(parameters('lockDownbyPublicIP'), 'no')]",
         "apiVersion": "2020-05-01",
         "type": "Microsoft.Network/networkSecurityGroups",
         "name": "[parameters('networkSecurityGroupName')]",
