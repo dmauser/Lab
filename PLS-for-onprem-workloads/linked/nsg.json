@@ -5,16 +5,9 @@
       "networkSecurityGroupName": {
            "type": "string"
       },
-      "lockDownbyPublicIP": {
+      "RestrictSshAccesByPublicIP": {
           "type": "string",
-          "allowedValues": [
-              "yes",
-              "no"
-          ]
-      },
-      "MyPublicIP": {
-          "type": "string",
-          "defaultValue": "null",
+          "defaultValue": "*",
           "metadata": {
             "description": "Optional in case you answer no for Lock Down Public IP, but required in case you selected yes. Please use curl ifconfig.io to get your Public IP address"
             }
@@ -31,32 +24,7 @@
         "mypip": "[concat(parameters('MyPublicIP'),'/32')]"
     },
     "resources": [
-      {
-        "condition": "[equals(parameters('lockDownbyPublicIP'), 'no')]",
-        "apiVersion": "2020-05-01",
-        "type": "Microsoft.Network/networkSecurityGroups",
-        "name": "[parameters('networkSecurityGroupName')]",
-        "location": "[resourceGroup().location]",
-        "properties": {
-          "securityRules": [
-            {
-                "name": "SSH",
-                "properties": {
-                    "priority": 300,
-                    "protocol": "TCP",
-                    "access": "Allow",
-                    "direction": "Inbound",
-                    "sourceAddressPrefix": "*",
-                    "sourcePortRange": "*",
-                    "destinationAddressPrefix": "*",
-                    "destinationPortRange": "22"
-              }
-            }
-          ]
-        }
-      },
-      {
-        "condition": "[equals(parameters('lockDownbyPublicIP'), 'yes')]",      
+      {   
         "apiVersion": "2020-05-01",
         "type": "Microsoft.Network/networkSecurityGroups",
         "name": "[concat(parameters('networkSecurityGroupName'),'-restricted')]",
@@ -70,7 +38,7 @@
                     "protocol": "TCP",
                     "access": "Allow",
                     "direction": "Inbound",
-                    "sourceAddressPrefix": "[variables('mypip')]",
+                    "sourceAddressPrefix": "[parameters('RestrictSshAccesByPublicIP')]",
                     "sourcePortRange": "*",
                     "destinationAddressPrefix": "*",
                     "destinationPortRange": "22"

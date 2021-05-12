@@ -51,18 +51,11 @@
                 "description": "Select VPn Gateway Generation."
             }
         },
-      "NsgLockdownByPublicIP": {
+      "RestrictSshAccesByPublicIP": {
           "type": "string",
-          "allowedValues": [
-              "yes",
-              "no"
-          ]
-      },
-      "MyPublicIP": {
-          "type": "string",
-          "defaultValue": "null",
+          "defaultValue": "*",
           "metadata": {
-            "description": "Optional in case you answer no for Lock Down Public IP, but required in case you selected yes. Please use curl ifconfig.io to get your Public IP address"
+            "description": "Default is any source Public IP (*). To restric access, please specify your CIDR. For single IP add 1.1.1.1/32."
             }
       },
         "location": {
@@ -118,11 +111,8 @@
                     "networkSecurityGroupName": {
                         "value": "[variables('nsgname')]"
                     },
-                    "lockDownbyPublicIP": {
-                        "value": "[parameters('NsgLockdownByPublicIP')]"
-                    },
-                    "MyPublicIP": {
-                        "value": "[parameters('MyPublicIP')]"
+                    "RestrictSshAccesByPublicIP": {
+                        "value": "[parameters('RestrictSshAccesByPublicIP')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
@@ -210,7 +200,7 @@
             "location": "[parameters('location')]",
             "comments": "This is the first vNet",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'nsg')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Environment'),'-nsg'))]"
             ],
             "properties": {
                 "addressSpace": {
@@ -224,7 +214,7 @@
                         "properties": {
                             "addressPrefix": "[variables('OnPrem').subnetPrefix]",
                             "networkSecurityGroup": {
-                                "id": "[reference(resourceId('Microsoft.Resources/deployments','nsg'), '2020-05-01').outputs.nsgResourceID.value]"
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments', concat(parameters('Environment'),'-nsg')), '2020-05-01').outputs.nsgResourceID.value]"
                             }                        
                         }
                     },
@@ -244,7 +234,7 @@
             "location": "[parameters('location')]",
             "comments": "This is the second vNet",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'nsg')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Environment'),'-nsg'))]"
             ],
             "properties": {
                 "addressSpace": {
@@ -258,7 +248,7 @@
                         "properties": {
                             "addressPrefix": "[variables('Azure').subnetPrefix]",
                             "networkSecurityGroup": {
-                                "id": "[reference(resourceId('Microsoft.Resources/deployments','nsg'), '2020-05-01').outputs.nsgResourceID.value]"
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments', concat(parameters('Environment'),'-nsg')), '2020-05-01').outputs.nsgResourceID.value]"
                             }
                         }
                     },
