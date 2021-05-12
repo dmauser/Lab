@@ -79,7 +79,7 @@
     "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
     "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vm.json'))]",
          "OnPrem": {
-            "name": "[concat(parameters('Environment'),'-OnPrem')]",
+            "name": "[concat(parameters('Environment'),'-OnPrem-vnet')]",
             "addressSpacePrefix": "192.168.1.0/24",
             "subnetName": "subnet1",
             "subnetPrefix": "192.168.1.0/25",
@@ -90,7 +90,7 @@
             "asn": 65002
         },
         "Azure": {
-            "name": "[concat(parameters('Environment'),'-Az')]",
+            "name": "[concat(parameters('Environment'),'-Az-vnet')]",
             "addressSpacePrefix": "10.0.0.0/24",
             "subnetName": "subnet1",
             "subnetPrefix": "10.0.0.0/27",
