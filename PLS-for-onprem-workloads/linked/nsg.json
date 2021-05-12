@@ -58,7 +58,7 @@
     "outputs": {
         "nsgResourceID": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName')))]"
+            "value": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
         }
     }
 }
