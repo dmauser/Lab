@@ -25,7 +25,7 @@
       {   
         "apiVersion": "2020-05-01",
         "type": "Microsoft.Network/networkSecurityGroups",
-        "name": "[concat(parameters('networkSecurityGroupName'),'-restricted')]",
+        "name": "[parameters('networkSecurityGroupName')]",
         "location": "[resourceGroup().location]",
         "properties": {
           "securityRules": [
