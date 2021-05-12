@@ -51,7 +51,7 @@
                 "description": "Select VPn Gateway Generation."
             }
         },
-      "RestrictSshAccesByPublicIP": {
+      "RestrictSshAccessByPublicIP": {
           "type": "string",
           "defaultValue": "*",
           "metadata": {
@@ -111,8 +111,8 @@
                     "networkSecurityGroupName": {
                         "value": "[variables('nsgname')]"
                     },
-                    "RestrictSshAccesByPublicIP": {
-                        "value": "[parameters('RestrictSshAccesByPublicIP')]"
+                    "RestrictSshAccessByPublicIP": {
+                        "value": "[parameters('RestrictSshAccessByPublicIP')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"

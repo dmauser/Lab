@@ -5,7 +5,7 @@
       "networkSecurityGroupName": {
            "type": "string"
       },
-      "RestrictSshAccesByPublicIP": {
+      "RestrictSshAccessByPublicIP": {
           "type": "string",
           "defaultValue": "*",
           "metadata": {
@@ -38,7 +38,7 @@
                     "protocol": "TCP",
                     "access": "Allow",
                     "direction": "Inbound",
-                    "sourceAddressPrefix": "[parameters('RestrictSshAccesByPublicIP')]",
+                    "sourceAddressPrefix": "[parameters('RestrictSshAccessByPublicIP')]",
                     "sourcePortRange": "*",
                     "destinationAddressPrefix": "*",
                     "destinationPortRange": "22"
