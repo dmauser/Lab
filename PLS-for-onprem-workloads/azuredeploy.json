@@ -6,8 +6,8 @@
             "type": "string",
             "allowedValues": [
                 "Provider",
-                "Cx-A",
-                "Cx-B"
+                "CxA",
+                "CxB"
             ],
             "metadata": {
                 "description": "Deploy each environment individually as Provider, Customer A and Customer B."
