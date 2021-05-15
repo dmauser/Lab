@@ -208,7 +208,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "Virtual": {
+                    "virtualMachineName": {
                         "value": "[concat(parameters('Environment'),'-onprem-lxvm')]"
                     },
                     "location": {
@@ -232,7 +232,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "Virtual": {
+                    "virtualMachineName": {
                         "value": "[concat(parameters('Environment'),'-az-lxvm')]"
                     },
                     "location": {
