@@ -199,7 +199,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[concat(parameters('Environment'),'-onprem-vm')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Environment'),'-onprem-vm'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -223,7 +223,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[concat(parameters('Environment'),'-az-vm')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Environment'),'-az-vm'))]"
             ],
             "properties": {
                 "mode": "Incremental",
