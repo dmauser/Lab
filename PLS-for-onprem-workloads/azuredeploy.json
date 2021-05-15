@@ -51,13 +51,13 @@
                 "description": "Select VPn Gateway Generation."
             }
         },
-      "RestrictSshAccessByPublicIP": {
-          "type": "string",
-          "defaultValue": "*",
-          "metadata": {
-            "description": "Default is any source Public IP (*). To restric access, please specify your CIDR. For single IP add 1.1.1.1/32."
+        "RestrictSshAccessByPublicIP": {
+            "type": "string",
+            "defaultValue": "*",
+            "metadata": {
+                "description": "Default is any source Public IP (*). To restric access, please specify your CIDR. For single IP add 1.1.1.1/32."
             }
-      },
+        },
         "location": {
             "type": "string",
             "metadata": {
@@ -67,11 +67,12 @@
         }
     },
     "variables": {
-    "nsgname": "[concat(parameters('Environment'),'-default-nsg')]",
-    "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
-    "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
-    "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vm.json'))]",
-         "OnPrem": {
+        "nsgname": "[concat(parameters('Environment'),'-default-nsg')]",
+        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
+        "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
+        "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vm.json'))]",
+        "vmextTemplateURI": "[concat(uri(variables('artifactsLocation'),'vmext.json'))]",
+        "OnPrem": {
             "name": "[concat(parameters('Environment'),'-OnPrem-vnet')]",
             "addressSpacePrefix": "192.168.1.0/24",
             "subnetName": "subnet1",
@@ -116,7 +117,7 @@
                     },
                     "location": {
                         "value": "[parameters('location')]"
-                    }                  
+                    }
                 }
 
             }
@@ -152,12 +153,12 @@
                     },
                     "location": {
                         "value": "[parameters('location')]"
-                    }                  
+                    }
                 }
 
             }
         },
-                {
+        {
             "name": "[concat(parameters('Environment'),'-az-vm')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
@@ -188,7 +189,55 @@
                     },
                     "location": {
                         "value": "[parameters('location')]"
-                    }                  
+                    }
+                }
+
+            }
+        },
+        {
+            "name": "[concat(parameters('Environment'),'-onpremvmext')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[concat(parameters('Environment'),'-onprem-vm')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmextTemplateURI')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "Virtual": {
+                        "value": "[concat(parameters('Environment'),'-onprem-lxvm')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+
+            }
+        },
+        {
+            "name": "[concat(parameters('Environment'),'-azvmext')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[concat(parameters('Environment'),'-az-vm')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmextTemplateURI')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "Virtual": {
+                        "value": "[concat(parameters('Environment'),'-az-lxvm')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
                 }
 
             }
@@ -215,7 +264,7 @@
                             "addressPrefix": "[variables('OnPrem').subnetPrefix]",
                             "networkSecurityGroup": {
                                 "id": "[reference(resourceId('Microsoft.Resources/deployments', concat(parameters('Environment'),'-nsg')), '2020-05-01').outputs.nsgResourceID.value]"
-                            }                        
+                            }
                         }
                     },
                     {
@@ -283,7 +332,7 @@
                 "publicIPAllocationMethod": "Dynamic"
             }
         },
-            {
+        {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('Azure').gatewayPublicIPName1]",
@@ -298,7 +347,7 @@
             "type": "Microsoft.Network/virtualNetworkGateways",
             "name": "[variables('OnPrem').gatewayName]",
             "location": "[parameters('location')]",
-            "dependsOn": [          
+            "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('OnPrem').gatewayPublicIPName)]",
                 "[resourceId('Microsoft.Network/virtualNetworks/', variables('OnPrem').name)]"
             ],

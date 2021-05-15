@@ -115,4 +115,4 @@ More information about Azure Gateway IPSec policies consult: [IKE Phase 1 (Main 
 ![Custom IPSec Settings](custom-ipsec-settings.png)
 
 ## LAB
-A lab with automated scenarios will be added soon. Stay tunned!
+A lab with automated scenarios will be added soon. Stay tuned!
