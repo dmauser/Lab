@@ -71,7 +71,7 @@
         "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/",
         "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
         "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vm.json'))]",
-        "vmextTemplateURI": "[concat(uri(variables('artifactsLocation'),'vmext.json'))]",
+        "vmextTemplateURI": "[concat(uri(variables('artifactsLocation'),'lxvmext.json'))]",
         "OnPrem": {
             "name": "[concat(parameters('Environment'),'-OnPrem-vnet')]",
             "addressSpacePrefix": "192.168.1.0/24",
