@@ -28,9 +28,9 @@
             "name": "[concat(parameters('virtualMachineName'),'/', 'Tools')]",
             "location": "[parameters('location')]",
             "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.7",
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "commandToExecute": "[parameters('commandToExecute')]"
