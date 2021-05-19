@@ -164,7 +164,7 @@
                                     "settings": {
                                         "commandToExecute": "./automate_nginx.sh",
                                         "fileUris": [
-                                            "https://raw.githubusercontent.com/microsoft/PL-DNS-Proxy/master/automate_nginx.sh"
+                                            "https://raw.githubusercontent.com/microsoft/PL-DNS-Proxy/master/automate_haproxy.sh"
                                         ]
                                     }
                                 }
