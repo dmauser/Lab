@@ -10,6 +10,7 @@
         },
         "vmssName": {
             "type": "string",
+            "defaultValue": "Ha-ProxyVMSS",
             "metadata": {
                 "description": "Globally unique dns name for the scale set. Must be 3-61 characters in length and globally unique across Azure."
             },
@@ -47,6 +48,13 @@
                 "description": "Name of the existing subnet to deploy the scale set into."
             }
         },
+        "onPremBackEndIP": {
+            "type": "string",
+            "defaultValue": "192.168.0.4",
+            "metadata": {
+                "description": "Set IP."
+            }
+        },        
         "authenticationType": {
             "type": "string",
             "defaultValue": "sshPublicKey",
@@ -162,9 +170,9 @@
                                     "typeHandlerVersion": "1.3",
                                     "autoUpgradeMinorVersion": true,
                                     "settings": {
-                                        "commandToExecute": "./automate_nginx.sh",
+                                        "commandToExecute": "[concat('./automate_haproxy.sh',' ',parameters('onPremBackEndIP'))]",
                                         "fileUris": [
-                                            "https://raw.githubusercontent.com/microsoft/PL-DNS-Proxy/master/automate_haproxy.sh"
+                                            "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads/linked/automate_haproxy.sh"
                                         ]
                                     }
                                 }
