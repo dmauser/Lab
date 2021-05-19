@@ -3,6 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmSku": {
+            "type": "string",
             "defaultValue": "Standard_B1ms",
             "metadata": {
                 "description": "Size for the Virtual Machine."
@@ -32,6 +33,7 @@
         },
         "existingVnetResourceGroupName": {
             "type": "string",
+            "defaultValue": "[resourceGroup().name]",
             "metadata": {
                 "description": "Name of the resourceGroup for the existing virtual network to deploy the scale set into."
             }
@@ -50,9 +52,9 @@
         },
         "onPremBackEndIP": {
             "type": "string",
-            "defaultValue": "192.168.0.4",
+            "defaultValue": "192.168.1.4",
             "metadata": {
-                "description": "Set IP."
+                "description": "Set On-premises IP."
             }
         },        
         "authenticationType": {
@@ -75,10 +77,10 @@
     },
     "variables": {
         "subnetId": "[resourceId(parameters('existingVnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVnetName'), parameters('existingSubnetName'))]",
-        "loadBalancerName": "HAProxyloadBalancer",
+        "loadBalancerName": "INT-STD-LB",
         "loadBalancerFrontEndName": "HAProxyloadBalancerFrontEnd",
         "loadBalancerBackEndName": "HAProxyloadBalancerBackEnd",
-        "loadBalancerProbeName": "HAProxySSHProbe",
+        "loadBalancerProbeName": "SSHProbe",
         "loadBalancerNatPoolName": "loadBalancerNatPool",
         "linuxConfiguration": {
             "disablePasswordAuthentication": true,
