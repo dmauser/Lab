@@ -31,3 +31,7 @@ az vm extension set \
 --name customScript \
 --publisher Microsoft.Azure.Extensions \
 --protected-settings '{"fileUris": ["https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"],"commandToExecute": "./nettools.sh"}'
+
+
+## Create PLS
+az network 
