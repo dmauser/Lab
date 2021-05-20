@@ -40,12 +40,14 @@
         },
         "existingVnetName": {
             "type": "string",
+            "defaultValue": "provider-az-vnet",
             "metadata": {
                 "description": "vName of the existing virtual network to deploy the scale set into."
             }
         },
         "existingSubnetName": {
             "type": "string",
+            "defaultValue": "haproxy",
             "metadata": {
                 "description": "Name of the existing subnet to deploy the scale set into."
             }
@@ -77,12 +79,11 @@
     },
     "variables": {
         "subnetId": "[resourceId(parameters('existingVnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVnetName'), parameters('existingSubnetName'))]",
-        "loadBalancerName": "PLS-STD-LB",
+        "loadBalancerName": "pls-std-lb",
         "loadBalancerFrontEndName": "HAProxyloadBalancerFrontEnd",
         "loadBalancerBackEndName": "HAProxyloadBalancerBackEnd",
         "loadBalancerProbeName": "SSHProbe",
         "loadBalancerNatPoolName": "loadBalancerNatPool",
-        "privatelinkservicename": "PLS-HAProxy",
         "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -189,7 +190,10 @@
             "type": "Microsoft.Network/loadBalancers",
             "name": "[variables('loadBalancerName')]",
             "location": "[resourceGroup().location]",
-            "apiVersion": "2017-06-01",
+            "apiVersion": "2020-07-01",
+            "sku": {
+                "name": "Standard"
+            },
             "properties": {
                 "frontendIPConfigurations": [
                     {
@@ -208,7 +212,7 @@
                 ],
                 "loadBalancingRules": [
                     {
-                        "name": "roundRobinLBRule",
+                        "name": "PLSLbRule",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/', variables('loadBalancerFrontEndName'))]"
@@ -249,33 +253,6 @@
                             "frontendPortRangeStart": 50000,
                             "frontendPortRangeEnd": 50019,
                             "backendPort": 22
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/privateLinkServices",
-            "apiVersion": "2020-06-01",
-            "name": "[variables('privatelinkservicename')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "enableProxyProtocol": false,
-                "loadBalancerFrontendIpConfigurations": [
-                    {
-                        "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancerFrontEndName'), variables('loadBalancerFrontEndName'))]"
-                    }
-                ],
-                "ipConfigurations": [
-                    {
-                        "name": "snet-provider-default-1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "privateIPAddressVersion": "IPv4",
-                            "subnet": {
-                                "id": "[variables('subnetId')]"
-                            },
-                            "primary": false
                         }
                     }
                 ]

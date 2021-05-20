@@ -1,0 +1,120 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmSku": {
+            "type": "string",
+            "defaultValue": "Standard_B1ms",
+            "metadata": {
+                "description": "Size for the Virtual Machine."
+            }
+        },
+        "vmssName": {
+            "type": "string",
+            "defaultValue": "HAProxyVMSS",
+            "metadata": {
+                "description": "Globally unique dns name for the scale set. Must be 3-61 characters in length and globally unique across Azure."
+            },
+            "maxLength": 61
+        },
+        "instanceCount": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of VM instances (100 or less)."
+            },
+            "defaultValue": 2,
+            "maxValue": 100
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Admin username on all VMs."
+            }
+        },
+        "existingVnetResourceGroupName": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Name of the resourceGroup for the existing virtual network to deploy the scale set into."
+            }
+        },
+        "existingVnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "vName of the existing virtual network to deploy the scale set into."
+            }
+        },
+        "existingSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the existing subnet to deploy the scale set into."
+            }
+        },
+        "HA_ProxyBackEndIP": {
+            "type": "string",
+            "defaultValue": "192.168.1.4",
+            "metadata": {
+                "description": "Set On-premises IP. It defaults to 192.168.1.4 (On-prem IP)"
+            }
+        },
+        "authenticationType": {
+            "type": "string",
+            "defaultValue": "sshPublicKey",
+            "allowedValues": [
+                "sshPublicKey",
+                "password"
+            ],
+            "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "adminPasswordOrKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+            }
+        }
+    },
+    "variables": {
+        "subnetId": "[resourceId(parameters('existingVnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVnetName'), parameters('existingSubnetName'))]",
+        "loadBalancerName": "PLS-STD-LB",
+        "privatelinkservicename": "PLS-HAProxy"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/privateLinkServices",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('privatelinkservicename')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]"
+            ],
+            "properties": {
+                "visibility": {
+                    "subscriptions": [
+                        "*"
+                    ]
+                },
+                "enableProxyProtocol": false,
+                "loadBalancerFrontendIpConfigurations": [
+                    {
+                        "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancerName'), variables('loadBalancerFrontEndName'))]"
+                    }
+                ],
+                "ipConfigurations": [
+                    {
+                        "name": "subnet1-1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "privateIPAddressVersion": "IPv4",
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            },
+                            "primary": false
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,37 +1,41 @@
 # Define variables
-rg=PLS-Provider
-location=eastus2
+rg=provider
+location=centralus
 vnetname=Provider-Az-vnet
 vmname=Provider-onprem-lxvm
+haproxyplsname=pls-haproxy
+firewallplsname=pls-firewall
+plsnatsubnetname=pls-nat-subnet
 
-
-# Create VNET/Subnet
-az group create --name $rg --location $location
-az network vnet create --resource-group $rg --name $vnetname --location $location \
---address-prefixes 10.0.0.0/24 \
---subnet-name subnet1 \
---subnet-prefix 10.0.0.0/24
-
-# Create VM using
-az network public-ip create --name $vmname-pip --resource-group $rg --location $location --allocation-method Dynamic
-az network nic create --resource-group $rg -n $vmname-nic --location $location \
---subnet subnet1 \
---vnet-name $vnetname \
---public-ip-address $vmname-pip
-az vm create -n $vmname --resource-group $rg --size Standard_B1s --image UbuntuLTS \
---admin-username dmauser \
---ssh-key-values dmauser.pub \
---nics $vmname-nic \
---no-wait
-
-## Run Extension Script
-az vm extension set \
---resource-group $rg \
---vm-name $vmname \
---name customScript \
---publisher Microsoft.Azure.Extensions \
---protected-settings '{"fileUris": ["https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"],"commandToExecute": "./nettools.sh"}'
+##Create Subnet for HAproxy
+az network vnet subnet create -g $rg --vnet-name $vnetname \
+--name haproxy \
+--address-prefixes "10.0.0.128/27" \
+--nat-gateway natgw
+#Provision HA Proxy
 
 
 ## Create PLS
-az network 
+# Disable-private-link-service-network-policies to true on PLS NAT subnet
+az network vnet subnet create -g $rg --vnet-name $vnetname \
+--name $plsnatsubnetname \
+--address-prefixes "10.0.0.160/28" \
+--disable-private-link-service-network-policies true
+#Create Private link Service
+az network private-link-service create -g $rg -l $location \
+--name $haproxyplsname \
+--vnet-name $vnetname \
+--subnet $plsnatsubnetname \
+--lb-name pls-std-lb \
+--lb-frontend-ip-configs HAProxyloadBalancerFrontEnd \
+
+# Changing Visibility to Anyone with your alias
+az network private-link-service update -g $rg \
+--name $haproxyplsname \
+--visibility "*"
+
+# List PLS Alias and create Private Endpoint on Customer A and Customer B.
+az network private-link-service show -g $rg --name $haproxyplsname --query alias
+
+
+az network private-link-service connection list -g $rg --name $haproxyplsname 
