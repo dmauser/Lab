@@ -2,7 +2,7 @@
 
 ## Concepts
 
-This lab is based on the reference architecture: [Using Private Link Service for On-premises workloads](https://github.com/dmauser/PrivateLink/tree/master/PLS-for-Onprem-workloads) using HA-Proxy. This solution will fully build the solution on Provider side as shown in the diagram below. You have to create Private Endpoints on each on of the customer deployments.
+This lab is based on the reference architecture: [Using Private Link Service for On-premises workloads](https://github.com/dmauser/PrivateLink/tree/master/PLS-for-Onprem-workloads) and it leverages HA-Proxy behind an Azure Load Balancer and Private Link Service. This solution will fully build the solution on the Provider side as shown in the diagram below. Therefore, you don't need to configure any component like HAProxy, Load Balance, and Private Link Service. Most of the actions are going to be to expose On-premises web workload (On-prem VM name _provider-onprem-vmlx_ exposed using local's VM Nginx) by creating Private Endpoints on customer A and B and validating access via Private Link to reach the Provider's On-premises VM.
 
 ### Solution diagram
 
@@ -25,18 +25,18 @@ Below some important details of each environment deployed:
 2. **Virtual Machines**: Cx(A/B)-onprem-lxvm (with IP 192.168.1.4 and running Nginx) and Cx(A/B)-az-lxvm (10.0.0.4).
 3. VPN Gateways and connection between Azure and On-premises environment.
 
-**Note:** that all three environments use the same address space which is another benefit of Private Link Service that has built-in NAT. Also you can deploy each environment on different region. As shown in the diagram Provider in on
+**Note:** All three environments use the same address space which is another benefit of Private Link Service that has built-in SNAT. Also, you can deploy each environment in different regions. As shown in the diagram above where you Provider on US Central, Customer A on East US, and Customer B on West US.
 
 ## Deploy this solution
 
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FPLS-for-onprem-workloads-haproxy%2Fazuredeploy.json)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FPLS-for-onprem-workloads-haproxy%2Fazuredeploy.json)
 
-**Note** Template provisioning takes approximately 25-30 minutes to complete per environment.
+**Note:** The template provisioning takes approximately 25-30 minutes to complete the Provider environment and 20 minutes for each Customer environment.
 
-Deploy three separated environments for Provider, Customer A and Customer B using the same link by 
+Deploy three separated environments for Provider, Customer A and Customer B using the same link by:
 
-1. selecting each one of the respective environments:
+1. Selecting each one of the respective environments:
 
     ![Environment](./media/deploy-environment.png)
 
@@ -47,15 +47,13 @@ Deploy three separated environments for Provider, Customer A and Customer B usin
     ![Environment](./media/deploy-restrictssh.png)
 
 
-### Deploy over Azure Portal (Arm Template)
-
-The recommendation is to deploy them on separate Azure Subscriptions and Tenants but all environments can be deployed in single subscription.
-
 ## LAB Steps
+
+**Goal:** Allow customers A and B access Provider's On-premises web workload.
 
 Use the steps below using Azure Portal. You need to go back and forth between Provider and Customers A and B.
 
-1. On Provider side obtain Private Link Service (PLS) alias.
+1. On the Provider side obtain the Private Link Service (PLS) alias.
 
     ![Environment](./media/pls-haproxy-alias.png)
 
@@ -63,7 +61,7 @@ Use the steps below using Azure Portal. You need to go back and forth between Pr
 
     ![Environment](./media/privatelinkcenter.png)
 
-3. Follow the wizard and make sure to paste PLS alias from step 1.
+3. Follow the wizard and make sure to paste the PLS alias from step 1.
 
     ![Environment](./media/consumer-connect-to-plsalias.png)
 
@@ -71,13 +69,13 @@ Use the steps below using Azure Portal. You need to go back and forth between Pr
 
     ![Environment](./media/consumer-cx-az-vnet.png)
 
-5. Review Private endpoint on Customer side and note that it is waiting for approval and has IP 10.0.0.5 allocated by clicking on the NIC.
+5. Review the Private endpoint on the Customer side and note that it is waiting for approval and has IP 10.0.0.5 allocated by clicking on the NIC.
 
     ![Environment](./media/consumer-pep-wait-approval.png)
 
     ![Environment](./media/consumer-pep-nic.png)
 
-6. At this point if you try to connect over that Private endpoint connection should fail. You can try a curl 10.0.0.5 on either Cx(A/B)-onprem-lxvm (192.168.1.4 and running Nginx) and Cx(A/B)-az-lxvm (10.0.0.4).
+6. At this point, if you try to connect over that Private endpoint connection should fail. You can try a curl 10.0.0.5 on either Cx(A/B)-onprem-lxvm (192.168.1.4 and running Nginx) and Cx(A/B)-az-lxvm (10.0.0.4).
 
 7. Approve Private Link connection on Provider side over pls-proxy (private link service) as shown:
 
@@ -93,7 +91,7 @@ Use the steps below using Azure Portal. You need to go back and forth between Pr
 
     ![Environment](./media/consumer-onpremvm-output.png)
 
-9. Review Nginx access logs on Provider-onprem-vmlx. You should see source IP of one of HAProxy VMSS instances 10.0.0.135 and Private Link Service (pls-haproxy) NAT IP after enabling X-FORWARDED-FOR on Ngix configuration by using option 1 of this [reference guide](https://www.loadbalancer.org/blog/nginx-and-x-forwarded-for-header).
+9. Review Nginx access logs on Provider-onprem-vmlx. You should see the source IP of one of the HAProxy VMSS instances 10.0.0.135 and Private Link Service (pls-haproxy) NAT IP after enabling X-FORWARDED-FOR on Nginx configuration by using option 1 of this [reference guide](https://www.loadbalancer.org/blog/nginx-and-x-forwarded-for-header).
 
     ![Environment](./media/provider-onprem-accesslogs.png)
 
