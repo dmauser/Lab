@@ -1,5 +1,4 @@
-# Using Private Link Service to publish On-premises workloads (HA-Proxy)
-
+# Using Private Link Service to publish On-premises workloads by using HAProxy
 
 ## Concepts
 
@@ -75,13 +74,21 @@ Use the steps below using Azure Portal. You need to go back and forth between Pr
 
 6. At this point if you try to connect over that Private endpoint connection should fail. You can try a curl 10.0.0.5 on either Cx(A/B)-onprem-lxvm (192.168.1.4 and running Nginx) and Cx(A/B)-az-lxvm (10.0.0.4).
 
-7. Approve Private Link connection on Provider side over pls-proxy as shown:
+7. Approve Private Link connection on Provider side over pls-proxy (private link service) as shown:
 
-    ![Environment](.\media\provider-pls-proxy-approve.png
-)
+    ![Environment](.\media\provider-pls-proxy-approve.png)
 
-8. Try again Curl 10.0.0.5 and you should have the right output. Below curl output before approval and after with provider-onprem-vmlx output.
+8. Try again Curl 10.0.0.5 and you should have the right output. Below curl output before approval (fail to connect) and after with provider-onprem-vmlx output:
+
+    **CxB-az-lxvm**
+    ![Environment](.\media\consumer-azvm-output.png)
+    **CxB-onprem-lxvm**
+    ![Environment](.\media\consumer-onpremvm-output.png)
+
+9. Review Nginx access logs on Provider-onprem-vmlx. You should see source IP of one of HAProxy VMSS instances 10.0.0.135 and Private Link Service (pls-haproxy) NAT IP after enabling X-FORWARDED-FOR on Ngix configuration by using option 1 of this [reference guide](https://www.loadbalancer.org/blog/nginx-and-x-forwarded-for-header).
+
+    ![Environment](.\media\provider-onprem-accesslogs.png)
 
 ## Clean up
 
-Remove Resource Group for each one of the deployed environments.
+Delete Resource Groups for each one of the deployed environments.
