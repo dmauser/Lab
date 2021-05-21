@@ -81,9 +81,11 @@ Use the steps below using Azure Portal. You need to go back and forth between Pr
 8. Try again Curl 10.0.0.5 and you should have the right output. Below curl output before approval (fail to connect) and after with provider-onprem-vmlx output:
 
     **CxB-az-lxvm**
+
     ![Environment](./media/consumer-azvm-output.png)
     
     **CxB-onprem-lxvm**
+
     ![Environment](./media/consumer-onpremvm-output.png)
 
 9. Review Nginx access logs on Provider-onprem-vmlx. You should see source IP of one of HAProxy VMSS instances 10.0.0.135 and Private Link Service (pls-haproxy) NAT IP after enabling X-FORWARDED-FOR on Ngix configuration by using option 1 of this [reference guide](https://www.loadbalancer.org/blog/nginx-and-x-forwarded-for-header).
