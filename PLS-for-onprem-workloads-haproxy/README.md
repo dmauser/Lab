@@ -32,7 +32,7 @@ Below some important details of each environment deployed:
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FPLS-for-onprem-workloads-haproxy%2Fazuredeploy.json)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FPLS-for-onprem-workloads-haproxy%2Fazuredeploy.json)
 
-**Note** Template provisioning takes approximately 20 minutes to complete per environment.
+**Note** Template provisioning takes approximately 25-30 minutes to complete per environment.
 
 Deploy three separated environments for Provider, Customer A and Customer B using the same link by 
 
