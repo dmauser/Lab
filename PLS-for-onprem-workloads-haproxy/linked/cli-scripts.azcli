@@ -15,7 +15,7 @@ az network vnet subnet create -g $rg --vnet-name $vnetname \
 #Provision HA Proxy
 
 
-## Create PLS
+## Create HAProxy PLS
 # Disable-private-link-service-network-policies to true on PLS NAT subnet
 az network vnet subnet create -g $rg --vnet-name $vnetname \
 --name $plsnatsubnetname \
@@ -27,7 +27,7 @@ az network private-link-service create -g $rg -l $location \
 --vnet-name $vnetname \
 --subnet $plsnatsubnetname \
 --lb-name pls-std-lb \
---lb-frontend-ip-configs HAProxyloadBalancerFrontEnd \
+--lb-frontend-ip-configs HAProxyloadBalancerFrontEnd
 
 # Changing Visibility to Anyone with your alias
 az network private-link-service update -g $rg \
@@ -38,4 +38,19 @@ az network private-link-service update -g $rg \
 az network private-link-service show -g $rg --name $haproxyplsname --query alias
 
 
-az network private-link-service connection list -g $rg --name $haproxyplsname 
+##### FIREWALL ######
+
+## Create Firewall PLS
+
+#Create Private link Service
+az network private-link-service create -g $rg -l $location \
+--name $firewallplsname \
+--vnet-name $vnetname \
+--subnet $plsnatsubnetname \
+--lb-name pls-std-lb \
+--lb-frontend-ip-configs FwloadBalancerFrontEnd
+
+# Changing Visibility to Anyone with your alias
+az network private-link-service update -g $rg \
+--name $firewallplsname \
+--visibility "*"
