@@ -82,6 +82,7 @@ Use the steps below using Azure Portal. You need to go back and forth between Pr
 
     **CxB-az-lxvm**
     ![Environment](./media/consumer-azvm-output.png)
+    
     **CxB-onprem-lxvm**
     ![Environment](./media/consumer-onpremvm-output.png)
 
