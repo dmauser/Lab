@@ -6,7 +6,7 @@ This lab is based on the reference architecture: [Using Private Link Service for
 
 ### Solution diagram
 
-![Private Link for On-premises workloads using HA Proxy](.\media\PLS-for-onprem-workloads-haproxy.png)
+![Private Link for On-premises workloads using HA Proxy](./media/PLS-for-onprem-workloads-haproxy.png)
 
 Below some important details of each environment deployed:
 
@@ -33,13 +33,13 @@ Deploy three separated environments for Provider, Customer A and Customer B usin
 
 1. selecting each one of the respective environments:
 
-    ![Environment](.\media\deploy-environment.png)
+    ![Environment](./media/deploy-environment.png)
 
 2. Set your username and password (SSH public key option coming soon).
 
 3. (Optional) set Public IP to restrict SSH access only using your public IP (obtain your public IP by using command curl ifconfig.io). You have to specify public IP plus CIDR, example 1.1.1.1/32.
 
-    ![Environment](.\media\deploy-restrictssh.png)
+    ![Environment](./media/deploy-restrictssh.png)
 
 
 ### Deploy over Azure Portal (Arm Template)
@@ -52,42 +52,42 @@ Use the steps below using Azure Portal. You need to go back and forth between Pr
 
 1. On Provider side obtain Private Link Service (PLS) alias.
 
-    ![Environment](.\media\pls-haproxy-alias.png)
+    ![Environment](./media/pls-haproxy-alias.png)
 
 2. On Customer (A and B) side deploy Private Endpoints using Private Link Center, selecting Private endpoints (1) and adding a new one (2).
 
-    ![Environment](.\media\privatelinkcenter.png)
+    ![Environment](./media/privatelinkcenter.png)
 
 3. Follow the wizard and make sure to paste PLS alias from step 1.
 
-    ![Environment](.\media\consumer-connect-to-plsalias.png)
+    ![Environment](./media/consumer-connect-to-plsalias.png)
 
 4. Place the private endpoint on Cx(A/B)-az-vnet on Subnet1 as shown:
 
-    ![Environment](.\media\consumer-cx-az-vnet.png)
+    ![Environment](./media/consumer-cx-az-vnet.png)
 
 5. Review Private endpoint on Customer side and note that it is waiting for approval and has IP 10.0.0.5 allocated by clicking on the NIC.
 
-    ![Environment](.\media\consumer-pep-wait-approval.png)
+    ![Environment](./media/consumer-pep-wait-approval.png)
 
-    ![Environment](.\media\consumer-pep-nic.png)
+    ![Environment](./media/consumer-pep-nic.png)
 
 6. At this point if you try to connect over that Private endpoint connection should fail. You can try a curl 10.0.0.5 on either Cx(A/B)-onprem-lxvm (192.168.1.4 and running Nginx) and Cx(A/B)-az-lxvm (10.0.0.4).
 
 7. Approve Private Link connection on Provider side over pls-proxy (private link service) as shown:
 
-    ![Environment](.\media\provider-pls-proxy-approve.png)
+    ![Environment](./media/provider-pls-proxy-approve.png)
 
 8. Try again Curl 10.0.0.5 and you should have the right output. Below curl output before approval (fail to connect) and after with provider-onprem-vmlx output:
 
     **CxB-az-lxvm**
-    ![Environment](.\media\consumer-azvm-output.png)
+    ![Environment](./media/consumer-azvm-output.png)
     **CxB-onprem-lxvm**
-    ![Environment](.\media\consumer-onpremvm-output.png)
+    ![Environment](./media/consumer-onpremvm-output.png)
 
 9. Review Nginx access logs on Provider-onprem-vmlx. You should see source IP of one of HAProxy VMSS instances 10.0.0.135 and Private Link Service (pls-haproxy) NAT IP after enabling X-FORWARDED-FOR on Ngix configuration by using option 1 of this [reference guide](https://www.loadbalancer.org/blog/nginx-and-x-forwarded-for-header).
 
-    ![Environment](.\media\provider-onprem-accesslogs.png)
+    ![Environment](./media/provider-onprem-accesslogs.png)
 
 ## Clean up
 
