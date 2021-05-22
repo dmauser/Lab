@@ -1,10 +1,20 @@
 # Using Private Link Service to publish On-premises workloads by using HAProxy
 
+**Contents**
+
+- [Concepts](#Concepts)
+	- [Architecture diagram](#Architecturediagram)
+	- [Provider](#Provider)
+	- [Customer A and B](#CustomerAandB)
+- [Deploy this solution](#Deploythissolution)
+- [LAB Steps](#LABSteps)
+- [Clean up](#Cleanup)
+
 ## Concepts
 
 This lab is based on the reference architecture: [Using Private Link Service for On-premises workloads](https://github.com/dmauser/PrivateLink/tree/master/PLS-for-Onprem-workloads) and it leverages HA-Proxy behind an Azure Load Balancer and Private Link Service. This solution will fully build the solution on the Provider side as shown in the diagram below. Therefore, you don't need to configure any component like HAProxy, Load Balance, and Private Link Service. Most of the actions are going to be to expose On-premises web workload (On-prem VM name _provider-onprem-vmlx_ exposed using local's VM Nginx) by creating Private Endpoints on customer A and B and validating access via Private Link to reach the Provider's On-premises VM.
 
-### Solution diagram
+### Architecture diagram
 
 ![Private Link for On-premises workloads using HA Proxy](./media/PLS-for-onprem-workloads-haproxy.png)
 
