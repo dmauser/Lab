@@ -2,13 +2,13 @@
 
 **Contents**
 
-- [Concepts](#Concepts)
-	- [Architecture diagram](#Architecturediagram)
-	- [Provider](#Provider)
-	- [Customer A and B](#CustomerAandB)
-- [Deploy this solution](#Deploythissolution)
-- [LAB Steps](#LABSteps)
-- [Clean up](#Cleanup)
+[Concepts](#Concepts)
+
+[Deploy this solution](#Deploythissolution)
+
+[LAB Steps](#LABSteps)
+
+[Clean up](#Cleanup)
 
 ## Concepts
 
