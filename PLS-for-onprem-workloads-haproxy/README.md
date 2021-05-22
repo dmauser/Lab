@@ -4,11 +4,11 @@
 
 [Concepts](#Concepts)
 
-[Deploy this solution](#Deploythissolution)
+[Deploy this solution](#Deploy-this-solution)
 
-[LAB Steps](#LABSteps)
+[LAB Steps](#LAB-Steps)
 
-[Clean up](#Cleanup)
+[Clean up](#Clean-up)
 
 ## Concepts
 
