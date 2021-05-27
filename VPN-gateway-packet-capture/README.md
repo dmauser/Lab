@@ -4,7 +4,9 @@
 
 This is Powershell script the leverages AzVirtualnetworkGatewayPacketCapture cmdlets to facilitate network packet captures on Azure Gateways. More information: [Configure packet captures for VPN gateways](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture). The biggest advantage of this feature is it allows customers to obtain their own Azure VPN Gateway packet captures without open a support ticket.
 
-  **Note:** This only works for Azure VPN Gateways and is not applicable for other types of Azure Gateways such as ExpressRoute or Application Gateway.
+  **Note:** This only works for Azure VPN Gateways and is not applicable for other types of Azure Gateways such as ExpressRoute, Application Gateway or Virtual WAN.
+  For Packet capture for **Virtual WAN VPN Gateway** consult this [link](https://github.com/dmauser/Lab/tree/master/vWAN-vpn-gateway-packet-capture)
+
 
 Default script behavior and features you may need adjust:
 
@@ -29,46 +31,73 @@ If you need more information about those parameters consult: [Start-AzVirtualnet
 
 You can download VNG-NetCap.ps1 or copy and paste script as shown below:
 
-<pre lang="...">
+```powershell
+Param(
+    [Parameter(Mandatory=$true,
+    HelpMessage="Add ")]
+    [String]
+    $VPNGWName,
 
-<#Prerequesits:
-- Install Azure Powershell Module (http://aka.ms/azps)
-- For now only Powershell 5.1 supported.
-- Create a Storage Account and Container in the same Resource Group as VPN Gateway.
+    [Parameter(Mandatory=$true,
+    HelpMessage="Add VPN Gateway Resource Group Name")]
+    [String]
+    $VPNGWRG,
+
+    [Parameter(Mandatory=$true,
+    HelpMessage="Add Storage Account Name")]
+    [String]
+    $StgName,
+
+    [Parameter(Mandatory=$true,
+    HelpMessage="Add Storage Account Resource Group Name")]
+    [String]
+    $StgRG,
+
+    [Parameter(Mandatory=$true,
+    HelpMessage="Add Storage Account blob container Name")]
+    [String]
+    $StgContainerName
+)
+
+# Variables that can be adjusted based in your needs.
+# Filter1 gets inner and outer IPSec Tunnel traffic (Default filter used by this script).
+$Filter1 = "{`"TracingFlags`": 11,`"MaxPacketBufferSize`": 120,`"MaxFileSize`": 500,`"Filters`" :[{`"CaptureSingleDirectionTrafficOnly`": false}]}" 
+# Filter2 shows how to filter between IPs or Subnets.
+$Filter2 = "{`"TracingFlags`": 11,`"MaxPacketBufferSize`": 120,`"MaxFileSize`": 500,`"Filters`" :[{`"SourceSubnets`":[`"10.60.4.4/32`",`"10.200.1.5/32`"],`"DestinationSubnets`":[`"10.60.4.4/32`",`"10.200.1.5/32`"],`"CaptureSingleDirectionTrafficOnly`": false}]}" # This filter gets inner and outer IPSec Tunnel traffic.
+<# Few notes about filters: 
+1) MaxPacketBufferSize it takes first 120 bytes. You can change it to 1500 to get full packet size in case you need to investigate the payload.
+2) MaxFileSize is 500 MB.
 #>
+$startTime = Get-Date
+$EndTime = $startTime.AddDays(1)
+$ctx = (Get-AzStorageAccount -Name $StgName -ResourceGroupName $StgRG).Context
+$SAStokenURL = New-AzStorageContainerSASToken  -Context $ctx -Container $StgContainerName -Permission rwd -ExpiryTime $EndTime -FullUri
 
-Connect-AzAccount
-$SubID = (Get-AzSubscription | Out-GridView -Title "Select Subscription ..."-PassThru )
-Set-AzContext -Subscription $SubID.name
-$RG = (Get-AzResourceGroup | Out-GridView -Title "Select an Azure Resource Group ..." -PassThru ).ResourceGroupName
-$VNG = (Get-AzVirtualNetworkGateway -ResourceGroupName $RG).Name | Out-GridView -Title "Select an Azure VNET Gateway ..." -PassThru
-$storeName = (Get-AzStorageAccount -ResourceGroupName $RG | Out-GridView -Title "Select an Azure Storage Account ..." -PassThru ).StorageAccountName
-$key = Get-AzStorageAccountKey -ResourceGroupName $RG -Name $storeName
-$context = New-AzStorageContext -StorageAccountName $storeName -StorageAccountKey $key[0].Value
-$containerName = (Get-AzStorageContainer -Context $context | Out-GridView -Title "Select Container Name..." -PassThru ).Name
-$now=get-date
-$sasurl = New-AzStorageContainerSASToken -Name $containerName -Context $context -Permission "rwd" -StartTime $now.AddHours(-1) -ExpiryTime $now.AddDays(1) -FullUri
-$minutes = 5, 7, 15, 20 | Out-Gridview -Title "How many Minutes network capture should run?" -OutputMode Single
-$seconds = 60*$minutes
+# Get full VPN Gateway Capture
+## Start Packet Capture
+Write-Host "Please wait, starting VPN Gateway packet capture..." -ForegroundColor Yellow
+Start-AzVirtualnetworkGatewayPacketCapture -ResourceGroupName $VPNGWRG -Name $VPNGWName -FilterData $Filter1
 
-#Start packet capture for a VPN gateway
-Write-Host "Starting capture for $VNG Azure VPN Gateway" -ForegroundColor Magenta
-$a = "{`"TracingFlags`": 15,`"MaxPacketBufferSize`": 1500,`"MaxFileSize`": 500,`"Filters`" :[{`"CaptureSingleDirectionTrafficOnly`": false}]}"
-Start-AzVirtualnetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG -FilterData $a
-Write-Host "Wait about $minutes minutes as capture is running on $VNG Azure VPN Gateway" -ForegroundColor Red
-Start-Sleep -Seconds $seconds
-#Stop packet capture for a VPN gateway
-Stop-AzVirtualNetworkGatewayPacketCapture -ResourceGroupName $RG -Name $VNG -SasUrl $sasurl
-#Script finished
-Write-Host "Process has been completed - Use Storage Explorer and download $VNG network captures on $containerName inside Storage Account $storeName" -ForegroundColor Magenta
-</pre>
+## Stop Packet Capture
+Write-Host -NoNewLine 'Reproduce your issue and press any key to stop to capture...' -ForegroundColor Yellow;
+$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+Write-Host ""
+Write-Host "Please wait, stopping VPN Gateway packet capture..." -ForegroundColor Red
+
+Stop-AzVirtualnetworkGatewayPacketCapture -ResourceGroupName $VPNGWRG -Name $VPNGWName -SasUrl $SAStokenURL
+
+## Retrieve your Packet Captures
+Write-Host "Retrieve packet captures using Storage Explorer over:" -ForegroundColor Yellow
+Write-Host "Storage account:" $StgName
+Write-Host "Blob container :" $StgContainerName
+```
 
 Sample output when script runs:
 ![](./media/scriptoutput.png)
 
 ## How to retrieve and review generated captures
 
-Use Azure Storage Explorer to retreive the captures. Navegate on container and capture should be inside folder with date/time (UTC) as shown:
+Use Azure Storage Explorer to download the captures. Navigate on container and capture should be inside folder with date/time (UTC) as shown:
 
 ![](./media/captureresults.png)
 
