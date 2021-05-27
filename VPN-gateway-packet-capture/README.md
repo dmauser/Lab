@@ -23,6 +23,14 @@ If you need more information about those parameters consult: [Start-AzVirtualnet
 
     ![](./media/createcontainer.png)
 
+Script requires you to specify five required parameters:
+
+- **VPNGWName** = VPN Gateway Name
+- **VPNGWRG** = VPN Gateway Resource Group Name
+- **StgName** = Storage Account Name
+- **StgRG** = Storage Account Resource Group Name
+- **StgContainerName** = Blog storage container name
+
 ## Powershell Script:
 
 You can download VNG-Packet-Capture.ps1 or copy and paste script as shown below:

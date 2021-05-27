@@ -6,7 +6,7 @@ Visibility is always good when you want to understand what is happening or troub
 
 **Note:** This script only works for vWAN VPN Gateways in case you want to capture over Virtual Network VPN Gateway, please check:
 
-- [Azure Virtual Network Gateway Packet Capture](https://github.com/dmauser/Lab/tree/master/AZVPNGW/PacketCapture)
+- [Azure Virtual Network Gateway Packet Capture](https://github.com/dmauser/Lab/tree/master/VPN-gateway-packet-capture)
 - [Configure packet captures for VPN gateways](https://docs.microsoft.com/en-us/azure/vpn-gateway/packet-capture)
 
 ## PowerShell script
