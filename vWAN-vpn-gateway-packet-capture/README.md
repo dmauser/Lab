@@ -11,13 +11,14 @@ Visibility is always good when you want to understand what is happening or troub
 
 ## PowerShell script
 
-Script is available inside the repository as PacketCapture.ps1 or can save the content listed below and make modifications based on your needs based on instructions/comments added inside the script.
+The script is available inside the repository as PacketCapture.ps1 or can save the content listed below and make modifications based on your needs based on instructions/comments added inside the script.
 
 ### Prerequisites
 
-1) At least Azure Az Module 5.0.0
-2) A storage account and blog container name.
-3) Ensure you are properly logged in your subscription where vWAN Gateways and Storage Account with container are present. You can validate that by using:
+1) At least Azure Az Module 5.0.0.
+2) It runs on any PowerShell version except it does not work over ISE mode.
+3) A storage account and blob container name.
+4) Ensure you are properly logged in to your subscription where vWAN Gateways and Storage Account with container are present. You can validate that by using:
 
 ```powershell
 Add-AzAccount #Logon on your Azure
@@ -25,7 +26,7 @@ Get-AzContext # Check you have correct Azure Subscription
 Set-AzContext -Subscription <Subscription Name> # Set appropriate Subscription
 ```
 
-Also script below requires you to specify five required parameters:
+5) Also script below requires you to specify five required parameters:
 
 - **vWANGWName** = vWAN VPN Gateway Name
 - **vWANGWRG** = vWAN Resource Group Name
