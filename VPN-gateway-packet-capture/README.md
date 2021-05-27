@@ -19,17 +19,13 @@ If you need more information about those parameters consult: [Start-AzVirtualnet
 
 ## Prerequisites
 
-- Create a storage account and container on the same Resource Group as your Virtual Network Gateway. For example: capture container under Storage Account mausertest as shown:
+- Create a storage account and container on the same Resource Group as your Virtual Network Gateway. For example: capture container under Storage Account as shown:
 
     ![](./media/createcontainer.png)
 
-- It runs only over Powershell 5.1 at this time.
-- Make sure Azure Powershell cmdlets are properly installed (see: http://aka.ms/azps)
-- See roadmap at bottom with new features to be added.
-
 ## Powershell Script:
 
-You can download VNG-NetCap.ps1 or copy and paste script as shown below:
+You can download VNG-Packet-Capture.ps1 or copy and paste script as shown below:
 
 ```powershell
 Param(
@@ -119,10 +115,3 @@ First section highlighs RADIUS authentication between Azure VPN Gateway Instance
 Second part shows P2S client (172.16.0.130) sending ping to Server (10.100.0.4) inside Azure VNET.
 
 ![](./media/radiusp2s.png)
-
-## Roadmap
-
-- Add support to Powershell Core 6.0.
-- Add option to create Storage Account + Container.
-- Add option to select Azure VPN Gateway to start captures per Connections. That will be useful for narrow down capture only for a specific Site-to-Site VPN Connection.
-- Add option to include filters.
