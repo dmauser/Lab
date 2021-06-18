@@ -1,0 +1,81 @@
+#Define Variables:
+rg=RSLAB-VPN-ER
+location=southcentralus #Set Region
+sharedkey=$(openssl rand -base64 24)
+erpeeringlocation=Dallas #Set ER Peering Location
+ercircuitrg=ER-Circuits #Set ER Circuit Resource Group
+echo "Type username and password to be used when deploying VMS"
+read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Echo $password to ensure you type password correctly.
+
+# Build site to site VPN to Emulate On-Premises:
+az group create --name $rg --location $location
+az deployment group create --name VPNGatewayDeploy --resource-group $rg \
+--template-file vpngw-deploy.json \
+--parameters sharedKey=$sharedkey gatewaySku=VpnGw1 vpnGatewayGeneration=Generation1 \
+--no-wait
+
+#Add NSGs
+mypip=$(curl ifconfig.io -s)
+az network nsg create --resource-group $rg --name Default-NSG --location $location
+az network nsg rule create \
+    --resource-group $rg \
+    --nsg-name Default-NSG \
+    --name AllowSSHRule \
+    --direction Inbound \
+    --priority 100 \
+    --source-address-prefixes $mypip/32 \
+    --source-port-ranges '*' \
+    --destination-address-prefixes '*' \
+    --destination-port-ranges 22 \
+    --access Allow \
+    --protocol Tcp \
+    --description "Allow inbound SSH"
+
+# Build Azure side Linux VM
+az network public-ip create --name AzVMPubIP --resource-group $rg --location $location --allocation-method Dynamic
+az network nic create --resource-group $rg -n AzVMNIC --location $location --subnet subnet1 --private-ip-address 10.0.2.10 --vnet-name Azure --public-ip-address AzVMPubIP --network-security-group Default-NSG
+az vm create -n AzVM1 --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics AzVMNIC --no-wait
+
+az network public-ip create --name onpremVMPubIP --resource-group $rg --location $location --allocation-method Dynamic
+az network nic create --resource-group $rg -n onpremVMNIC --location $location --subnet subnet1 --private-ip-address 192.168.101.10 --vnet-name onprem --public-ip-address onpremVMPubIP --network-security-group Default-NSG
+az vm create -n OnpremVM1 --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics onpremVMNIC --no-wait
+
+#Create ExpressRoute Gateway
+az network public-ip create --name AzureERGW-pip --resource-group $rg --location $location
+az network vnet-gateway create --name AzureERGW --resource-group $rg --location $location --public-ip-address AzureERGW-pip --vnet Azure --gateway-type "ExpressRoute" --sku "Standard" --no-wait
+
+#Create ER Circuit (Optional)
+az network express-route create --bandwidth 50 Mbps -n ER-$erpeeringlocation-Circuit --peering-location "$erpeeringlocation" -g $ercircuitrg --provider "Megaport" -l $location --sku-family MeteredData --sku-tier Standard
+echo provision ER Circuit using this information:
+az network express-route show -n ER-$erpeeringlocation-Circuit -g $ercircuitrg --query serviceKey -o tsv
+
+#Create Route Route Server
+az network routeserver create --resource-group $rg --name RSAZ \
+--hosted-subnet $(az network vnet subnet show --resource-group $rg --vnet-name Azure --name RouteServerSubnet --query id --out tsv)
+
+#Allow Route Server to transit over branch.
+az network routeserver update --resource-group $rg --name RSAZ --allow-b2b-traffic true
+az network routeserver show  --resource-group $rg --name RSAZ --query allowBranchToBranchTraffic
+
+#Attach Expressroute Connection 
+
+## Option 1 - ER Circuit same subscription
+erid=$(az network express-route show -n ER-$erpeeringlocation-Circuit -g $ercircuitrg --query id -o tsv) 
+az network vpn-connection create --name Connection-to-ER-$erpeeringlocation-Circuit \
+--resource-group $rg --vnet-gateway1 AzureERGW \
+--express-route-circuit2 $erid \
+--routing-weight 0
+
+## Option 2 - ER Circuit using ResourceID and Authorization Key
+erid="" #Add ExpressRoute ResurceID
+authkey="" #Add ExpressRoute Authorization Key
+
+az network vpn-connection create --name Connection-to-ER-$erpeeringlocation-Circuit \
+--resource-group $rg --vnet-gateway1 AzureERGW \
+--express-route-circuit2 $erid \
+--routing-weight 0
+----authorization-key $authkey
+
+## Optional Add NSG to Subnets:
+az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name Azure --network-security-group Default-NSG
+az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name OnPrem --network-security-group Default-NSG

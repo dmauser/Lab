@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "networkSecurityGroupName": {
+           "type": "string"
+      },
+      "RestrictSshAccessByPublicIP": {
+          "type": "string",
+          "defaultValue": "*",
+          "metadata": {
+            "description": "Optional in case you answer no for Lock Down Public IP, but required in case you selected yes. Please use curl ifconfig.io to get your Public IP address"
+            }
+      },      
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "Location for all resources."
+        }
+      }
+    },
+    "variables": {},
+    "resources": [
+      {   
+        "apiVersion": "2020-05-01",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[parameters('networkSecurityGroupName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+                "name": "SSH",
+                "properties": {
+                    "priority": 300,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "[parameters('RestrictSshAccessByPublicIP')]",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "22"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "outputs": {
+        "nsgResourceID": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+        }
+    }
+}

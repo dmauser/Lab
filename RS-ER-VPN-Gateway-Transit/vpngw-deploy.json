@@ -1,0 +1,355 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sharedKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The shared key used to establish connection between the two vNet Gateways."
+            }
+        },
+        "gatewaySku": {
+            "type": "string",
+            "defaultValue": "VpnGw2",
+            "allowedValues": [
+                "VpnGw1",
+                "VpnGw2",
+                "VpnGw3",
+                "VpnGw4",
+                "VpnGw5"
+            ],
+            "metadata": {
+                "description": "The SKU for the VPN Gateway. Cannot be Basic SKU."
+            }
+        },
+        "vpnGatewayGeneration": {
+            "type": "string",
+            "defaultValue": "Generation1",
+            "allowedValues": [
+                "Generation1",
+                "Generation2"
+            ],
+            "metadata": {
+                "description": "Select VPn Gateway Generation."
+            }
+        },
+        "Restrict_SSH_AccessByPublicIP": {
+            "type": "string",
+            "defaultValue": "*",
+            "metadata": {
+                "description": "Default is any source Public IP (*). To restric access, please specify your CIDR. For single IP add 1.1.1.1/32."
+            }
+        },        
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of the resources"
+            },
+            "defaultValue": "[resourceGroup().location]"
+        }
+    },
+    "variables": {
+        "nsgname": "Default-NSG",
+        "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
+        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/linked/",
+        "OnPrem": {
+            "name": "OnPrem",
+            "addressSpacePrefix": "192.168.101.0/24",
+            "subnetName": "subnet1",
+            "subnetPrefix": "192.168.101.0/25",
+            "gatewayName": "OnPrem-Gateway",
+            "gatewaySubnetPrefix": "192.168.101.128/27",
+            "gatewayPublicIPName": "OnPrem-Gateway-pip",
+            "connectionName": "OnPrem-to-Azure",
+            "asn": 65002
+        },
+        "Azure": {
+            "name": "Azure",
+            "addressSpacePrefix": "10.0.2.0/23",
+            "subnetName": "subnet1",
+            "subnetPrefix": "10.0.2.0/24",
+            "trustedPrefix": "10.0.3.0/27",
+            "untrustedPrefix": "10.0.3.32/27",
+            "rssubnetPrefix": "10.0.3.64/27",
+            "gatewayName": "Azure-Gateway",
+            "gatewaySubnetPrefix": "10.0.3.96/27",
+            "gatewayPublicIPName1": "Azure-Gateway-pip1",
+            "gatewayPublicIPName2": "Azure-Gateway-pip2",
+            "connectionName": "Azure-to-OnPrem",
+            "asn": 65515
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('OnPrem').name]",
+            "location": "[parameters('location')]",
+            "comments": "This is the first vNet",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('OnPrem').addressSpacePrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('OnPrem').subnetName]",
+                        "properties": {
+                            "addressPrefix": "[variables('OnPrem').subnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('OnPrem').gatewaySubnetPrefix]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "NSG",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('nsgtemplateURI')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSecurityGroupName": {
+                        "value": "[variables('nsgname')]"
+                    },
+                    "RestrictSshAccessByPublicIP": {
+                        "value": "[parameters('Restrict_SSH_AccessByPublicIP')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('Azure').name]",
+            "location": "[parameters('location')]",
+            "comments": "This is the second vNet",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('Azure').addressSpacePrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('Azure').subnetName]",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').subnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').gatewaySubnetPrefix]"
+                        }
+                    },
+                    {
+                        "name": "trusted",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').trustedPrefix]"
+                        }
+                    },
+                    {
+                        "name": "untrusted",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').untrustedPrefix]"
+                        }
+                    },
+                    {
+                        "name": "RouteServerSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').rssubnetPrefix]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('OnPrem').gatewayPublicIPName]",
+            "location": "[parameters('location')]",
+            "comments": "This is the public IP for vNet Gateway 1",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('Azure').gatewayPublicIPName1]",
+            "location": "[parameters('location')]",
+            "comments": "This is the public IP for vNet Gateway 2",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+                {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('Azure').gatewayPublicIPName2]",
+            "location": "[parameters('location')]",
+            "comments": "This is the public IP for vNet Gateway 2",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[variables('OnPrem').gatewayName]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('OnPrem').gatewayPublicIPName)]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('OnPrem').name)]"
+            ],
+            "comments": "This is the vNet Gateway for vNet 1",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('OnPrem').name, 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('OnPrem').gatewayPublicIPName)]"
+                            }
+                        },
+                        "name": "OnPremGatewayConfig"
+                    }
+                ],
+                "gatewayType": "Vpn",
+                "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
+                "sku": {
+                    "name": "[parameters('gatewaySku')]",
+                    "tier": "[parameters('gatewaySku')]"
+                },
+                "vpnType": "RouteBased",
+                "enableBgp": true,
+                "bgpSettings": {
+                    "asn": "[variables('OnPrem').asn]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[variables('Azure').gatewayName]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('Azure').gatewayPublicIPName1)]",
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('Azure').gatewayPublicIPName1)]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('Azure').name)]"
+            ],
+            "comments": "This is the vNet Gateway for vNet 2",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "Ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('Azure').name, 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('Azure').gatewayPublicIPName1)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Ipconfig2",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('Azure').name, 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('Azure').gatewayPublicIPName2)]"
+                            }
+                        }
+                       
+                    }
+                ],
+                "gatewayType": "Vpn",
+                "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
+                "sku": {
+                    "name": "[parameters('gatewaySku')]",
+                    "tier": "[parameters('gatewaySku')]"
+                },
+                "vpnType": "RouteBased",
+                "enableBgp": true,
+                "activeActive": true,
+                "bgpSettings": {
+                    "asn": "[variables('Azure').asn]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/connections",
+            "name": "[variables('OnPrem').connectionName]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('OnPrem').gatewayName)]",
+                "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('Azure').gatewayName)]"
+            ],
+            "comments": "This is the VPN connection from Gateway 1 to Gateway 2",
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('OnPrem').gatewayName)]"
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('Azure').gatewayName)]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "routingWeight": 3,
+                "sharedKey": "[parameters('sharedKey')]",
+                "enableBGP": true
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/connections",
+            "name": "[variables('Azure').connectionName]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('OnPrem').gatewayName)]",
+                "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('Azure').gatewayName)]"
+            ],
+            "comments": "This is the VPN connection from Gateway 2 to Gateway 1",
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('Azure').gatewayName)]"
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('OnPrem').gatewayName)]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "routingWeight": 3,
+                "sharedKey": "[parameters('sharedKey')]",
+                "enableBGP": true
+            }
+        }
+    ]
+}
