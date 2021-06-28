@@ -13,8 +13,8 @@
                 "Standard",
                 "HighPerformance",
                 "UltraPerformance"
-            ]            
-        },        
+            ]
+        },
         "vnetName": {
             "type": "String"
         }
@@ -51,7 +51,7 @@
                             },
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'), '/subnets/GatewaySubnet')]"
-                            }                            
+                            }
                         }
                     }
                 ],

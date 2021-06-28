@@ -72,18 +72,10 @@
         "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
         "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
         "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
-        "OnPrem": {
-            "name": "OnPrem",
-            "addressSpacePrefix": "192.168.101.0/24",
-            "subnetName": "subnet1",
-            "subnetPrefix": "192.168.101.0/25",
-            "gatewayName": "OnPrem-vpngw",
-            "gatewaySubnetPrefix": "192.168.101.128/27",
-            "gatewayPublicIPName": "OnPrem-Gateway-pip",
-            "connectionName": "OnPrem-to-Azure",
-            "asn": 65002
-        },
-        "AzuregatewayName": "Azure-vpngw",
+        "OnPremName": "OnPrem",
+        "OnPremGatewayName": "OnPrem-vpngw",
+        "OnPremAsn": "65002",
+        "AzureGatewayName": "Azure-vpngw",
         "AzureErgatewayName": "Azure-ergw",
         "AzureAsn": "65515",
         "AzureName": "Azure"
@@ -114,7 +106,7 @@
             }
         },
         {
-            "name": "[concat(variables('OnPrem').name,'vnet')]",
+            "name": "[concat(variables('OnPremName'),'vnet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -148,11 +140,11 @@
             }
         },
         {
-            "name": "[concat(variables('OnPrem').gatewayName,'vng')]",
+            "name": "[concat(variables('OnPremGatewayName'),'vng')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').name,'vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPremName'),'vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -161,22 +153,22 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "gatewayName": "[variables('OnPrem').gatewayName]",
+                    "gatewayName": "[variables('OnPremGatewayName')]",
                     "gatewaySku": "[parameters('gatewaySku')]",
                     "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
                     "activeActive": "Disabled",
-                    "asn": "[variables('OnPrem').asn]",
-                    "vnetName": "[concat(variables('OnPrem').name, '-vnet')]"
+                    "asn": "[variables('OnPremAsn')]",
+                    "vnetName": "[concat(variables('OnPremName'), '-vnet')]"
                 }
 
             }
         },
         {
-            "name": "[concat(variables('Azure').gatewayName,'vng')]",
+            "name": "[concat(variables('AzureGatewayName'),'vng')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('AzureName'),'vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -185,7 +177,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "gatewayName": "[variables('AzuregatewayName')]",
+                    "gatewayName": "[variables('AzureGatewayName')]",
                     "gatewaySku": "[parameters('gatewaySku')]",
                     "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
                     "activeActive": "Enabled",
@@ -200,8 +192,8 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').gatewayName,'vng'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').gatewayName,'vng'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPremGatewayName'),'vng'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('AzureGatewayName'),'vng'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -213,13 +205,13 @@
                     "sharedKey": "[parameters('sharedKey')]",
                     "gatewaySku": "[parameters('gatewaySku')]",
                     "activeActive": "Enabled",
-                    "asn": "[variables('Azure').asn]",
-                    "vnetName": "[concat(variables('Azure').name, '-vnet')]"
+                    "asn": "[variables('AzureAsn')]",
+                    "vnetName": "[concat(variables('AzureName'), '-vnet')]"
                 }
             }
         },
         {
-            "name": "[concat(variables('Azure').name, 'ERGateway')]",
+            "name": "[concat(variables('AzureName'), 'ERGateway')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "properties": {
@@ -229,8 +221,8 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "expressrouteGatewayName": "[variables('Azure').ergatewayName]",
-                    "vnetName": "[concat(variables('Azure').name, '-vnet')]"
+                    "expressrouteGatewayName": "[variables('AzureErgatewayName')]",
+                    "vnetName": "[concat(variables('AzureName'), '-vnet')]"
                 }
 
             }
@@ -240,7 +232,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name, 'ERGateway'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('AzureName'), 'ERGateway'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -250,7 +242,7 @@
                 },
                 "parameters": {
                     "connectionName": "Connection-ER-Circuit",
-                    "expressrouteGatewayName": "[variables('Azure').ergatewayName]",
+                    "expressrouteGatewayName": "[variables('AzureName')]",
                     "expressRouteCircuitID": "[parameters('expressRouteCircuitID')]",
                     "UseAutorizationKey": "[parameters('UseAutorizationKey')]",
                     "AutorizationKey": "[parameters('AutorizationKey')]"

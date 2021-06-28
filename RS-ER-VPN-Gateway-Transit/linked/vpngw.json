@@ -88,10 +88,10 @@
             "comments": "This is the public IP for vNet Gateway 2",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
-           },
+            },
             "sku": {
                 "name": "Basic",
-                "tier": "Regional" 
+                "tier": "Regional"
             }
         },
         {
@@ -106,7 +106,7 @@
             },
             "sku": {
                 "name": "Basic",
-                "tier": "Regional" 
+                "tier": "Regional"
             }
         },
         {
@@ -134,7 +134,7 @@
                         }
                     },
                     {
-                         "name": "Ipconfig2",
+                        "name": "Ipconfig2",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
@@ -149,7 +149,7 @@
                 "gatewayType": "Vpn",
                 "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
                 "sku": {
-                     "name": "[parameters('gatewaySku')]",
+                    "name": "[parameters('gatewaySku')]",
                     "tier": "[parameters('gatewaySku')]"
                 },
                 "vpnType": "RouteBased",
@@ -170,7 +170,7 @@
                                 "[parameters('customBgpIPAddresses_2')]"
                             ]
                         }
-                    ]                        
+                    ]
                 }
             }
         },
@@ -201,7 +201,7 @@
                 "gatewayType": "Vpn",
                 "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
                 "sku": {
-                     "name": "[parameters('gatewaySku')]",
+                    "name": "[parameters('gatewaySku')]",
                     "tier": "[parameters('gatewaySku')]"
                 },
                 "vpnType": "RouteBased",
@@ -216,9 +216,9 @@
                                 "[parameters('customBgpIPAddresses_1')]"
                             ]
                         }
-                    ]                        
+                    ]
                 }
             }
-        }        
-    ] 
+        }
+    ]
 }

@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The shared key used to establish connection between the two vNet Gateways."
             }
-        }        
+        }
     },
     "variables": {
         "location": "[resourceGroup().location]",
