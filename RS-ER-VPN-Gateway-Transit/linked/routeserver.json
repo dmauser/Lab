@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "routeserverName": {
+            "defaultValue": "RS1",
+            "type": "String"
+        },
+        "AllowBranchtoBranchTraffic": {
+            "type": "String",
+            "defaultValue": "True",
+            "allowedValues": [
+                "True",
+                "False"
+            ]
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of the resources"
+            },
+            "defaultValue": "[resourceGroup().location]"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualHubs",
+            "apiVersion": "2020-11-01",
+            "name": "[parameters('routeserverName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "allowBranchToBranchTraffic": "[parameters('AllowBranchtoBranchTraffic')]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualHubs/ipConfigurations",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('routeserverName'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualHubs', parameters('routeserverName'))]"
+            ],
+            "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+                }
+            }
+        }
+    ]
+}

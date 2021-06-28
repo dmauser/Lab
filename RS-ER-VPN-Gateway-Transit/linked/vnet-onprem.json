@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+       "location": "[resourceGroup().location]",
+        "OnPrem": {
+            "name": "OnPrem",
+            "addressSpacePrefix": "192.168.101.0/24",
+            "subnetName": "subnet1",
+            "subnetPrefix": "192.168.101.0/25",
+            "gatewaySubnetPrefix": "192.168.101.128/27"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[concat(variables('OnPrem').name, '-vnet')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('OnPrem').addressSpacePrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('OnPrem').subnetName]",
+                        "properties": {
+                            "addressPrefix": "[variables('OnPrem').subnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('OnPrem').gatewaySubnetPrefix]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

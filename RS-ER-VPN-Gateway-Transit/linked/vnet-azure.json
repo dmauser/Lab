@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+       "location": "[resourceGroup().location]",
+        "Azure": {
+            "name": "Azure",
+            "addressSpacePrefix": "10.0.2.0/23",
+            "subnetName": "subnet1",
+            "subnetPrefix": "10.0.2.0/24",
+            "trustedPrefix": "10.0.3.0/27",
+            "untrustedPrefix": "10.0.3.32/27",
+            "rssubnetPrefix": "10.0.3.64/27",
+            "gatewaySubnetPrefix": "10.0.3.96/27"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[concat(variables('Azure').name, '-vnet')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('Azure').addressSpacePrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('Azure').subnetName]",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').subnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').gatewaySubnetPrefix]"
+                        }
+                    },
+                    {
+                        "name": "trusted",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').trustedPrefix]"
+                        }
+                    },
+                    {
+                        "name": "untrusted",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').untrustedPrefix]"
+                        }
+                    },
+                    {
+                        "name": "RouteServerSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('Azure').rssubnetPrefix]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
