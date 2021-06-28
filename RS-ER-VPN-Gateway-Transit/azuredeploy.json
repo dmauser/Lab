@@ -242,7 +242,7 @@
                 },
                 "parameters": {
                     "connectionName": "Connection-ER-Circuit",
-                    "expressrouteGatewayName": "[variables('AzureName')]",
+                    "expressrouteGatewayName": "[variables('AzureErgatewayName')]",
                     "expressRouteCircuitID": "[parameters('expressRouteCircuitID')]",
                     "UseAutorizationKey": "[parameters('UseAutorizationKey')]",
                     "AutorizationKey": "[parameters('AutorizationKey')]"
