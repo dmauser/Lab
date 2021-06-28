@@ -83,22 +83,10 @@
             "connectionName": "OnPrem-to-Azure",
             "asn": 65002
         },
-        "Azure": {
-            "name": "Azure",
-            "addressSpacePrefix": "10.0.2.0/23",
-            "subnetName": "subnet1",
-            "subnetPrefix": "10.0.2.0/24",
-            "trustedPrefix": "10.0.3.0/27",
-            "untrustedPrefix": "10.0.3.32/27",
-            "rssubnetPrefix": "10.0.3.64/27",
-            "gatewayName": "Azure-vpngw",
-            "ergatewayName": "Azure-ergw",
-            "gatewaySubnetPrefix": "10.0.3.96/27",
-            "gatewayPublicIPName1": "Azure-Gateway-pip1",
-            "gatewayPublicIPName2": "Azure-Gateway-pip2",
-            "connectionName": "Azure-to-OnPrem",
-            "asn": 65515
-        }
+        "AzuregatewayName": "Azure-vpngw",
+        "AzureErgatewayName": "Azure-ergw",
+        "AzureAsn": "65515",
+        "AzureName": "Azure"
     },
     "resources": [
         {
@@ -143,7 +131,7 @@
             }
         },
         {
-            "name": "[concat(variables('Azure').name, 'vnet')]",
+            "name": "[concat(variables('AzureName'), 'vnet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -197,12 +185,12 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "gatewayName": "[variables('Azure').gatewayName]",
+                    "gatewayName": "[variables('AzuregatewayName')]",
                     "gatewaySku": "[parameters('gatewaySku')]",
                     "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
                     "activeActive": "Enabled",
-                    "asn": "[variables('Azure').asn]",
-                    "vnetName": "[concat(variables('Azure').name, '-vnet')]"
+                    "asn": "[variables('AzureAsn')]",
+                    "vnetName": "[concat(variables('AzureName'), '-vnet')]"
                 }
 
             }
