@@ -64,6 +64,7 @@
     },
     "variables": {
         "nsgname": "Default-NSG",
+        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/linked/",
         "erconnURI": "[concat(uri(variables('artifactsLocation'),'erconnection.json'))]",
         "ergwtemplateURI": "[concat(uri(variables('artifactsLocation'),'ergw.json'))]",
         "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
@@ -71,7 +72,6 @@
         "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
         "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
         "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
-        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/linked/",
         "OnPrem": {
             "name": "OnPrem",
             "addressSpacePrefix": "192.168.101.0/24",
@@ -164,7 +164,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('OnPrem').name)]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').name,'vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -188,7 +188,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').name)]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -212,8 +212,8 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('Onprem').gatewayName)]",
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').gatewayName,'vng'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').gatewayName,'vng'))]"
             ],
             "properties": {
                 "mode": "Incremental",
