@@ -113,7 +113,7 @@
             "condition": "[equals(parameters('activeActive'),'Enabled')]",
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworkGateways",
-            "name": "[variables('AAgwname')]",
+            "name": "[parameters('gatewayName')]",
             "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('PublicIPName1'))]",
