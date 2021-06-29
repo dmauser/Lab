@@ -82,7 +82,7 @@
             "gatewaySubnetPrefix": "192.168.101.128/27",
             "gatewayPublicIPName": "OnPrem-Gateway-pip",
             "connectionName": "OnPrem-to-Azure",
-            "asn": 65002
+            "asn": "65002"
         },
         "Azure": {
             "name": "Azure",
@@ -98,7 +98,7 @@
             "gatewayPublicIPName1": "Azure-Gateway-pip1",
             "gatewayPublicIPName2": "Azure-Gateway-pip2",
             "connectionName": "Azure-to-OnPrem",
-            "asn": 65515
+            "asn": "65515"
         }
     },
     "resources": [
