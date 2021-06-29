@@ -251,7 +251,7 @@
             }
         },
         {
-            "name": "[concat(variables('Azure').name, 'ERGateway')]",
+            "name": "[variables('Azure').ergatewayName]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -279,7 +279,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name, 'ERGateway'))]"
+                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -313,7 +313,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').gatewayName,'vng'))]",
                 "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').gatewayName,'vng'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name, 'ERGateway'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').ergatewayName))]"
             ],
             "properties": {
                 "mode": "Incremental",
