@@ -285,7 +285,9 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "connectionName": "Connection-to-ER-Circuit",
+                    "connectionName": {
+                        "value": "Connection-to-ER-Circuit"
+                    },
                     "expressrouteGatewayName": {
                         "value": "[variables('Azure').ergatewayName]"
                     },
