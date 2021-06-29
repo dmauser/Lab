@@ -71,7 +71,7 @@
         "onpremvnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-onprem.json'))]",
         "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
         "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
-        "aavpngwtemplateURI":  "[concat(uri(variables('artifactsLocation'),'aa-vpngw.json'))]",
+        "aavpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'aa-vpngw.json'))]",
         "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpnconnection.json'))]",
         "OnPrem": {
             "name": "OnPrem",
@@ -187,7 +187,7 @@
                         "value": "[variables('OnPrem').asn]"
                     },
                     "vnetName": {
-                        "value": "[concat(variables('OnPrem').name, '-vnet')]" 
+                        "value": "[concat(variables('OnPrem').name, '-vnet')]"
                     }
                 }
 
@@ -208,7 +208,7 @@
                 },
                 "parameters": {
                     "gatewayName": {
-                        "value":  "[variables('Azure').gatewayName]"
+                        "value": "[variables('Azure').gatewayName]"
                     },
                     "gatewaySku": {
                         "value": "[parameters('gatewaySku')]"
