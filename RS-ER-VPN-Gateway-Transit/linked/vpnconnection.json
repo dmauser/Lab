@@ -28,10 +28,6 @@
             "type": "Microsoft.Network/connections",
             "name": "[variables('OnPrem').connectionName]",
             "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('OnPrem').gatewayName)]",
-                "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('Azure').gatewayName)]"
-            ],
             "comments": "This is the VPN connection from Gateway 1 to Gateway 2",
             "properties": {
                 "virtualNetworkGateway1": {
