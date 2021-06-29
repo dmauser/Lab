@@ -71,14 +71,35 @@
         "onpremvnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-onprem.json'))]",
         "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
         "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
+        "aavpngwtemplateURI":  "[concat(uri(variables('artifactsLocation'),'aa-vpngw.json'))]",
         "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
-        "OnPremName": "OnPrem",
-        "OnPremGatewayName": "OnPrem-vpngw",
-        "OnPremAsn": "65002",
-        "AzureGatewayName": "Azure-vpngw",
-        "AzureErgatewayName": "Azure-ergw",
-        "AzureAsn": "65515",
-        "AzureName": "Azure"
+        "OnPrem": {
+            "name": "OnPrem",
+            "addressSpacePrefix": "192.168.101.0/24",
+            "subnetName": "subnet1",
+            "subnetPrefix": "192.168.101.0/25",
+            "gatewayName": "OnPrem-vpngw",
+            "gatewaySubnetPrefix": "192.168.101.128/27",
+            "gatewayPublicIPName": "OnPrem-Gateway-pip",
+            "connectionName": "OnPrem-to-Azure",
+            "asn": 65002
+        },
+        "Azure": {
+            "name": "Azure",
+            "addressSpacePrefix": "10.0.2.0/23",
+            "subnetName": "subnet1",
+            "subnetPrefix": "10.0.2.0/24",
+            "trustedPrefix": "10.0.3.0/27",
+            "untrustedPrefix": "10.0.3.32/27",
+            "rssubnetPrefix": "10.0.3.64/27",
+            "gatewayName": "Azure-vpngw",
+            "ergatewayName": "Azure-ergw",
+            "gatewaySubnetPrefix": "10.0.3.96/27",
+            "gatewayPublicIPName1": "Azure-Gateway-pip1",
+            "gatewayPublicIPName2": "Azure-Gateway-pip2",
+            "connectionName": "Azure-to-OnPrem",
+            "asn": 65515
+        }
     },
     "resources": [
         {
@@ -106,7 +127,7 @@
             }
         },
         {
-            "name": "[concat(variables('OnPremName'),'vnet')]",
+            "name": "[concat(variables('OnPrem').name,'vnet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -123,7 +144,7 @@
             }
         },
         {
-            "name": "[concat(variables('AzureName'), 'vnet')]",
+            "name": "[concat(variables('Azure').name, 'vnet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -140,11 +161,11 @@
             }
         },
         {
-            "name": "[concat(variables('OnPremGatewayName'),'vng')]",
+            "name": "[concat(variables('OnPrem').gatewayName,'vng')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPremName'),'vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').name,'vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -153,36 +174,57 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "gatewayName": "[variables('OnPremGatewayName')]",
-                    "gatewaySku": "[parameters('gatewaySku')]",
-                    "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
-                    "activeActive": "Disabled",
-                    "asn": "[variables('OnPremAsn')]",
-                    "vnetName": "[concat(variables('OnPremName'), '-vnet')]"
+                    "gatewayName": {
+                        "value": "[variables('OnPrem').gatewayName]"
+                    },
+                    "gatewaySku": {
+                        "value": "[parameters('gatewaySku')]"
+                    },
+                    "vpnGatewayGeneration": {
+                        "value": "[parameters('vpnGatewayGeneration')]"
+                    },
+                    "activeActive": {
+                        "value": "Disabled"
+                    },
+                    "asn": {
+                        "value": "[variables('OnPrem').asn]"
+                    },
+                    "vnetName": {
+                        "value": "[concat(variables('OnPrem').name, '-vnet')]" 
+                    }
                 }
 
             }
         },
         {
-            "name": "[concat(variables('AzureGatewayName'),'vng')]",
+            "name": "[concat(variables('Azure').gatewayName,'vng')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('AzureName'),'vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('vpngwtemplateURI')]",
+                    "uri": "[variables('aavpngwtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "gatewayName": "[variables('AzureGatewayName')]",
-                    "gatewaySku": "[parameters('gatewaySku')]",
-                    "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
-                    "activeActive": "Enabled",
-                    "asn": "[variables('AzureAsn')]",
-                    "vnetName": "[concat(variables('AzureName'), '-vnet')]"
+                    "gatewayName": {
+                        "value":  "[variables('Azure').gatewayName]"
+                    },
+                    "gatewaySku": {
+                        "value": "[parameters('gatewaySku')]"
+                    },
+                    "vpnGatewayGeneration": {
+                        "value": "[parameters('vpnGatewayGeneration')]"
+                    },
+                    "asn": {
+                        "value": "[variables('Azure').asn]"
+                    },
+                    "vnetName": {
+                        "value": "[concat(variables('Azure').name, '-vnet')]"
+                    }
                 }
 
             }
@@ -192,8 +234,8 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPremGatewayName'),'vng'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('AzureGatewayName'),'vng'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').gatewayName,'vng'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').gatewayName,'vng'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -202,16 +244,14 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "sharedKey": "[parameters('sharedKey')]",
-                    "gatewaySku": "[parameters('gatewaySku')]",
-                    "activeActive": "Enabled",
-                    "asn": "[variables('AzureAsn')]",
-                    "vnetName": "[concat(variables('AzureName'), '-vnet')]"
+                    "sharedKey": {
+                        "value": "[parameters('sharedKey')]"
+                    }
                 }
             }
         },
         {
-            "name": "[concat(variables('AzureName'), 'ERGateway')]",
+            "name": "[concat(variables('Azure').name, 'ERGateway')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "properties": {
@@ -221,8 +261,12 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "expressrouteGatewayName": "[variables('AzureErgatewayName')]",
-                    "vnetName": "[concat(variables('AzureName'), '-vnet')]"
+                    "expressrouteGatewayName": {
+                        "value": "[variables('Azure').ergatewayName]"
+                    },
+                    "vnetName": {
+                        "value": "[concat(variables('Azure').name, '-vnet')]"
+                    }
                 }
 
             }
@@ -232,7 +276,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('AzureName'), 'ERGateway'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name, 'ERGateway'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -241,11 +285,19 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "connectionName": "Connection-ER-Circuit",
-                    "expressrouteGatewayName": "[variables('AzureErgatewayName')]",
-                    "expressRouteCircuitID": "[parameters('expressRouteCircuitID')]",
-                    "UseAutorizationKey": "[parameters('UseAutorizationKey')]",
-                    "AutorizationKey": "[parameters('AutorizationKey')]"
+                    "connectionName": "Connection-to-ER-Circuit",
+                    "expressrouteGatewayName": {
+                        "value": "[variables('Azure').ergatewayName]"
+                    },
+                    "expressRouteCircuitID": {
+                        "value": "[parameters('expressRouteCircuitID')]"
+                    },
+                    "UseAutorizationKey": {
+                        "value": "[parameters('UseAutorizationKey')]"
+                    },
+                    "AutorizationKey": {
+                        "value": "[parameters('AutorizationKey')]"
+                    }
                 }
             }
         }

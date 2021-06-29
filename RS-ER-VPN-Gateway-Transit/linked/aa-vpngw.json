@@ -48,6 +48,13 @@
                 "description": "Set first APIPA BGP Address"
             }
         },
+        "customBgpIPAddresses_2": {
+            "defaultValue": "169.254.21.2",
+            "type": "String",
+            "metadata": {
+                "description": "Set second APIPA BGP Address (this is ignored when Active-Active is set to Disabled)"
+            }
+        },
         "vnetName": {
             "type": "string",
             "metadata": {
@@ -57,7 +64,8 @@
     },
     "variables": {
         "location": "[resourceGroup().location]",
-        "PublicIPName1": "[concat(parameters('gatewayName'),'-pip1')]"
+        "PublicIPName1": "[concat(parameters('gatewayName'),'-pip1')]",
+        "PublicIPName2": "[concat(parameters('gatewayName'),'-pip2')]"
     },
     "resources": [
         {
@@ -76,11 +84,26 @@
         },
         {
             "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('PublicIPName2')]",
+            "location": "[variables('location')]",
+            "comments": "This is the public IP for vNet Gateway 2",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "name": "[parameters('gatewayName')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('PublicIPName1'))]"
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('PublicIPName1'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('PublicIPName2'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -95,6 +118,18 @@
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIPName1'))]"
                             }
                         }
+                    },
+                    {
+                        "name": "Ipconfig2",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnetName'),'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIPName2'))]"
+                            }
+                        }
                     }
                 ],
                 "gatewayType": "Vpn",
@@ -105,14 +140,20 @@
                 },
                 "vpnType": "RouteBased",
                 "enableBgp": true,
-                "activeActive": false,
+                "activeActive": true,
                 "bgpSettings": {
                     "asn": "[parameters('asn')]",
                     "bgpPeeringAddresses": [
                         {
-                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gatewayName')),'/ipConfigurations/Ipconfig1')]",
+                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways', parameters('gatewayName')),'/ipConfigurations/Ipconfig1')]",
                             "customBgpIpAddresses": [
                                 "[parameters('customBgpIPAddresses_1')]"
+                            ]
+                        },
+                        {
+                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gatewayName')),'/ipConfigurations/Ipconfig2')]",
+                            "customBgpIpAddresses": [
+                                "[parameters('customBgpIPAddresses_2')]"
                             ]
                         }
                     ]
