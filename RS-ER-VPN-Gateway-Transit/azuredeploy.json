@@ -72,7 +72,7 @@
         "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
         "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
         "aavpngwtemplateURI":  "[concat(uri(variables('artifactsLocation'),'aa-vpngw.json'))]",
-        "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
+        "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpnconnection.json'))]",
         "OnPrem": {
             "name": "OnPrem",
             "addressSpacePrefix": "192.168.101.0/24",
