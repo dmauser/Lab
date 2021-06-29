@@ -183,9 +183,6 @@
                     "vpnGatewayGeneration": {
                         "value": "[parameters('vpnGatewayGeneration')]"
                     },
-                    "activeActive": {
-                        "value": "Disabled"
-                    },
                     "asn": {
                         "value": "[variables('OnPrem').asn]"
                     },
