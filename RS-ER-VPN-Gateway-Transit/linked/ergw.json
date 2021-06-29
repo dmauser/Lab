@@ -47,10 +47,10 @@
                         "name": "vnetGatewayConfig0",
                         "properties": {
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/Microsoft.Network/virtualNetworkGateways', variables('publicIpAddressName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
                             },
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'), '/subnets/GatewaySubnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnetName'),'GatewaySubnet')]"
                             }
                         }
                     }
