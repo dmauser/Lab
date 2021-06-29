@@ -36,6 +36,7 @@
             "name": "[parameters('routeserverName')]",
             "location": "[parameters('location')]",
             "properties": {
+                "sku": "Standard",
                 "allowBranchToBranchTraffic": "[parameters('AllowBranchtoBranchTraffic')]"
             }
         },

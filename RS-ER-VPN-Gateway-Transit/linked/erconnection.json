@@ -23,13 +23,15 @@
             "defaultValue": "null"
         }
     },
-    "variables": {},
+    "variables": {
+        "location": "[resourceGroup().location]"
+    },
     "resources": [
         {
             "type": "Microsoft.Network/connections",
             "apiVersion": "2020-11-01",
             "name": "[parameters('connectionName')]",
-            "location": "southcentralus",
+            "location": "[variables('location')]",
             "properties": {
                 "virtualNetworkGateway1": {
                     "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('expressrouteGatewayName'))]"
