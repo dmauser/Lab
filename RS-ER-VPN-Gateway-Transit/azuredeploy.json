@@ -253,6 +253,10 @@
             "name": "[concat(variables('Azure').spoke1, '-to-HUB-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').spoke1,'-vnet'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -280,6 +284,10 @@
             "name": "[concat(variables('Azure').spoke2, '-to-HUB-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').spoke2,'-vnet'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -307,6 +315,10 @@
             "name": "[concat(variables('Azure').name, '-to-Spoke1-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').spoke1,'-vnet'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -334,6 +346,10 @@
             "name": "[concat(variables('Azure').name, '-to-Spoke2-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').spoke1,'-vnet'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
