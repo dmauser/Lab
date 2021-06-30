@@ -202,7 +202,7 @@
                         "value": "[variables('Azure').trustedPrefix]"
                     },
                     "untrustedPrefix": {
-                        "type": "[variables('Azure').untrustedPrefix]"
+                        "value": "[variables('Azure').untrustedPrefix]"
                     },
                     "rssubnetPrefix": {
                         "value": "[variables('Azure').rssubnetPrefix]"
@@ -300,6 +300,9 @@
                     },
                     "direction": {
                         "value": "SpoketoHub"
+                    },
+                    "HubVnetID": {
+                        "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('Azure').name, '-vnet'))]"
                     }
                 }
 
@@ -331,6 +334,9 @@
                     },
                     "direction": {
                         "value": "SpoketoHub"
+                    },
+                    "HubVnetID": {
+                        "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('Azure').name, '-vnet'))]"
                     }
                 }
 
@@ -362,6 +368,9 @@
                     },
                     "direction": {
                         "value": "HubToSpoke"
+                    },
+                    "SpokeVnetID": {
+                        "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('Azure').spoke1, '-vnet'))]"
                     }
                 }
 
@@ -393,6 +402,9 @@
                     },
                     "direction": {
                         "value": "HubToSpoke"
+                    },
+                    "SpokeVnetID": {
+                        "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('Azure').spoke2, '-vnet'))]"
                     }
                 }
 

@@ -11,6 +11,12 @@
         "spokeNetwork": {
             "type": "string"
         },
+        "HubVnetID": {
+            "type": "string"
+        },
+        "SpokeVnetID": {
+            "type": "string"
+        },
         "direction": {
             "type": "string",
             "allowedValues": [
@@ -35,11 +41,12 @@
                 "allowGatewayTransit": true,
                 "useRemoteGateways": false,
                 "remoteVirtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('spokeNetwork'))]"
+                    "id": "[parameters('SpokeVnetID')]"
                 }
             }
         },
         {
+            "condition": "[equals(parameters('direction'),'SpoketoHub')]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "2020-05-01",
             "name": "[concat(parameters('spokeNetwork'), '/', parameters('peeringname'))]",
@@ -54,7 +61,7 @@
                 "allowGatewayTransit": false,
                 "useRemoteGateways": true,
                 "remoteVirtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('hubNetwork'))]"
+                    "id": "[parameters('HubVnetID')]"
                 }
             }
         }
