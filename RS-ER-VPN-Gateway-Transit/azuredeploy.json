@@ -185,7 +185,32 @@
                     "uri": "[variables('azurevnettemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
-                "parameters": {}
+                "parameters": {
+                    "name": {
+                        "value": "[variables('Azure').name]"
+                    },
+                    "addressSpacePrefix": {
+                        "value": "[variables('Azure').addressSpacePrefix]"
+                    },
+                    "subnetName": {
+                        "value": "[variables('Azure').subnetName]"
+                    },
+                    "subnetPrefix": {
+                        "value": "[variables('Azure').subnetPrefix]"
+                    },
+                    "trustedPrefix": {
+                        "value": "[variables('Azure').trustedPrefix]"
+                    },
+                    "untrustedPrefix": {
+                        "type": "[variables('Azure').untrustedPrefix]"
+                    },
+                    "rssubnetPrefix": {
+                        "value": "[variables('Azure').rssubnetPrefix]"
+                    },
+                    "gatewaySubnetPrefix": {
+                        "value": "[variables('Azure').gatewaySubnetPrefix]"
+                    }
+                }
 
             }
         },
