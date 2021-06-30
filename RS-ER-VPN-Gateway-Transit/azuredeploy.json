@@ -168,7 +168,23 @@
                     "uri": "[variables('onpremvnettemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
-                "parameters": {}
+                "parameters": {
+                    "name": {
+                        "value": "[variables('OnPrem').name]"
+                    },
+                    "addressSpacePrefix": {
+                        "value": "[variables('OnPrem').addressSpacePrefix]"
+                    },
+                    "subnetName": {
+                        "value": "[variables('OnPrem').subnetName]"
+                    },
+                    "subnetPrefix": {
+                        "value": "[variables('Onprem').subnetPrefix]"
+                    },
+                    "gatewaySubnetPrefix": {
+                        "value": "[variables('Onprem').gatewaySubnetPrefix]"
+                    }
+                }
 
             }
         },
@@ -587,7 +603,7 @@
             }
         },
         {
-            "name": "[concat(variables('Azure').name,'-az-vm')]",
+            "name": "[concat(variables('Azure').name,'-vm')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -622,7 +638,7 @@
             }
         },
         {
-            "name": "[concat(variables('Azure').spoke1,'-az-vm')]",
+            "name": "[concat(variables('Azure').spoke1,'-vm')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -657,7 +673,7 @@
             }
         },
         {
-            "name": "[concat(variables('Azure').spoke2,'-az-vm')]",
+            "name": "[concat(variables('Azure').spoke2,'-vm')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -692,7 +708,7 @@
             }
         },
         {
-            "name": "[concat(variables('OnPrem').name,'-az-vm')]",
+            "name": "[concat(variables('OnPrem').name,'-vm')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [

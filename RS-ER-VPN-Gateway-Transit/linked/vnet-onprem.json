@@ -2,34 +2,42 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "addressSpacePrefix": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "subnetPrefix": {
+            "type": "string"
+        },
+        "gatewaySubnetPrefix": {
+            "type": "string"
+        }        
     },
     "variables": {
-       "location": "[resourceGroup().location]",
-        "OnPrem": {
-            "name": "OnPrem",
-            "addressSpacePrefix": "192.168.101.0/24",
-            "subnetName": "subnet1",
-            "subnetPrefix": "192.168.101.0/25",
-            "gatewaySubnetPrefix": "192.168.101.128/27"
-        }
+       "location": "[resourceGroup().location]"
     },
     "resources": [
         {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[concat(variables('OnPrem').name, '-vnet')]",
+            "name": "[concat(parameters('name'), '-vnet')]",
             "location": "[variables('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('OnPrem').addressSpacePrefix]"
+                        "[parameters('addressSpacePrefix')]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "[variables('OnPrem').subnetName]",
+                        "name": "[parameters('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('OnPrem').subnetPrefix]",
+                            "addressPrefix": "[parameters('subnetPrefix')]",
                             "networkSecurityGroup": {
                                 "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
                             }
@@ -38,7 +46,7 @@
                     {
                         "name": "GatewaySubnet",
                         "properties": {
-                            "addressPrefix": "[variables('OnPrem').gatewaySubnetPrefix]"
+                            "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
                         }
                     }
                 ]
