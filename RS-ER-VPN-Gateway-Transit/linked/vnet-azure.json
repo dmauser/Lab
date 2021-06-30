@@ -28,13 +28,13 @@
         }
     },
     "variables": {
-       "location": "[resourceGroup().location]"
+        "location": "[resourceGroup().location]"
     },
     "resources": [
         {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[concat(parameters('name'), '-vnet')]",
+            "name": "[concat(parameters('name'),'-vnet')]",
             "location": "[variables('location')]",
             "properties": {
                 "addressSpace": {
@@ -51,13 +51,7 @@
                                 "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
                             }
                         }
-                    },
-                    {
-                        "name": "GatewaySubnet",
-                        "properties": {
-                            "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
-                        }
-                    },
+                    },                
                     {
                         "name": "trusted",
                         "properties": {
@@ -74,6 +68,12 @@
                         "name": "RouteServerSubnet",
                         "properties": {
                             "addressPrefix": "[parameters('rssubnetPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
                         }
                     }
                 ]
