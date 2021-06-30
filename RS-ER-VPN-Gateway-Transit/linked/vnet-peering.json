@@ -12,10 +12,12 @@
             "type": "string"
         },
         "HubVnetID": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "null"
         },
         "SpokeVnetID": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "null"
         },
         "direction": {
             "type": "string",
