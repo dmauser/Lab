@@ -18,7 +18,7 @@
         "sharedKey": {
             "type": "securestring",
             "metadata": {
-                "description": "The shared key used to establish connection between the two vNet Gateways."
+                "description": "The shared key used to establish connection between the two Azure and OnPrem VPN Gateways."
             }
         },
         "gatewaySku": {
@@ -124,7 +124,7 @@
             "spoke1addressSpacePrefix": "10.0.2.0/24",
             "spoke1subnetName": "subnet1",
             "spoke1subnetPrefix": "10.0.2.0/27",
-            "spoke2": "Az-Spk1",
+            "spoke2": "Az-Spk2",
             "spoke2addressSpacePrefix": "10.0.3.0/24",
             "spoke2subnetName": "subnet1",
             "spoke2subnetPrefix": "10.0.3.0/27"
