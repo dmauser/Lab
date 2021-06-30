@@ -104,7 +104,7 @@
             "asn": "65002"
         },
         "Azure": {
-            "name": "Azure-Hub",
+            "name": "Az-Hub",
             "addressSpacePrefix": "10.0.1.0/24",
             "subnetName": "subnet1",
             "subnetPrefix": "10.0.1.0/27",
@@ -120,11 +120,11 @@
             "asn": "65515",
             "routeserverName": "Azure-RS",
             "routeserverSubnetName": "RouteServerSubnet",
-            "spoke1": "Azure-Spoke1",
+            "spoke1": "Az-Spk1",
             "spoke1addressSpacePrefix": "10.0.2.0/24",
             "spoke1subnetName": "subnet1",
             "spoke1subnetPrefix": "10.0.2.0/27",
-            "spoke2": "Azure-Spoke2",
+            "spoke2": "Az-Spk1",
             "spoke2addressSpacePrefix": "10.0.3.0/24",
             "spoke2subnetName": "subnet1",
             "spoke2subnetPrefix": "10.0.3.0/27"
@@ -280,7 +280,8 @@
             "apiVersion": "2020-10-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').spoke1,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').gatewayName,'-vng'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -314,7 +315,8 @@
             "apiVersion": "2020-10-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').spoke2,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').name,'-vnet'))]",
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').gatewayName,'-vng'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -611,7 +613,7 @@
                         "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('Azure').name, '-vnet'))]"
                     },
                     "virtualMachineName": {
-                        "value": "[concat(variables('Azure').name,'-az-lxvm')]"
+                        "value": "[concat(variables('Azure').name,'-lxvm')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
@@ -646,7 +648,7 @@
                         "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('Azure').spoke1, '-vnet'))]"
                     },
                     "virtualMachineName": {
-                        "value": "[concat(variables('Azure').spoke1,'-az-lxvm')]"
+                        "value": "[concat(variables('Azure').spoke1,'-lxvm')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
@@ -681,7 +683,7 @@
                         "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('Azure').spoke2, '-vnet'))]"
                     },
                     "virtualMachineName": {
-                        "value": "[concat(variables('Azure').spoke2,'-az-lxvm')]"
+                        "value": "[concat(variables('Azure').spoke2,'-lxvm')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
@@ -716,7 +718,7 @@
                         "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(variables('OnPrem').name, '-vnet'))]"
                     },
                     "virtualMachineName": {
-                        "value": "[concat(variables('OnPrem').name,'-az-lxvm')]"
+                        "value": "[concat(variables('OnPrem').name,'-lxvm')]"
                     },
                     "location": {
                         "value": "[parameters('location')]"
