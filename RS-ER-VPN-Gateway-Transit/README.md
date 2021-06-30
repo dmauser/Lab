@@ -3,6 +3,7 @@
 ## Concepts
 
 TBD
+![Environment](./media/er-vpn-rs-lab.png)
 
 ## Deploy this solution
 
