@@ -27,6 +27,11 @@ TBD
 
 ## LAB steps
 
+### Parameters example
+
+![Parameters example](./media/solution-parameters.png)
+
+
 ## Clean up
 
 1. Delete Route Server using [Preview Portal ](http://aka.ms/routeserver)

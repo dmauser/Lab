@@ -12,13 +12,7 @@
             "type": "string",
             "defaultValue": "*",
             "metadata": {
-                "description": "Default is any source Public IP (*). To restric access, please specify your CIDR. For single IP add 1.1.1.1/32."
-            }
-        },
-        "sharedKey": {
-            "type": "securestring",
-            "metadata": {
-                "description": "The shared key used to establish connection between the two Azure and OnPrem VPN Gateways."
+                "description": "The default is to allow SSH access from any source Public IP (*). To restric access it, please specify your Public IP address with CIDR. For single IP add 1.1.1.1/32."
             }
         },
         "gatewaySku": {
@@ -32,7 +26,7 @@
                 "VpnGw5"
             ],
             "metadata": {
-                "description": "The SKU for the VPN Gateway. Cannot be Basic SKU."
+                "description": "The SKU for the VPN Gateway"
             }
         },
         "vpnGatewayGeneration": {
@@ -43,7 +37,19 @@
                 "Generation2"
             ],
             "metadata": {
-                "description": "Select VPn Gateway Generation."
+                "description": "Select VPN Gateway Generation."
+            }
+        },
+                "sharedKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The shared key used to VPN tunnel between the two Azure and OnPrem VPN Gateways."
+            }
+        },
+        "ExpressRouteEnvironmentName": {
+            "type": "String",
+            "metadata": {
+                "description": "Add the environment name such as AVS, HLI, Skytap, RemoteLab representing On-premises location"
             }
         },
         "expressRouteCircuitID": {
@@ -554,7 +560,7 @@
                 },
                 "parameters": {
                     "connectionName": {
-                        "value": "Connection-to-ER-Circuit"
+                        "value": "[concat('Connection-to-', parameters('ExpressrouteEnvironmentName'))]"
                     },
                     "expressrouteGatewayName": {
                         "value": "[variables('Azure').ergatewayName]"
