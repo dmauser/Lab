@@ -1,4 +1,4 @@
-# Transit routing between ExpressRoute and Azure VPN using Azure Route Server
+# Transit routing between ExpressRoute and VPN using Azure Route Server
 
 **Contents**
 
