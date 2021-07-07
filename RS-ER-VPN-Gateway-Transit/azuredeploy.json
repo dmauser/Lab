@@ -582,9 +582,8 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('OnPrem').gatewayName,'-vng'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').gatewayName,'-vng'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('Azure').ergatewayName))]"
+                "[resourceId('Microsoft.Resources/deployments', 'vpnconnections')]",
+                "[resourceId('Microsoft.Resources/deployments', 'erconnections')]"
             ],
             "properties": {
                 "mode": "Incremental",
