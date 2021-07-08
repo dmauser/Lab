@@ -10,7 +10,7 @@
 
 [Clean up](#Clean-up)
 
-[Acknowledgments](## Acknowledgments)
+[Acknowledgments](#Acknowledgments)
 
 ## Concepts
 
