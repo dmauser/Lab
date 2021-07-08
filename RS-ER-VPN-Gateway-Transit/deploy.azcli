@@ -64,6 +64,3 @@ az network vpn-connection create --name Connection-to-ER-$erpeeringlocation-Circ
 ## Optional Add NSG to Subnets:
 az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name Azure --network-security-group Default-NSG
 az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name OnPrem --network-security-group Default-NSG
-
-#Scenario: Adding Azure Firewall
-az network vnet subnet create --address-prefix 10.10.0.96/27 --name $azurehubname-vnet --resource-group $RG--vnet-name Hub1
