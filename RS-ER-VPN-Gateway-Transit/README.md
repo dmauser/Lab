@@ -71,4 +71,4 @@ You can change all the address spaces of all networks by editing the ARM templat
 
 ## Acknowledgments
 
-Special thanks to Heather Sze for validating this lab and the Networking GBB team for their insights.
+Special thanks to (Heather Sze)[https://github.com/hsze/] for validating this lab and the Networking GBB team for their insights.
