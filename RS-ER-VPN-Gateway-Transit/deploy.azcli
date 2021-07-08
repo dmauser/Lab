@@ -67,7 +67,3 @@ az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name On
 
 #Scenario: Adding Azure Firewall
 az network vnet subnet create --address-prefix 10.10.0.96/27 --name $azurehubname-vnet --resource-group $RG--vnet-name Hub1
-
-
-
-
