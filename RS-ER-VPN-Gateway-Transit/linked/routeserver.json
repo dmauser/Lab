@@ -32,7 +32,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/virtualHubs",
-            "apiVersion": "2020-11-01",
+            "apiVersion": "2021-02-01",
             "name": "[parameters('routeserverName')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -42,7 +42,7 @@
         },
         {
             "type": "Microsoft.Network/virtualHubs/ipConfigurations",
-            "apiVersion": "2020-11-01",
+            "apiVersion": "2021-02-01",
             "name": "[concat(parameters('routeserverName'), '/Default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualHubs', parameters('routeserverName'))]"
