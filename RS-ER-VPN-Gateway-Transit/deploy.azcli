@@ -1,13 +1,16 @@
 #Define Variables:
 rg=RSLAB-VPN-ER
 location=southcentralus #Set Region
+azurehubname=az-hub
+azurespokename1=az-spk1
+azurespokename2=az-spk2
+onpremname=onprem
 sharedkey=$(openssl rand -base64 24)
 erpeeringlocation=Dallas #Set ER Peering Location
 ercircuitrg=ER-Circuits #Set ER Circuit Resource Group
 mypip=$(curl ifconfig.io -s) #captures your local Public IP and adds it to NSG to restric access to SSH only for your Public IP.
 echo "Type username and password to be used when deploying VMS"
 read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Echo $password to ensure you type password correctly.
-
 
 # Build site to site VPN to Emulate On-Premises and Azure:
 az group create --name $rg --location $location
@@ -16,15 +19,15 @@ az deployment group create --name VPNGatewayDeploy --resource-group $rg \
 --parameters sharedKey=$sharedkey gatewaySku=VpnGw1 vpnGatewayGeneration=Generation1 Restrict_SSH_AccessByPublicIP=$mypip \
 --no-wait
 
-# Build Azure side Linux VM
-az network public-ip create --name AzVMPubIP --resource-group $rg --location $location --allocation-method Dynamic
-az network nic create --resource-group $rg -n AzVMNIC --location $location --subnet subnet1 --private-ip-address 10.0.2.10 --vnet-name Azure --public-ip-address AzVMPubIP 
-az vm create -n AzVM1 --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics AzVMNIC --no-wait
+# Build Azure Hub side Linux VM
+az network public-ip create --name Az-Hub-lxvm-pip --resource-group $rg --location $location --allocation-method Dynamic
+az network nic create --resource-group $rg -n Az-Hub-lxvm-nic --location $location --subnet subnet1 --vnet-name Azure --public-ip-address AzVMPubIP 
+az vm create -n Az-Hub-lxvm --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics AzVMNIC --no-wait
 
+# Build On-prem side Linux VM
 az network public-ip create --name onpremVMPubIP --resource-group $rg --location $location --allocation-method Dynamic
-az network nic create --resource-group $rg -n onpremVMNIC --location $location --subnet subnet1 --private-ip-address 192.168.101.10 --vnet-name onprem --public-ip-address onpremVMPubIP 
+az network nic create --resource-group $rg -n onpremVMNIC --location $location --subnet subnet1 --vnet-name onprem --public-ip-address onpremVMPubIP 
 az vm create -n OnpremVM1 --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics onpremVMNIC --no-wait
-
 
 #Create ER Circuit (Optional)
 az network express-route create --bandwidth 50 Mbps -n ER-$erpeeringlocation-Circuit --peering-location "$erpeeringlocation" -g $ercircuitrg --provider "Megaport" -l $location --sku-family MeteredData --sku-tier Standard
@@ -61,3 +64,10 @@ az network vpn-connection create --name Connection-to-ER-$erpeeringlocation-Circ
 ## Optional Add NSG to Subnets:
 az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name Azure --network-security-group Default-NSG
 az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name OnPrem --network-security-group Default-NSG
+
+#Scenario: Adding Azure Firewall
+az network vnet subnet create --address-prefix 10.10.0.96/27 --name $azurehubname-vnet --resource-group $RG--vnet-name Hub1
+
+
+
+
