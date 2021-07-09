@@ -2,12 +2,12 @@
 
 **Topics covered:**
 
-- [Azure VPN Gateway](#AzureVPNGateway)
+- [Azure VPN Gateway](#Azure-VPN-Gateway)
 - [ExpressRoute](#ExpressRoute)
-- [Azure Virtual WAN (VWAN)](#AzureVirtualWANVWAN)
-- [Private Link](#PrivateLink)
-- [Azure Files](#AzureFiles)
-- [Azure Route Server](#AzureRouteServer)
+- [Azure Virtual WAN (VWAN)](#Azure-Virtua-lWAN)
+- [Private Link](#Private-Link)
+- [Azure Files](#Azure-Files)
+- [Azure Route Server](#Azure-Route-Server)
 
 ## Azure VPN Gateway
 - [Verify BGP information on Azure VPN and ExpressRoute Gateways](https://github.com/dmauser/Lab/tree/master/ER-and-VPN-Gateway-BGP-info)
@@ -17,7 +17,7 @@
 - [Deploying Local SKU ExpressRoute Circuits](https://github.com/dmauser/Lab/tree/master/ExpressRoute-local)
 - [Verify BGP information on Azure VPN and ExpressRoute Gateways](https://github.com/dmauser/Lab/tree/master/ER-and-VPN-Gateway-BGP-info)
 
-## Azure Virtual WAN (VWAN)
+## Azure Virtual WAN
 - [Multiple Virtual WANs (Prod and Dev)](https://github.com/dmauser/Lab/tree/master/vWAN-split-dev-and-prod-design)
 - [vWAN VPN Gateway Packet Capture](https://github.com/dmauser/Lab/tree/master/vWAN-vpn-gateway-packet-capture)
 - [Sample script showing how to migrate Spoke VNET from traditional HUB/Spoke to vWAN HUB](https://github.com/dmauser/Lab/tree/master/vWAN-spoke-vnet-sample-migration-script)
