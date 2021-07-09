@@ -68,7 +68,7 @@ You can change all the address spaces of all networks by editing the ARM templat
 ## Clean up
 
 1. Delete Route Server using [Preview Portal](http://aka.ms/routeserver)
-2. Delete Resource Group where your resource got provisioned.
+2. Delete Resource Group where your resources got provisioned.
 
 ## Acknowledgments
 
