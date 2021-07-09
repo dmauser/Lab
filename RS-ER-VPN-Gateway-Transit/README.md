@@ -42,7 +42,7 @@ The components that you can deployed are exactly what is shown above on the Arch
 2. **Azure Spoke1** (10.0.2.0/24) and subnet1
 3. **Azure Spoke2** (10.0.3.0/24) and subnet1
 4. Emulated **On-premises** on Azure (192.168.101.0/24) and subnet1
-5. **VPN Gateways:** Azure-VPN-Gateway and Onprem-VPN-Gateway with VPN connection and BGP (Azure AS: 65515 and Onprem AS: 65002). Note that this solution uses BGP but that transit is also allowed when VPN is using static tunnels.
+5. **VPN Gateways:** Azure-VPN-Gateway and Onprem-VPN-Gateway with VPN connection and BGP (Azure AS: 65515 and Onprem AS: 65002). Note: this solution uses BGP (dynamic routing), but transit with ARS is also possible when VPN Gateway uses static routing IPSec tunnels.
 6. **ExpressRoute Gateway:** Azure-ergw and connection to specified ExpressRoute ResourceID.
 7. **Azure Route Server** with *branch to branch enabled* to allow transit between ExpressRoute gateways and VPN Gateway.
 8. Virtual Machines provisioned: **Az-Hub-lxvm** (10.0.1.4), **Az-Spk1-lxvm** (10.0.2.4), **Az-Spk2-lxvm** (10.0.3.4) and **OnPrem-lxvm** (192.168.101.4).
