@@ -34,7 +34,7 @@ This lab intends to help you to build a Lab environment to simulate transit betw
 
 **Note:** The template provisioning takes approximately 50-60 minutes to complete.
 
-## What gets deployed by this solution
+## Solution components
 
 The components that you can deployed are exactly what is shown above on the Architecture Diagram:
 
