@@ -135,7 +135,7 @@
         "Azure": {
             "subnetName": "subnet1",
             "gatewayName": "[concat(parameters('Azure').hubname,'-vpngw')]",
-            "ergatewayName": "[concat(parameters('OnPrem').name,'-ergw')]",
+            "ergatewayName": "[concat(parameters('Azure').hubname,'-ergw')]",
             "gatewayPublicIPName1": "[concat(parameters('Azure').hubname,'-vpngw-pip1')]",
             "gatewayPublicIPName2": "[concat(parameters('Azure').hubname,'-vpngw-pip2')]",
             "connectionName": "[concat(parameters('Azure').hubname,'-to-',concat(parameters('OnPrem').name))]",
