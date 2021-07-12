@@ -594,8 +594,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'vpnconnections')]",
-                "[resourceId('Microsoft.Resources/deployments', 'erconnections')]"
+                "[resourceId('Microsoft.Resources/deployments', 'vpnconnections')]"
             ],
             "properties": {
                 "mode": "Incremental",
