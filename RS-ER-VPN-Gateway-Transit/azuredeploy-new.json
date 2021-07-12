@@ -122,7 +122,7 @@
         "spokevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-spoke.json'))]",
         "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
         "aavpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'aa-vpngw.json'))]",
-        "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpnconnection.json'))]",
+        "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpnconnection-new.json'))]",
         "routeServerURI": "[concat(uri(variables('artifactsLocation'),'routeserver.json'))]",
         "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vm.json'))]",
         "vnetpeeringURI": "[concat(uri(variables('artifactsLocation'),'vnet-peering.json'))]",
@@ -517,7 +517,19 @@
                 "parameters": {
                     "sharedKey": {
                         "value": "[parameters('sharedKey')]"
-                    }
+                    },
+                    "OnPremGatewayName": {
+                        "value": "[variables('OnPrem').gatewayName]"
+                    },
+                    "OnPremConnectionName": {
+                        "value": "[variables('OnPrem').connectionName]"
+                    },
+                    "AzureGatewayName": {
+                        "value": "[variables('Azure').gatewayName]"
+                    },
+                    "AzureConnectionName": {
+                        "value": "[variables('Azure').connectionName]"
+                    }                    
                 }
             }
         },
