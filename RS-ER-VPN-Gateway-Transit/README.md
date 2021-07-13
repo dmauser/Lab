@@ -32,7 +32,7 @@ This lab intends to help you to build a Lab environment to simulate transit betw
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FRS-ER-VPN-Gateway-Transit%2Fazuredeploy.json)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fdmauser%2FLab%2Fmaster%2FRS-ER-VPN-Gateway-Transit%2Fazuredeploy.json)
 
-**Note:** The template provisioning takes approximately 50-60 minutes to complete.
+**Note:** The template provisioning takes approximately 40-50 minutes to complete.
 
 ## Solution components
 
@@ -107,6 +107,12 @@ az deployment group create --name RSERVPNTransitLab-$location --resource-group $
 ```
 
 The Azure CLI Script also is available inside this Repo as [deploy.azcli](https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/deploy.azcli).
+
+### Deployment validation
+
+Use Azure Portal to check deployment status inside Azure Resource Group as shown below. Total deployment will be shown on the last entry (example below RSERVPNTransitLab-centralus which took 37 minutes and 38 seconds to complete the resources provisioning).
+
+![variables](./media/deployment-status.png)
 
 ### Review Routes
 
