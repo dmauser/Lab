@@ -1,66 +1,42 @@
-#Define Variables:
-rg=RSLAB-VPN-ER
-location=southcentralus #Set Region
-azurehubname=az-hub
-azurespokename1=az-spk1
-azurespokename2=az-spk2
-onpremname=onprem
-sharedkey=$(openssl rand -base64 24)
-erpeeringlocation=Dallas #Set ER Peering Location
-ercircuitrg=ER-Circuits #Set ER Circuit Resource Group
-mypip=$(curl ifconfig.io -s) #captures your local Public IP and adds it to NSG to restric access to SSH only for your Public IP.
-echo "Type username and password to be used when deploying VMS"
-read -p 'Username: ' username && read -sp 'Password: ' password #set variables for username and password over prompt. Echo $password to ensure you type password correctly.
+## CLI deploy example deploying using a different VNET address space (Azure and On-premises)
+#Variables
+rg=RSLAB-VPN-ER #Define your resource group
+VMAdminUsername=dmauser #specify your user
+location=centralus #Set Region
+mypip=$(curl ifconfig.io -s) #captures your local Public IP and adds it to NSG to restrict access to SSH only for your Public IP.
+sharedkey=$(openssl rand -base64 24) #VPN Gateways S2S shared key is automatically generated.
+ERenvironmentName=AVS-CUS #Set remove environment connecting via Expressroute (Example: AVS, Skytap, HLI, OnPremDC)
+ERResourceID="/subscriptions/SubID/resourceGroups/RG/providers/Microsoft.Network/expressRouteCircuits/ERCircuitName" ## ResourceID of your ExpressRoute Circuit.
+UseAutorizationKey="No" #Use authorization Key, possible values Yes or No.
+AutorizationKey="null" #Only add ER Authorization Key if UseAutorizationKey=Yes.
 
-# Build site to site VPN to Emulate On-Premises and Azure:
+#Define emulated On-premises parameters:
+OnPremName=OnPrem #On-premises Name
+OnPremVnetAddressSpace=192.168.10.0/24 #On-premises VNET address space
+OnPremSubnet1prefix=192.168.10.0/25 #On-premises Subnet1 address prefix
+OnPremgatewaySubnetPrefix=192.168.10.128/27 #On-premises Gateways address prefix
+OnPremgatewayASN=60200 #On-premises VPN Gateways ASN
+
+#Define parameters for Azure Hub and Spokes:
+AzurehubName=Az-Hub #Azure Hub Name
+AzurehubaddressSpacePrefix=10.0.10.0/24 #Azure Hub VNET address space
+AzurehubNamesubnetName=subnet1 #Azure Hub Subnet name where VM will be provisioned
+Azurehubsubnet1Prefix=10.0.10.0/27 #Azure Hub Subnet address prefix
+AzurehubgatewaySubnetPrefix=10.0.10.32/27 #Azure Hub Gateway Subnet address prefix
+AzurehubrssubnetPrefix=10.0.10.64/27 #Azure Hub Route Server subnet address prefix
+Azurespoke1Name=Az-Spk1 #Azure Spoke 1 name
+Azurespoke1AddressSpacePrefix=10.0.11.0/24 # Azure Spoke 1 VNET address space
+Azurespoke1Subnet1Prefix=10.0.11.0/27 # Azure Spoke 1 Subnet1 address prefix
+Azurespoke2Name=Az-Spk2 #Azure Spoke 1 name
+Azurespoke2AddressSpacePrefix=10.0.12.0/24 # Azure Spoke 1 VNET address space
+Azurespoke2Subnet1Prefix=10.0.12.0/27 # Azure Spoke 1 VNET address space
+
+#Parsing parameters above in Json format (do not change)
+JsonAzure={\"hubName\":\"$AzurehubName\",\"addressSpacePrefix\":\"$AzurehubaddressSpacePrefix\",\"subnetName\":\"$AzurehubNamesubnetName\",\"subnet1Prefix\":\"$Azurehubsubnet1Prefix\",\"gatewaySubnetPrefix\":\"$AzurehubgatewaySubnetPrefix\",\"rssubnetPrefix\":\"$AzurehubrssubnetPrefix\",\"spoke1Name\":\"$Azurespoke1Name\",\"spoke1AddressSpacePrefix\":\"$Azurespoke1AddressSpacePrefix\",\"spoke1Subnet1Prefix\":\"$Azurespoke1Subnet1Prefix\",\"spoke2Name\":\"$Azurespoke2Name\",\"spoke2AddressSpacePrefix\":\"$Azurespoke2AddressSpacePrefix\",\"spoke2Subnet1Prefix\":\"$Azurespoke2Subnet1Prefix\"}
+JsonOnPrem={\"name\":\"$OnPremName\",\"addressSpacePrefix\":\"$OnPremVnetAddressSpace\",\"subnet1Prefix\":\"$OnPremSubnet1prefix\",\"gatewaySubnetPrefix\":\"$OnPremgatewaySubnetPrefix\",\"asn\":\"$OnPremgatewayASN\"}
+
 az group create --name $rg --location $location
-az deployment group create --name VPNGatewayDeploy --resource-group $rg \
---template-uri https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/vpngw-deploy.json \
---parameters sharedKey=$sharedkey gatewaySku=VpnGw1 vpnGatewayGeneration=Generation1 Restrict_SSH_AccessByPublicIP=$mypip \
+az deployment group create --name RSERVPNTransitLab-$location --resource-group $rg \
+--template-uri https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/azuredeploy.json \
+--parameters VmAdminUsername=$VMAdminUsername gatewaySku=VpnGw1 vpnGatewayGeneration=Generation1 sharedKey=$sharedkey ExpressRouteEnvironmentName=$ERenvironmentName expressRouteCircuitID=$ERResourceID UseAutorizationKey=$UseAutorizationKey UseAutorizationKey=$UseAutorizationKey Onprem=$JsonOnPrem Azure=$JsonAzure \
 --no-wait
-
-# Build Azure Hub side Linux VM
-az network public-ip create --name Az-Hub-lxvm-pip --resource-group $rg --location $location --allocation-method Dynamic
-az network nic create --resource-group $rg -n Az-Hub-lxvm-nic --location $location --subnet subnet1 --vnet-name Azure --public-ip-address AzVMPubIP 
-az vm create -n Az-Hub-lxvm --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics AzVMNIC --no-wait
-
-# Build On-prem side Linux VM
-az network public-ip create --name onpremVMPubIP --resource-group $rg --location $location --allocation-method Dynamic
-az network nic create --resource-group $rg -n onpremVMNIC --location $location --subnet subnet1 --vnet-name onprem --public-ip-address onpremVMPubIP 
-az vm create -n OnPremVM1 --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics onpremVMNIC --no-wait
-
-#Create ER Circuit (Optional)
-az network express-route create --bandwidth 50 Mbps -n ER-$erpeeringlocation-Circuit --peering-location "$erpeeringlocation" -g $ercircuitrg --provider "Megaport" -l $location --sku-family MeteredData --sku-tier Standard
-echo provision ER Circuit using this information:
-az network express-route show -n ER-$erpeeringlocation-Circuit -g $ercircuitrg --query serviceKey -o tsv
-
-#Create Route Route Server
-az network routeserver create --resource-group $rg --name RSAZ \
---hosted-subnet $(az network vnet subnet show --resource-group $rg --vnet-name Azure --name RouteServerSubnet --query id --out tsv)
-
-#Allow Route Server to transit over branch.
-az network routeserver update --resource-group $rg --name RSAZ --allow-b2b-traffic true
-az network routeserver show  --resource-group $rg --name RSAZ --query allowBranchToBranchTraffic
-
-#Attach Expressroute Connection 
-
-## Option 1 - ER Circuit same subscription
-erid=$(az network express-route show -n ER-$erpeeringlocation-Circuit -g $ercircuitrg --query id -o tsv) 
-az network vpn-connection create --name Connection-to-ER-$erpeeringlocation-Circuit \
---resource-group $rg --vnet-gateway1 AzureERGW \
---express-route-circuit2 $erid \
---routing-weight 0
-
-## Option 2 - ER Circuit using ResourceID and Authorization Key
-erid="" #Add ExpressRoute ResurceID
-authkey="" #Add ExpressRoute Authorization Key
-
-az network vpn-connection create --name Connection-to-ER-$erpeeringlocation-Circuit \
---resource-group $rg --vnet-gateway1 AzureERGW \
---express-route-circuit2 $erid \
---routing-weight 0
-----authorization-key $authkey
-
-## Optional Add NSG to Subnets:
-az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name Azure --network-security-group Default-NSG
-az network vnet subnet update --name subnet1 --resource-group $rg --vnet-name OnPrem --network-security-group Default-NSG
