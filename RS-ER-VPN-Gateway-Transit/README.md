@@ -38,7 +38,7 @@ This lab intends to help you to build a Lab environment to simulate transit betw
 
 The components that you can deployed are exactly what is shown above on the Architecture Diagram:
 
-1. **Azure Hub VNET** (10.0.1.0/24) and subnets (subnet1, trusted, untrusted, RouteServerSubnet, GatewaySubnet)
+1. **Azure Hub VNET** (10.0.1.0/24) and subnets (subnet1, RouteServerSubnet, GatewaySubnet)
 2. **Azure Spoke1** (10.0.2.0/24) and subnet1
 3. **Azure Spoke2** (10.0.3.0/24) and subnet1
 4. Emulated **On-premises** on Azure (192.168.101.0/24) and subnet1
@@ -59,9 +59,9 @@ You can change all the address spaces during the deployment of the ARM Template 
 
 ![variables](./media/parameters-address-space.png)
 
-Additionally you can use **Azure CLI** by defining variables for the newer address spaces.
+Additionally you can use **Azure CLI** by defining variables for the newer address spaces and other parameters that you want to customize. Below in this script OnPrem VNET is changed to 192.168.10.0/24 as well as Azure Hub and Spokes 1 and 2 to 10.0.10.0/24, 10.11.0.0/24 and 10.0.12.0/24.
 
-```Bash
+```Shell
 ## CLI deploy example deploying using a different VNET address space (Azure and On-premises)
 #Variables
 rg=RSLAB-VPN-ER #Define your resource group
@@ -106,7 +106,7 @@ az deployment group create --name RSERVPNTransitLab-$location --resource-group $
 --no-wait
 ```
 
-Script also is available inside this Repo as [deploy.azcli script](https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/deploy.azcli).
+The Azure CLI Script also is available inside this Repo as [deploy.azcli](https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/deploy.azcli).
 
 ### Review Routes
 
