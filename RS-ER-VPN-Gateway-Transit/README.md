@@ -59,7 +59,7 @@ You can change all the address spaces during the deployment of the ARM Template 
 
 ![variables](./media/parameters-address-space.png)
 
-Additionally you can use **Azure CLI** by defining variables for the newer address spaces and other parameters that you want to customize. Below in this script OnPrem VNET is changed to 192.168.10.0/24 as well as Azure Hub and Spokes 1 and 2 to 10.0.10.0/24, 10.11.0.0/24 and 10.0.12.0/24.
+Additionally you can use **Azure CLI** by defining variables for the newer address spaces and other parameters that you want to customize. Below in this script OnPrem VNET is changed to 192.168.10.0/24 as well as Azure Hub and Spokes 1 and 2 to 10.0.10.0/24, 10.11.0.0/24 and 10.0.12.0/24 respectively. It is important to note that each Subnet for each VNET has to also match with that change.
 
 ```Shell
 ## CLI deploy example deploying using a different VNET address space (Azure and On-premises)
