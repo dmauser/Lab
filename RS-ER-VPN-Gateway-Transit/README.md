@@ -122,8 +122,8 @@ Use Azure Portal to check deployment status inside Azure Resource Group as shown
 
 ## Clean up
 
-1. Delete Route Server using [Preview Portal](http://aka.ms/routeserver)
-2. Delete Resource Group where your resourcesd got provisioned.
+1. Access [Azure Preview Portal](https://preview.portal.azure.com) (Note: preview portal is requires because Azure Route Server is still in Public Preview).
+2. Delete Resource Group where your resources got provisioned.
 
 ## Acknowledgments
 
