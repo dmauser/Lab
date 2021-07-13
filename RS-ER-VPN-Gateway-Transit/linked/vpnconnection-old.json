@@ -7,36 +7,34 @@
             "metadata": {
                 "description": "The shared key used to establish connection between the two vNet Gateways."
             }
-        },
-        "OnPremGatewayName": {
-            "type": "string"
-        },
-        "OnPremConnectionName": {
-            "type": "string"
-        },
-        "AzureGatewayName": {
-            "type": "string"
-        },
-        "AzureConnectionName": {
-            "type": "string"
         }
     },
     "variables": {
-        "location": "[resourceGroup().location]"
+        "location": "[resourceGroup().location]",
+        "OnPrem": {
+            "name": "OnPrem",
+            "gatewayName": "OnPrem-vpngw",
+            "connectionName": "OnPrem-to-Azure"
+        },
+        "Azure": {
+            "name": "Azure",
+            "gatewayName": "Azure-vpngw",
+            "connectionName": "Azure-to-OnPrem"
+        }
     },
     "resources": [
         {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/connections",
-            "name": "[parameters('OnPremConnectionName')]",
+            "name": "[variables('OnPrem').connectionName]",
             "location": "[variables('location')]",
             "comments": "This is the VPN connection from Gateway 1 to Gateway 2",
             "properties": {
                 "virtualNetworkGateway1": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('OnPremGatewayName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('OnPrem').gatewayName)]"
                 },
                 "virtualNetworkGateway2": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('AzureGatewayName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('Azure').gatewayName)]"
                 },
                 "connectionType": "Vnet2Vnet",
                 "routingWeight": 3,
@@ -47,15 +45,15 @@
         {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/connections",
-            "name": "[parameters('AzureConnectionName')]",
+            "name": "[variables('Azure').connectionName]",
             "location": "[variables('location')]",
             "comments": "This is the VPN connection from Gateway 2 to Gateway 1",
             "properties": {
                 "virtualNetworkGateway1": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('AzureGatewayName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('Azure').gatewayName)]"
                 },
                 "virtualNetworkGateway2": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('OnPremGatewayName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('OnPrem').gatewayName)]"
                 },
                 "connectionType": "Vnet2Vnet",
                 "routingWeight": 3,

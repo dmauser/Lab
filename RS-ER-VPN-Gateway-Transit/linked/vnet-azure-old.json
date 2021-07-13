@@ -14,6 +14,12 @@
         "subnetPrefix": {
             "type": "string"
         },
+        "trustedPrefix": {
+            "type": "string"
+        },
+        "untrustedPrefix": {
+            "type": "string"
+        },
         "rssubnetPrefix": {
             "type": "string"
         },
@@ -44,6 +50,18 @@
                             "networkSecurityGroup": {
                                 "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
                             }
+                        }
+                    },                
+                    {
+                        "name": "trusted",
+                        "properties": {
+                            "addressPrefix": "[parameters('trustedPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "untrusted",
+                        "properties": {
+                            "addressPrefix": "[parameters('untrustedPrefix')]"
                         }
                     },
                     {
