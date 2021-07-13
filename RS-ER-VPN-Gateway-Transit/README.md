@@ -79,7 +79,7 @@ OnPremName=OnPrem #On-premises Name
 OnPremVnetAddressSpace=192.168.10.0/24 #On-premises VNET address space
 OnPremSubnet1prefix=192.168.10.0/25 #On-premises Subnet1 address prefix
 OnPremgatewaySubnetPrefix=192.168.10.128/27 #On-premises Gateways address prefix
-OnPremgatewayASN=60200 #On-premises VPN Gateways ASN
+OnPremgatewayASN=60010 #On-premises VPN Gateways ASN
 
 #Define parameters for Azure Hub and Spokes:
 AzurehubName=Az-Hub #Azure Hub Name
