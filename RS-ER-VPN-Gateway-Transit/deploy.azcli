@@ -27,7 +27,7 @@ az vm create -n Az-Hub-lxvm --resource-group $rg --size Standard_B1s --image Ubu
 # Build On-prem side Linux VM
 az network public-ip create --name onpremVMPubIP --resource-group $rg --location $location --allocation-method Dynamic
 az network nic create --resource-group $rg -n onpremVMNIC --location $location --subnet subnet1 --vnet-name onprem --public-ip-address onpremVMPubIP 
-az vm create -n OnpremVM1 --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics onpremVMNIC --no-wait
+az vm create -n OnPremVM1 --resource-group $rg --size Standard_B1s --image UbuntuLTS --admin-username $username --admin-password $password --nics onpremVMNIC --no-wait
 
 #Create ER Circuit (Optional)
 az network express-route create --bandwidth 50 Mbps -n ER-$erpeeringlocation-Circuit --peering-location "$erpeeringlocation" -g $ercircuitrg --provider "Megaport" -l $location --sku-family MeteredData --sku-tier Standard

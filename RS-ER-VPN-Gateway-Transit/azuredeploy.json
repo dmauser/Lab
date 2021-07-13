@@ -82,7 +82,7 @@
             },
             "defaultValue": "[resourceGroup().location]"
         },
-        "OnPrem": {
+        "Onprem": {
             "type": "object",
             "defaultValue": {
                 "name": "OnPrem",
@@ -128,9 +128,9 @@
         "vnetpeeringURI": "[concat(uri(variables('artifactsLocation'),'vnet-peering.json'))]",
         "OnPrem": {
             "subnetName": "subnet1",
-            "gatewayName": "[concat(parameters('OnPrem').name,'-vpngw')]",
-            "gatewayPublicIPName": "[concat(parameters('OnPrem').name,'-vpngw-pip')]",
-            "connectionName": "[concat(parameters('OnPrem').name,'-to-',concat(parameters('Azure').hubname))]"
+            "gatewayName": "[concat(parameters('Onprem').name,'-vpngw')]",
+            "gatewayPublicIPName": "[concat(parameters('Onprem').name,'-vpngw-pip')]",
+            "connectionName": "[concat(parameters('Onprem').name,'-to-',concat(parameters('Azure').hubname))]"
         },
         "Azure": {
             "subnetName": "subnet1",
@@ -138,7 +138,7 @@
             "ergatewayName": "[concat(parameters('Azure').hubname,'-ergw')]",
             "gatewayPublicIPName1": "[concat(parameters('Azure').hubname,'-vpngw-pip1')]",
             "gatewayPublicIPName2": "[concat(parameters('Azure').hubname,'-vpngw-pip2')]",
-            "connectionName": "[concat(parameters('Azure').hubname,'-to-',concat(parameters('OnPrem').name))]",
+            "connectionName": "[concat(parameters('Azure').hubname,'-to-',concat(parameters('Onprem').name))]",
             "asn": "65515",
             "routeserverName": "[concat(parameters('Azure').hubname,'-routeserver')]",
             "routeserverSubnetName": "RouteServerSubnet",
@@ -172,7 +172,7 @@
             }
         },
         {
-            "name": "[concat(parameters('OnPrem').name,'-vnet')]",
+            "name": "[concat(parameters('Onprem').name,'-vnet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -186,10 +186,10 @@
                 },
                 "parameters": {
                     "name": {
-                        "value": "[parameters('OnPrem').name]"
+                        "value": "[parameters('Onprem').name]"
                     },
                     "addressSpacePrefix": {
-                        "value": "[parameters('OnPrem').addressSpacePrefix]"
+                        "value": "[parameters('Onprem').addressSpacePrefix]"
                     },
                     "subnetName": {
                         "value": "[variables('OnPrem').subnetName]"
@@ -439,7 +439,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('OnPrem').name,'-vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Onprem').name,'-vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -458,10 +458,10 @@
                         "value": "[parameters('vpnGatewayGeneration')]"
                     },
                     "asn": {
-                        "value": "[parameters('OnPrem').asn]"
+                        "value": "[parameters('Onprem').asn]"
                     },
                     "vnetName": {
-                        "value": "[concat(parameters('OnPrem').name,'-vnet')]"
+                        "value": "[concat(parameters('Onprem').name,'-vnet')]"
                     }
                 }
 
@@ -538,7 +538,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('OnPrem').name,'-vnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Onprem').name,'-vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
