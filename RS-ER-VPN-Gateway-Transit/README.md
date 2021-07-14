@@ -106,6 +106,9 @@ az deployment group create --name RSERVPNTransitLab-$location --resource-group $
 --template-uri https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/azuredeploy.json \
 --parameters VmAdminUsername=$VMAdminUsername gatewaySku=VpnGw1 vpnGatewayGeneration=Generation1 sharedKey=$sharedkey ExpressRouteEnvironmentName=$ERenvironmentName expressRouteCircuitID=$ERResourceID UseAutorizationKey=$UseAutorizationKey UseAutorizationKey=$UseAutorizationKey Onprem=$JsonOnPrem Azure=$JsonAzure \
 --no-wait
+
+# Note: You will be prompted for the VM admin password. If you whish specify avoid that prompt, please specify VmAdminPassword parameter.
+
 ```
 
 The Azure CLI Script also is available inside this Repo as [deploy.azcli](https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/deploy.azcli).
