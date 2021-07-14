@@ -53,7 +53,9 @@ The components that you can deployed are exactly what is shown above on the Arch
 
 ![Parameters example](./media/solution-parameters.png)
 
-### Consideration about address spaces
+### Considerations
+
+#### Deploying using a custom network address space
 
 You can change all the address spaces during the deployment of the ARM Template via Portal as shown (last two entries):
 
@@ -107,6 +109,10 @@ az deployment group create --name RSERVPNTransitLab-$location --resource-group $
 ```
 
 The Azure CLI Script also is available inside this Repo as [deploy.azcli](https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/deploy.azcli).
+
+#### Azure Route Server management
+
+You may not be able to visualize Azure Route Server inside your resource group. During Public Preview Azure Route Server can be managed via portal using http://aka.ms/routeserver.
 
 ### Deployment validation
 
