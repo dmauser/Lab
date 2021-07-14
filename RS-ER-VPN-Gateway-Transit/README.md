@@ -53,15 +53,15 @@ The components that you can deployed are exactly what is shown above on the Arch
 
 ![Parameters example](./media/solution-parameters.png)
 
-### Considerations
+### Deployment considerations
 
-#### Deploying using a custom network address space
+#### Defining custom network address spaces
 
-You can change all the address spaces during the deployment of the ARM Template via Portal as shown (last two entries):
+You can change Azure and On-premises network address spaces during the deployment of the ARM Template via Portal as shown (last two entries):
 
 ![variables](./media/parameters-address-space.png)
 
-Additionally you can use **Azure CLI** by defining variables for the newer address spaces and other parameters that you want to customize. Below in this script OnPrem VNET is changed to 192.168.10.0/24 as well as Azure Hub and Spokes 1 and 2 to 10.0.10.0/24, 10.11.0.0/24 and 10.0.12.0/24 respectively. It is important to note that each Subnet for each VNET has to also match with that change.
+Additionally, you can use **Azure CLI** by defining variables for the newer address spaces and other parameters that you want to customize. Below the sample CLI script, we have OnPrem VNET is changed to **192.168.10.0/24**, Azure Hub and Spokes 1 and 2 are changed to **10.0.10.0/24, 10.11.0.0/24**, and **10.0.12.0/24**, respectively. It is important to note that each Subnet for each VNET has to also match with that change.
 
 ```Shell
 ## CLI deploy example deploying using a different VNET address space (Azure and On-premises)
