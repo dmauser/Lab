@@ -101,7 +101,8 @@
                 "subnetName": "subnet1",
                 "subnet1Prefix": "10.0.1.0/27",
                 "gatewaySubnetPrefix": "10.0.1.32/27",
-                "rssubnetPrefix": "10.0.1.64/27",
+                "AzureFirewallPrefix": "10.0.1.64/26",
+                "rssubnetPrefix": "10.0.1.128/27",
                 "spoke1Name": "Az-Spk1",
                 "spoke1AddressSpacePrefix": "10.0.2.0/24",
                 "spoke1Subnet1Prefix": "10.0.2.0/27",
@@ -142,6 +143,7 @@
             "asn": "65515",
             "routeserverName": "[concat(parameters('Azure').hubname,'-routeserver')]",
             "routeserverSubnetName": "RouteServerSubnet",
+            "AzureFirewallSubnetName": "AzureFirewallSubnet",
             "spoke1subnetName": "subnet1",
             "spoke2subnetName": "subnet1"
         }
@@ -232,6 +234,9 @@
                     },
                     "rssubnetPrefix": {
                         "value": "[parameters('Azure').rssubnetPrefix]"
+                    },
+                    "AzureFirewallPrefix": {
+                        "value": "[parameters('Azure').AzureFirewallPrefix]"
                     },
                     "gatewaySubnetPrefix": {
                         "value": "[parameters('Azure').gatewaySubnetPrefix]"

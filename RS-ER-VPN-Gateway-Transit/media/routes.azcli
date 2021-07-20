@@ -1,0 +1,69 @@
+#Define Variables
+rg=RSLAB-VPN-ER #Define your resource group
+location=centralus #Set Region
+AzurehubName=Az-Hub #Azure Hub Name
+AzurehubaddressSpacePrefix=10.0.10.0/24 #Azure Hub VNET address space
+Azurehubsubnet1Prefix=10.0.10.0/27 #Azure Hub Subnet address prefix
+Azurespoke1Name=Az-Spk1 #Azure Spoke 1 name
+Azurespoke1AddressSpacePrefix=10.0.11.0/24 # Azure Spoke 1 VNET address space
+Azurespoke2Name=Az-Spk2 #Azure Spoke 1 name
+Azurespoke2AddressSpacePrefix=10.0.12.0/24 # Azure Spoke 1 VNET address space
+OnPremName=OnPrem #On-premises Name
+OnPremVnetAddressSpace=192.168.10.0/24 #On-premises VPN VNET address space
+EREnvironmentAddressSpace=172.16.0.0/24 #On-premises ExpressRoute VNET address space
+
+OnPremGWBGPIP=$(az network vnet-gateway show -g $rg -n $OnPremName-vpngw --query "bgpSettings.bgpPeeringAddress" -o tsv)
+AzGWBGPIP1=$(az network vnet-gateway show -g $rg -n $AzurehubName-vpngw --query "bgpSettings.bgpPeeringAddresses[0].defaultBgpIpAddresses" -o tsv)
+AzGWBGPIP2=$(az network vnet-gateway show -g $rg -n $AzurehubName-vpngw --query "bgpSettings.bgpPeeringAddresses[1].defaultBgpIpAddresses" -o tsv)
+
+# VMs IP and Effective Routes
+# Azure Hub VM 
+az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $AzurehubName-lxvm-nic -o table
+
+# Onpremises VM
+az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $OnPremName-lxvm-nic -o table
+
+# Azure Spoke1 VM 
+az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $Azurespoke1Name-lxvm-nic -o table
+
+# Azure Spoke2 VM
+az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $Azurespoke2Name-lxvm-nic -o table
+
+# Check ER/VPN GW learned / advertised routes
+# Azure Hub VPN Gateway
+az network vnet-gateway list-bgp-peer-status -g $rg -n $AzurehubName-vpngw  -o table
+az network vnet-gateway list-advertised-routes -g $rg -n $AzurehubName-vpngw \
+--peer $OnPremGWBGPIP \
+-o table 
+az network vnet-gateway list-learned-routes -g $rg -n $AzurehubName-vpngw -o table
+
+# On-premises VPN Gateway
+az network vnet-gateway list-bgp-peer-status -g $rg -n $OnPremName-vpngw  -o table
+array=($AzGWBGPIP1 $AzGWBGPIP2)
+for peer in "${array[@]}"
+    do
+    az network vnet-gateway list-advertised-routes -g $rg -n $OnPremName-vpngw \
+    --peer $peer \
+    -o table 
+    done
+az network vnet-gateway list-learned-routes -g $rg -n $OnPremName-vpngw -o table
+
+# Azure Hub ER-GW
+az network vnet-gateway list-bgp-peer-status -g $rg -n $AzurehubName-ergw -o table
+az network vnet-gateway list-advertised-routes -g $rg -n $AzurehubName-ergw \
+-o table \
+--peer $(az network routeserver show --resource-group $rg -n $AzurehubName-routeserver --query "virtualRouterIps[0]" -o tsv) #RSINT0
+
+az network vnet-gateway list-advertised-routes -g $rg -n $AzurehubName-ergw \
+-o table \
+--peer $(az network routeserver show --resource-group $rg -n $AzurehubName-routeserver --query "virtualRouterIps[1]" -o tsv) #RSINT1
+
+az network vnet-gateway list-learned-routes -g $rg -n $AzurehubName-ergw -o table
+
+#Route Server Config / learned and advertised routes (Note, it does not show for iBGP but only for eBGP peering with NVAs)
+az network routeserver show -g $rg -n $AzurehubName-routeserver
+az network routeserver peering list -g $rg --routeserver $AzurehubName-routeserver #empty result expected
