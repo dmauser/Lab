@@ -174,17 +174,17 @@ echo nc -z -v $(az network nic show --resource-group $rg -n $OnPremName-lxvm-nic
 echo nc -z -v 172.16.0.2 22
 
 
-# Install Network Utilities (traceroute, tcptraceroute and others - review link below) on your Linux VMs 
+# (Optional) Install Network Utilities (traceroute, tcptraceroute and others - review link below) on your Linux VMs 
 nettoolsuri="https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"
 for vm in `az vm list -g $rg --query "[?storageProfile.osDisk.osType=='Linux'].name" -o tsv`
 do
-    az vm extension set \
-    --resource-group $rg \
-    --vm-name $vm \
-    --name customScript \
-    --publisher Microsoft.Azure.Extensions \
-    --protected-settings '{"fileUris": ["$nettoolsuri"],"commandToExecute": "./nettools.sh"}' \
-    --no-wait
+ az vm extension set \
+ --resource-group $rg \
+ --vm-name $vm \
+ --name customScript \
+ --publisher Microsoft.Azure.Extensions \
+ --protected-settings "{\"fileUris\": [\"$nettoolsuri\"],\"commandToExecute\": \"./nettools.sh\"}" \
+ --no-wait
 done
 
 # Check the Firewall Logs
