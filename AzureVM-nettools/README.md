@@ -81,12 +81,12 @@ nettoolsuri="https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettoo
 # Loop below will list all your Linux VMs and install the network utilities on them.
 for vm in `az vm list -g $rg --query "[?storageProfile.osDisk.osType=='Linux'].name" -o tsv`
 do
-    az vm extension set \
-    --resource-group $rg \
-    --vm-name $vm \
-    --name customScript \
-    --publisher Microsoft.Azure.Extensions \
-    --protected-settings '{"fileUris": ["$nettoolsuri"],"commandToExecute": "./nettools.sh"}' \
-    --no-wait
+ az vm extension set \
+ --resource-group $rg \
+ --vm-name $vm \
+ --name customScript \
+ --publisher Microsoft.Azure.Extensions \
+ --protected-settings "{\"fileUris\": [\"$nettoolsuri\"],\"commandToExecute\": \"./nettools.sh\"}" \
+ --no-wait
 done
 ```
