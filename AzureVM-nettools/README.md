@@ -4,9 +4,9 @@
 
 [Concepts](#Concepts)
 
-[Scenario 1: Deploy a new Azure Linux VM with Network Tools using CLI](#Scenario-1:-Deploy-a-new-Azure-Linux-VM-with-Network-Tools-using-CLI)
+[Scenario 1: Deploy a new Azure Linux VM with Network Tools using CLI](#scenario-1-deploy-a-new-azure-linux-vm-with-network-tools-using-cli)
 
-[Scenario 2: Install network utilities on your existing Linux VMs](#Scenario-2:-Install-network-utilities-on-your-existing-Linux-VMs)
+[Scenario 2: Install network utilities on your existing Linux VMs](#scenario-2-install-network-utilities-on-your-existing-linux-vms)
 
 ## Concepts
 
