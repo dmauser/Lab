@@ -10,8 +10,9 @@
 
 ## Concepts
 
-This is a quick lab to show you how to deploy networking utilities/tools on your Linux VM. (Windows coming soon)
-Please review the list of network tools installed inside the content of the [script](https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh). You can also define your own startup script and replace the script URL on the variable nettoolsuri listed on the examples below.
+This is a quick lab to show you how to deploy useful network utilities/tools on your Linux VM. (Windows coming soon)
+
+Please review the list of network tools installed inside the content of the [script](https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh). You can also define your own startup script and replace the script URL on the variable **nettoolsuri** listed in the examples below.
 
 It is important to note all procedures below have been tested on Linux Ubuntu 18.04. You may need to make changes depending on your Linux distro.
 
