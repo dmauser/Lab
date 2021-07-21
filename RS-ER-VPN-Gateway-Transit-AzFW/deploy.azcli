@@ -7,7 +7,7 @@ rg=RSLAB-VPN-ER
 ##Set Region
 location=$(az group show -g $rg --query location -o tsv)
 
-## On-premises ExpressRoute VNET address space
+## On-premises (AVS, HLI, Skytap) address space
 EREnvironmentAddressSpace=172.16.0.0/24 
 
 ##Azure Hub Name
@@ -34,7 +34,7 @@ OnPremVnetAddressSpace=$(az network vnet show -g $rg -n $OnPremName-vnet --query
 ## Log Analytics workspace name. 
 Workspacename=$AzurehubName-Firewall-Logs 
 
-#Build Azure Firewall
+#Build Azure Firewall / Note this section takes few minutes to complete.
 az network public-ip create --name $AzurehubName-azfw-pip --resource-group $rg --location $location --allocation-method static --sku standard
 az network firewall create --name $AzurehubName-azfw --resource-group $rg --location $location
 az network firewall ip-config create --firewall-name $AzurehubName-azfw --name FW-config --public-ip-address $AzurehubName-azfw-pip  --resource-group $rg --vnet-name $AzurehubName-vnet
@@ -86,7 +86,6 @@ az network route-table route create --resource-group $rg --name Exception --rout
 --next-hop-type Internet
 ## Associating RT-Hub-to-AzFW Hub Subnet1 (Hub and Spokes)
 az network vnet subnet update -n subnet1 -g $rg --vnet-name $AzurehubName-vnet --route-table RT-Hub-to-AzFW 
-
 
 # Spoke 1 and 2 traffic to Firewall
 ## Create UDR + Disable BGP Propagation
@@ -142,14 +141,59 @@ az network vnet subnet update -n GatewaySubnet -g $rg --vnet-name $AzurehubName-
 
 
 #Connectivity test
-## Leaving Ping or run port connectivity check and check the Firewall Logs
-nc -z -v 172.16.0.2 22
-nc -z -v 10.0.11.4 22
-nc -z -v 10.0.12.4 22
-nc -z -v 192.168.10.4 22
+
+# VMs IP and Effective Routes
+# Azure Hub VM 
+az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $AzurehubName-lxvm-nic -o table
+
+# Onpremises VM
+az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $OnPremName-lxvm-nic -o table
+
+# Azure Spoke1 VM 
+az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $Azurespoke1Name-lxvm-nic -o table
+
+# Azure Spoke2 VM
+az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show-effective-route-table --resource-group $rg -n $Azurespoke2Name-lxvm-nic -o table
+
+## Leaving Ping or run port connectivity check below and check the Firewall Logs
+## Please replace with the correct IPs from previous that you can see from section.
+
+#Hub VM
+echo nc -z -v $(az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+#Spoke 1 VM 
+echo nc -z -v $(az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+#Spoke 2 VM 
+echo nc -z -v $(az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+#Remove VPN Branch VM 
+echo nc -z -v $(az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+# Replace with the remote Environment connected via ER (not in Azure) \
+echo nc -z -v 172.16.0.2 22
+
+array=$(az vm list -g $rg --query "[].name" -o tsv)
+for vm in "${array[*]}"
+do
+    echo "$vm"
+done
+
+array=$(az vm list -g $rg --query "[].name" -o tsv)
+for vm in "${array[*]}"
+do 
+ az vm extension set --resource-group $rg --vm-name $vm --name customScript --publisher Microsoft.Azure.Extensions --protected-settings '{"fileUris": ["https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"],"commandToExecute": "./nettools.sh"}'
+done
+
+array=$(az vm list -g $rg --query "[].name" -o tsv)
+for vm in "${array[@]}"
+do
+ az vm extension set --resource-group $rg --vm-name $vm --name customScript --publisher Microsoft.Azure.Extensions --protected-settings '{"fileUris": ["https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"],"commandToExecute": "./nettools.sh"}' --no-wait
+done
 
 # Check the Firewall Logs
 ## Use the customer query (content between Kusto_Query)
+## Changes made from the default query: list last 10 min, only shows connections to port 22, sort more recent records first ()
 <<Kusto_Query 
 // Network rule log data 
 // Parses the network rule log data. 
@@ -195,8 +239,7 @@ TargetPort = tostring(TargetPortInt)
 | where TargetPort contains "22"
 Kusto_Query
 
-
-# Misc
+# Misc/Troubleshooting
 # Disable UDRs ## Disable Route Tables (bypass Firewall)
 az network vnet subnet update -n subnet1 -g $rg --vnet-name $AzurehubName-vnet --route-table ""
 az network vnet subnet update -n subnet1 -g $rg --vnet-name $Azurespoke1Name-vnet --route-table ""
