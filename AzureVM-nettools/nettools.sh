@@ -12,6 +12,6 @@ sudo apt-get install hping3 -y
 # iPerf
 sudo apt-get install iperf3 -y
 # Nginx
-sudo apt-get install install nginx && hostname > /var/www/html/index.html
+sudo apt-get install nginx && hostname > /var/www/html/index.html
 # Speedtest
 sudo apt-get install speedtest-cli -y
