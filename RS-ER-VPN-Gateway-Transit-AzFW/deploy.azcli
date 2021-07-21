@@ -173,30 +173,17 @@ echo nc -z -v $(az network nic show --resource-group $rg -n $OnPremName-lxvm-nic
 # Replace with the remote Environment connected via ER (not in Azure) \
 echo nc -z -v 172.16.0.2 22
 
-array=$(az vm list -g $rg --query "[].name" -o tsv)
-for vm in "${array[*]}"
-do
-    echo "$vm"
-done
 
-
-for vm in `az vm list -g $rg --query "[].name" -o tsv`
-do
-    echo "$vm"
-done
-
-
-
+# Install Network Utilities (traceroute, tcptraceroute and others - review link below) on your Linux VMs 
 nettoolsuri="https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"
-
-for vm in `az vm list -g $rg --query "[].name" -o tsv`
+for vm in `az vm list -g $rg --query "[?storageProfile.osDisk.osType=='Linux'].name" -o tsv`
 do
     az vm extension set \
     --resource-group $rg \
     --vm-name $vm \
     --name customScript \
     --publisher Microsoft.Azure.Extensions \
-    --protected-settings '{"fileUris": [$nettoolsuri],"commandToExecute": "./nettools.sh"}'
+    --protected-settings '{"fileUris": ["$nettoolsuri"],"commandToExecute": "./nettools.sh"}' \
     --no-wait
 done
 

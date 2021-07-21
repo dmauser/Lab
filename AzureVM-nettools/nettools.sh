@@ -11,7 +11,7 @@ sudo apt-get install nmap -y
 sudo apt-get install hping3 -y
 # iPerf
 sudo apt-get install iperf3 -y
-# Nginx
-sudo apt-get install nginx && hostname > /var/www/html/index.html
+# Nginx and adds machine name on main page
+sudo apt-get install nginx -y && hostname > /var/www/html/index.html
 # Speedtest
 sudo apt-get install speedtest-cli -y

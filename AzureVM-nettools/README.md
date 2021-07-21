@@ -1,6 +1,13 @@
 # LAB
 
-## Create Azure Linux VM - CLI 
+## Content
+
+## Concepts
+
+This is a quick lab to show you how to deploy networking utilities/tools on your Linux VM. (Windows coming soon)
+Please review the list of network tools installed inside the content of the [script](https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh)
+
+## Scenario 1 - Deploy a Azure Linux VM with Network Tools - CLI
 
 ```Bash
 # Define variables
@@ -32,6 +39,6 @@ az vm extension set \
   --vm-name $vmname \
   --name customScript \
   --publisher Microsoft.Azure.Extensions \
-  --protected-settings '{"fileUris": ["https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"],"commandToExecute": "./nettools.sh"}'
-
+  --protected-settings '{"fileUris": ["https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"],"commandToExecute": "./nettools.sh"}' \
+  --no-wait
 ```
