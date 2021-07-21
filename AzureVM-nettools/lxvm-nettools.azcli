@@ -1,10 +1,11 @@
 
-# ** Deploy a Azure Linux VM with Network Tools - CLI **
+## Scenario 1 - Deploy a Azure Linux VM with Network Tools - CLI
 # Define variables
 rg=LAB-NetTools1
 location=southcentralus
 vnetname=AzureVNET
 vmname=AzVM1
+username=azureadmin
 
 # Create VNET/Subnet
 az group create --name $rg --location $location
@@ -20,7 +21,7 @@ az network nic create --resource-group $rg -n $vmname-nic --location $location \
 --vnet-name $vnetname \
 --public-ip-address $vmname-pip
 az vm create -n $vmname --resource-group $rg --size Standard_B1s --image UbuntuLTS \
---admin-username azureadmin \
+--admin-username $username \
 --nics $vmname-nic \
 --generate-ssh-keys
 
@@ -34,5 +35,6 @@ az vm extension set \
 --no-wait
 
 ## Obtain Public IP and ssh to the target machine.
-az network public-ip show --name $vmname-pip --resource-group $rg
-ssh 
+pip=$(az network public-ip show --name $vmname-pip --resource-group $rg --query ipAddress -o tsv)
+# ssh to the VM and test the tools are present (traceroute and others)
+ssh azureadmin@$pip
