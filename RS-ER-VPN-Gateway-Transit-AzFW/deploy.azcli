@@ -9,7 +9,6 @@ rg=RSLAB-ER-VPN-AZFW
 location=$(az group show -g $rg --query location -o tsv)
 ## On-premises (AVS, HLI, Skytap) address space connected via ExpressRoute circuit.
 EREnvironmentAddressSpace=172.16.0.0/24 
-
 ##Azure Hub Name
 AzurehubName=Az-Hub
 ## Azure Hub VNET address space
@@ -30,7 +29,6 @@ Azurespoke2AddressSpacePrefix=$(az network vnet show -g $rg -n $Azurespoke2Name-
 OnPremName=OnPrem
 #On-premises VPN VNET address space
 OnPremVnetAddressSpace=$(az network vnet show -g $rg -n $OnPremName-vnet --query "addressSpace.addressPrefixes" -o tsv)
-
 ## Log Analytics workspace name. 
 Workspacename=$AzurehubName-Firewall-Logs 
 
@@ -139,28 +137,24 @@ az network route-table route create --resource-group $rg --name EREvn-to-AzFw --
 ## Associating RT-to-GWSubnet to GatewaySubnet
 az network vnet subnet update -n GatewaySubnet -g $rg --vnet-name $AzurehubName-vnet --route-table RT-GWSubnet-to-AzFW
 
-
-#Validations
-
-# Dump VMs IP and Effective Routes
-# Azure Hub VM 
+# Validations
+# 1) Dump VMs IP and Effective Routes
+## Azure Hub VM 
 az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $AzurehubName-lxvm-nic -o table
-
-# Onpremises VM
+## Onpremises VM
 az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $OnPremName-lxvm-nic -o table
-
-# Azure Spoke1 VM 
+## Azure Spoke1 VM 
 az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $Azurespoke1Name-lxvm-nic -o table
-
-# Azure Spoke2 VM
+## Azure Spoke2 VM
 az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $Azurespoke2Name-lxvm-nic -o table
 
-## Leaving Ping or run port connectivity check below and check the Firewall Logs
-## Please replace with the correct IPs from previous that you can see from section.
+# 2) Leaving Ping or run port connectivity check below and check the Firewall Logs
+
+# 3) Generate netcat command to check connectivity and review activity on Azure Firewall logs:
 
 #Hub VM
 echo nc -z -v $(az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
@@ -173,8 +167,7 @@ echo nc -z -v $(az network nic show --resource-group $rg -n $OnPremName-lxvm-nic
 # Replace with the remote Environment connected via ER (not in Azure) \
 echo nc -z -v 172.16.0.2 22
 
-
-# (Optional) Install Network Utilities (traceroute, tcptraceroute and others - review link below) on your Linux VMs 
+# 4) (Optional) Install Network Utilities (traceroute, tcptraceroute and others - review link below) on your Linux VMs and use them to check routes, ping as well as curl remote hostname for other connectivity checks: 
 nettoolsuri="https://raw.githubusercontent.com/dmauser/Lab/master/AzureVM-nettools/nettools.sh"
 for vm in `az vm list -g $rg --query "[?storageProfile.osDisk.osType=='Linux'].name" -o tsv`
 do
@@ -187,14 +180,14 @@ do
  --no-wait
 done
 
-# Check the Firewall Logs
+# 5) Check the Firewall Logs
 ## Use the customer query (content between Kusto_Query)
-## Changes made from the default query: list last 10 min, only shows connections to port 22, sort more recent records first ()
+## Changes made from the default query: list last one hour, only shows connections to port 22, sort more recent records first ()
 <<Kusto_Query 
 // Network rule log data 
 // Parses the network rule log data. 
 AzureDiagnostics
-| where TimeGenerated > ago(10min)
+| where TimeGenerated > ago(1h)
 | where Category == "AzureFirewallNetworkRule"
 | where OperationName == "AzureFirewallNatRuleLog" or OperationName == "AzureFirewallNetworkRuleLog"
 //case 1: for records that look like this:
@@ -235,8 +228,8 @@ TargetPort = tostring(TargetPortInt)
 | where TargetPort contains "22"
 Kusto_Query
 
-# Misc/Troubleshooting
-# Disable UDRs ## Disable Route Tables (bypass Firewall)
+# 6) Misc/Troubleshooting
+# Disable UDRs ## Disable Route Tables (bypass Firewall) - It restores default behavior of the original LAB without the Firewall.
 az network vnet subnet update -n subnet1 -g $rg --vnet-name $AzurehubName-vnet --route-table ""
 az network vnet subnet update -n subnet1 -g $rg --vnet-name $Azurespoke1Name-vnet --route-table ""
 az network vnet subnet update -n subnet1 -g $rg --vnet-name $Azurespoke2Name-vnet --route-table ""
