@@ -318,4 +318,4 @@ az network vnet subnet update -n GatewaySubnet -g $rg --vnet-name $AzurehubName-
 
 ## Acknowledgments
 
-Special thanks to Networking GBB team for validation and their insights.
+Special thanks to Networking GBB team for validation and providing insights.
