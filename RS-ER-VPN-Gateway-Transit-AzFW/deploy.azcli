@@ -1,3 +1,4 @@
+# Install required CLI extension
 az extension list-available --output table
 az extension add --name azure-firewall
 
@@ -6,8 +7,7 @@ az extension add --name azure-firewall
 rg=RSLAB-ER-VPN-AZFW
 ##Set Region
 location=$(az group show -g $rg --query location -o tsv)
-
-## On-premises (AVS, HLI, Skytap) address space
+## On-premises (AVS, HLI, Skytap) address space connected via ExpressRoute circuit.
 EREnvironmentAddressSpace=172.16.0.0/24 
 
 ##Azure Hub Name
@@ -140,9 +140,9 @@ az network route-table route create --resource-group $rg --name EREvn-to-AzFw --
 az network vnet subnet update -n GatewaySubnet -g $rg --vnet-name $AzurehubName-vnet --route-table RT-GWSubnet-to-AzFW
 
 
-#Connectivity test
+#Validations
 
-# VMs IP and Effective Routes
+# Dump VMs IP and Effective Routes
 # Azure Hub VM 
 az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $AzurehubName-lxvm-nic -o table

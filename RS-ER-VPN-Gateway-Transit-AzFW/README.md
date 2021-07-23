@@ -14,13 +14,13 @@
 
 ## Concepts
 
-This LAB is a continuation of the scenario of  [Transit between ExpressRoute and Azure S2S VPN using Route Server](https://github.com/dmauser/Lab/tree/master/RS-ER-VPN-Gateway-Transit) but it add Azure Firewall to allow traffic inspection between all ends: ExpressRoute, VPN, Hub and Spoke VNETs. 
+This LAB is a continuation of the scenario of  [Transit between ExpressRoute and Azure S2S VPN using Route Server](https://github.com/dmauser/Lab/tree/master/RS-ER-VPN-Gateway-Transit) but adds Azure Firewall to allow traffic inspection between all ends: ExpressRoute, VPN, Hub and Spoke VNETs.
 
 ### Use Case
 
-All customers that have business relationships with other enterprises can benefit of this scenario as consumer to other service providers/vendors or as provider allowing their customer access resources in Azure as well as On-premises.
+All customers that have business to business (B2B) with other companies can benefit from this scenario, whether as a consumer to other service providers/vendors or as providers allowing their customer access resources in Azure as well as On-premises.
 
-This lab intends to help you to build a Lab environment to simulate transit between ExpressRoute and VPN by creating the environment integrally as well as emulate an on-premises environment to give you the capability to demonstrate and validate the transit functionality made possible by ARS. In addition, it adds Azure Firewall as central security component for traffic inspection between VPN and ExpressRoute connection as well as workloads placed on the Spoke VNETs.
+This lab intends to help you to build a Lab environment to simulate transit between ExpressRoute and VPN by creating the environment integrally as well as emulate an on-premises environment to give you the capability to demonstrate and validate the transit functionality made possible by ARS. In addition, it adds Azure Firewall as a central security component for traffic inspection between VPN and ExpressRoute connections and workloads placed on the Spoke VNETs.
 
 ### Architecture diagram
 
@@ -37,6 +37,7 @@ This lab intends to help you to build a Lab environment to simulate transit betw
 ### Step 2 - Deploy Azure Firewall and route tables (UDRs)
 
 ```bash
+# Install required CLI extension
 az extension list-available --output table
 az extension add --name azure-firewall
 
@@ -45,8 +46,7 @@ az extension add --name azure-firewall
 rg=RSLAB-ER-VPN-AZFW
 ##Set Region
 location=$(az group show -g $rg --query location -o tsv)
-
-## On-premises (AVS, HLI, Skytap) address space
+## On-premises (AVS, HLI, Skytap) address space connected via ExpressRoute circuit.
 EREnvironmentAddressSpace=172.16.0.0/24 
 
 ##Azure Hub Name
