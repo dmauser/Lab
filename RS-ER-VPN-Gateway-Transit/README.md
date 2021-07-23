@@ -129,6 +129,8 @@ Use Azure Portal to check deployment status inside Azure Resource Group as shown
 - **Azure ExpressRoute Gateway** PowerShell script or CLI. You can find a PowerShell script where you can dump BGP routes for both VPN and ExpressRoute Gateways, consult: [Verify BGP information on Azure VPN and ExpressRoute Gateways](https://github.com/dmauser/Lab/tree/master/VNG-BGP-Info).
 - **Azure Route Server** by using CLI: _[az network routeserver peering list-advertised-routes](https://docs.microsoft.com/en-us/cli/azure/network/routeserver/peering?view=azure-cli-latest#az-network-routeserver-peering-list-advertised-routes)_ and _[az network routeserver peering list-learned-routes](https://docs.microsoft.com/en-us/cli/azure/network/routeserver/peering?view=azure-cli-latest#az_network_routeserver_peering_list_learned_routes)_
 
+**Update**: A new CLI script routes.azcli [https://github.com/dmauser/Lab/blob/master/RS-ER-VPN-Gateway-Transit/routes.azcli] has been to assist you review routes from components involved.
+
 ## Clean up
 
 1. Access [Azure Preview Portal](https://preview.portal.azure.com) (Note: preview portal is requires because Azure Route Server is still in Public Preview).
