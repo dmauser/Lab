@@ -3,7 +3,7 @@ az extension add --name azure-firewall
 
 #Variables
 ##Define your resource group
-rg=RSLAB-VPN-ER 
+rg=RSLAB-ER-VPN-AZFW
 ##Set Region
 location=$(az group show -g $rg --query location -o tsv)
 
