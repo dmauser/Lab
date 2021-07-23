@@ -6,7 +6,7 @@
 
 [Deploy this solution](#Deploy-this-solution)
 
-[LAB steps](#LAB-steps)
+[Validations](#Validations)
 
 [Clean up](#Clean-up)
 
@@ -27,7 +27,7 @@ This lab intends to help you to build a Lab environment to simulate transit betw
 ![Environment](./media/er-vpn-rs-azfw-lab.png)
 
 
-## Solution components
+### Solution components
 
 The components that you can deployed are exactly what is shown above on the Architecture Diagram:
 
