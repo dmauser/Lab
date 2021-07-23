@@ -1,17 +1,30 @@
 #Define Variables
 rg=RSLAB-VPN-ER #Define your resource group
-location=centralus #Set Region
-AzurehubName=Az-Hub #Azure Hub Name
-AzurehubaddressSpacePrefix=10.0.10.0/24 #Azure Hub VNET address space
-Azurehubsubnet1Prefix=10.0.10.0/27 #Azure Hub Subnet address prefix
-Azurespoke1Name=Az-Spk1 #Azure Spoke 1 name
-Azurespoke1AddressSpacePrefix=10.0.11.0/24 # Azure Spoke 1 VNET address space
-Azurespoke2Name=Az-Spk2 #Azure Spoke 1 name
-Azurespoke2AddressSpacePrefix=10.0.12.0/24 # Azure Spoke 1 VNET address space
-OnPremName=OnPrem #On-premises Name
-OnPremVnetAddressSpace=192.168.10.0/24 #On-premises VPN VNET address space
-EREnvironmentAddressSpace=172.16.0.0/24 #On-premises ExpressRoute VNET address space
+location=$(az group show -g $rg --query location -o tsv)
 
+## On-premises (AVS, HLI, Skytap) address space
+EREnvironmentAddressSpace=172.16.0.0/24 
+
+##Azure Hub Name
+AzurehubName=Az-Hub
+## Azure Hub VNET address space
+AzurehubaddressSpacePrefix=$(az network vnet show -g $rg -n $AzurehubName-vnet --query "addressSpace.addressPrefixes" -o tsv)
+##Azure Hub Subnet address prefix
+Azurehubsubnet1Prefix=$(az network vnet subnet show -g $rg -n subnet1 --vnet-name $AzurehubName-vnet --query addressPrefix -o tsv)
+## Azure Hub Firewall Subnet address prefix
+AzurehubFirewallPrefix=$(az network vnet subnet show -g $rg -n AzureFirewallSubnet --vnet-name $AzurehubName-vnet --query addressPrefix -o tsv) 
+##Azure Spoke 1 name
+Azurespoke1Name=Az-Spk1
+## Azure Spoke 1 VNET address space
+Azurespoke1AddressSpacePrefix=$(az network vnet show -g $rg -n $Azurespoke1Name-vnet --query "addressSpace.addressPrefixes" -o tsv) 
+##Azure Spoke 2 name
+Azurespoke2Name=Az-Spk2
+## Azure Spoke 2 VNET address space
+Azurespoke2AddressSpacePrefix=$(az network vnet show -g $rg -n $Azurespoke2Name-vnet --query "addressSpace.addressPrefixes" -o tsv)
+#On-premises Name
+OnPremName=OnPrem
+#On-premises VPN VNET address space
+OnPremVnetAddressSpace=$(az network vnet show -g $rg -n $OnPremName-vnet --query "addressSpace.addressPrefixes" -o tsv)
 OnPremGWBGPIP=$(az network vnet-gateway show -g $rg -n $OnPremName-vpngw --query "bgpSettings.bgpPeeringAddress" -o tsv)
 AzGWBGPIP1=$(az network vnet-gateway show -g $rg -n $AzurehubName-vpngw --query "bgpSettings.bgpPeeringAddresses[0].defaultBgpIpAddresses" -o tsv)
 AzGWBGPIP2=$(az network vnet-gateway show -g $rg -n $AzurehubName-vpngw --query "bgpSettings.bgpPeeringAddresses[1].defaultBgpIpAddresses" -o tsv)
@@ -21,7 +34,7 @@ AzGWBGPIP2=$(az network vnet-gateway show -g $rg -n $AzurehubName-vpngw --query 
 az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $AzurehubName-lxvm-nic -o table
 
-# Onpremises VM
+# On-premises VM
 az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $OnPremName-lxvm-nic -o table
 
@@ -34,15 +47,20 @@ az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "i
 az network nic show-effective-route-table --resource-group $rg -n $Azurespoke2Name-lxvm-nic -o table
 
 # Check ER/VPN GW learned / advertised routes
-# Azure Hub VPN Gateway
+# 1) Azure Hub VPN Gateway
+## BGP Peer Status
 az network vnet-gateway list-bgp-peer-status -g $rg -n $AzurehubName-vpngw  -o table
+## Advertised BGP Routes to OnPrem-vpngw
 az network vnet-gateway list-advertised-routes -g $rg -n $AzurehubName-vpngw \
 --peer $OnPremGWBGPIP \
 -o table 
+## Learned BGP Routes
 az network vnet-gateway list-learned-routes -g $rg -n $AzurehubName-vpngw -o table
 
-# On-premises VPN Gateway
+# 2) On-premises VPN Gateway
+## BGP Peer Status
 az network vnet-gateway list-bgp-peer-status -g $rg -n $OnPremName-vpngw  -o table
+## Advertised BGP Routes to OnPrem-vpngw to Active Active Azure-Hub-vpngw
 array=($AzGWBGPIP1 $AzGWBGPIP2)
 for peer in "${array[@]}"
     do
@@ -50,20 +68,22 @@ for peer in "${array[@]}"
     --peer $peer \
     -o table 
     done
+## Learned BGP Routes
 az network vnet-gateway list-learned-routes -g $rg -n $OnPremName-vpngw -o table
 
-# Azure Hub ER-GW
+# 3) Azure Hub ER-GW
+## BGP Peer Status
 az network vnet-gateway list-bgp-peer-status -g $rg -n $AzurehubName-ergw -o table
+## Advertised BGP Routes to Azure Route Server (two instances)
 az network vnet-gateway list-advertised-routes -g $rg -n $AzurehubName-ergw \
 -o table \
 --peer $(az network routeserver show --resource-group $rg -n $AzurehubName-routeserver --query "virtualRouterIps[0]" -o tsv) #RSINT0
-
 az network vnet-gateway list-advertised-routes -g $rg -n $AzurehubName-ergw \
 -o table \
 --peer $(az network routeserver show --resource-group $rg -n $AzurehubName-routeserver --query "virtualRouterIps[1]" -o tsv) #RSINT1
-
+## Learned BGP Routes
 az network vnet-gateway list-learned-routes -g $rg -n $AzurehubName-ergw -o table
 
-#Route Server Config / learned and advertised routes (Note, it does not show for iBGP but only for eBGP peering with NVAs)
+# 4) Route Server Config / learned and advertised routes (Note, it does not show for iBGP but only for eBGP peering with NVAs)
 az network routeserver show -g $rg -n $AzurehubName-routeserver
-az network routeserver peering list -g $rg --routeserver $AzurehubName-routeserver #empty result expected
+az network routeserver peering list -g $rg --routeserver $AzurehubName-routeserver #empty result expected because that is just for eBGP with 3rd party NVAs.
