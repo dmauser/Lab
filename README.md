@@ -8,6 +8,7 @@
 - [Private Link](#Private-Link)
 - [Azure Files](#Azure-Files)
 - [Azure Route Server](#Azure-Route-Server)
+- [Azure Firewall](#Azure-Firewall)
 
 ## Azure VPN Gateway
 - [Verify BGP information on Azure VPN and ExpressRoute Gateways](https://github.com/dmauser/Lab/tree/master/ER-and-VPN-Gateway-BGP-info)
@@ -30,6 +31,10 @@
 ##  Azure Files
 - [Network performance considerations when using Azure Files over Private Endpoint](https://github.com/dmauser/azure-files-netperf)
 
+## Azure Firewall
+- [Using Azure Firewall to inspect traffic between VPN and ExpressRoute](https://github.com/dmauser/Lab/tree/master/RS-ER-VPN-Gateway-Transit-AzFW)
+
 ## Azure Route Server
 - [Forced Tunneling of Internet traffic through Active-Active OPNsense Firewalls using Azure Route Server (ExpressRoute)](https://github.com/dmauser/Lab/tree/master/RS-AA-OPNsense-ForceTunnel-ER)
 - [Transit between ExpressRoute and Azure S2S VPN using Route Server](https://github.com/dmauser/Lab/tree/master/RS-ER-VPN-Gateway-Transit)
+- [Using Azure Firewall to inspect traffic between VPN and ExpressRoute](https://github.com/dmauser/Lab/tree/master/RS-ER-VPN-Gateway-Transit-AzFW)
