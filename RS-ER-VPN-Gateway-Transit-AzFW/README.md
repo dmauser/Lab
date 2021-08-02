@@ -31,15 +31,15 @@ This lab intends to help you to build a Lab environment to simulate transit betw
 
 The components that you can deployed are exactly what is shown above on the Architecture Diagram:
 
-1. **Azure Hub VNET** (10.0.100.0/24) and subnets (subnet1, RouteServerSubnet, GatewaySubnet, AzureFirewallSubnet)
-2. **Azure Spoke1** (10.0.101.0/24) and subnet1
-3. **Azure Spoke2** (10.0.102.0/24) and subnet1
+1. **Azure Hub VNET** (10.0.10.0/24) and subnets (subnet1, RouteServerSubnet, GatewaySubnet, AzureFirewallSubnet)
+2. **Azure Spoke1** (10.0.11.0/24) and subnet1
+3. **Azure Spoke2** (10.0.12.0/24) and subnet1
 4. Emulated **On-premises** on Azure (192.168.100.0/24) and subnet1
 5. **VPN Gateways:** Azure-VPN-Gateway and Onprem-VPN-Gateway with VPN connection and BGP (Azure AS: 65515 and Onprem AS: 65100). Note: this solution uses BGP (dynamic routing), but transit with ARS is also possible when VPN Gateway uses static routing IPSec tunnels. Defined static over Local Network Gateway are also propagated via iBGP from VPN Gateway to Azure Route Server, and than propagated to ExpressRoute Gateway.
 6. **ExpressRoute Gateway:** Azure-ergw and connection to specified ExpressRoute ResourceID.
 7. **Azure Route Server** with *branch to branch enabled* to allow transit between ExpressRoute gateways and VPN Gateway.
-8. Virtual Machines provisioned: **Az-Hub-lxvm** (10.0.100.4), **Az-Spk1-lxvm** (10.0.101.4), **Az-Spk2-lxvm** (10.0.103.4) and **OnPrem-lxvm** (192.168.100.4).
-9. Azure Firewall **Az-Hub-azfw** 
+8. Virtual Machines provisioned: **Az-Hub-lxvm** (10.0.10.4), **Az-Spk1-lxvm** (10.0.11.4), **Az-Spk2-lxvm** (10.0.12.4) and **OnPrem-lxvm** (192.168.100.4).
+9. Azure Firewall **Az-Hub-azfw** (10.0.10.68).
 
 ## Deploy this solution
 
