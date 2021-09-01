@@ -28,8 +28,23 @@
             "defaultValue": "[resourceGroup().location]"
         }
     },
-    "variables": {},
+    "variables": {
+        "publicIpAddressName": "[concat(parameters('routeserverName'),'-pip1')]"
+    },
     "resources": [
+{
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIpAddressName')]",
+            "location": "[parameters('location')]",
+            "comments": "Standard Public IP associated to Route Server",
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            },
+            "sku": {
+                "name": "Standard"
+            }
+        },
         {
             "type": "Microsoft.Network/virtualHubs",
             "apiVersion": "2021-02-01",
@@ -45,12 +60,16 @@
             "apiVersion": "2021-02-01",
             "name": "[concat(parameters('routeserverName'), '/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualHubs', parameters('routeserverName'))]"
+                "[resourceId('Microsoft.Network/virtualHubs', parameters('routeserverName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
             ],
             "properties": {
                 "privateIPAllocationMethod": "Dynamic",
                 "subnet": {
                     "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+                },
+                "PublicIPAddress": {
+                    "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
                 }
             }
         }
