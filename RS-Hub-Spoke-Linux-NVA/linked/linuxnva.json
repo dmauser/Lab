@@ -1,0 +1,178 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachineSize": {
+      "type": "string",
+      "defaultValue": "Standard_B2s",
+      "metadata": {
+        "description": "VM size"
+      }
+    },
+    "virtualMachineName": {
+      "type": "string",
+      "metadata": {
+        "description": "Linux Router Manchine Name"
+      }
+    },
+    "osDiskType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+      "Standard_LRS", 
+      "StandardSSD_LRS",
+      "Premium_LRS" 
+      ],
+      "metadata": {
+        "description": "Select Disk Type: Premium SSD (Premium_LRS), Standard SSD (StandardSSD_LRS), Standard HDD (Standard_LRS)"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password"
+      }
+    },
+    "existingVirtualNetworkName": {
+      "type": "string",
+      "metadata": {
+      "description": "Existing Virtual Nework Name"
+      }
+    },
+    "existingSubnet": {
+      "type": "string",
+      "metadata": {
+      "description": "Type Existing Subnet Name"
+       }
+    },
+    "scriptUri": {
+      "defaultValue": "[uri(deployment().properties.templateLink.uri, '/scripts/linuxnva.sh')]",
+      "type": "string",
+      "metadata": { "description": "Script that will be executed" }            
+    },
+    "scriptCmd": {
+       "defaultValue": "sh LinuxRouter.sh",
+       "type": "string",
+       "metadata": { "description": "Command to run the script" }            
+    }
+  },
+  "variables": {
+    "extensionName":"CustomScript",
+    "NIC": "[concat(parameters('virtualMachineName'),'-NIC')]",
+    "publicIPAddressName": "[concat(parameters('virtualMachineName'),'-PublicIP')]",
+    "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('existingVirtualNetworkName'), parameters('existingSubnet'))]",
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+      "name": "[parameters('virtualMachineName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2017-03-30",
+      "location": "[variables('location')]",
+      "comments": "This is the virtual machine that you're building.",
+      "dependsOn": [
+        "[variables('NIC')]"
+        ],
+      "properties": {
+        "osProfile": {
+          "computerName": "[parameters('virtualMachineName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('virtualMachineSize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "18.04-LTS",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('osDiskType')]"
+            }
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "properties": {
+                "primary": true
+              },
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('NIC'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('NIC')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "comments": "This will be your Primary NIC Untrusted",
+      "dependsOn": [
+        "[variables('publicIpAddressName')]"
+      ],
+      "properties": {
+        "enableIPForwarding": true,
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnet1Ref')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('publicIpAddressName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('location')]",
+      "comments": "Public IP for your Primary NIC",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('virtualMachineName'), '/', variables('extensionName'))]",
+      "apiVersion": "2015-06-15",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('scriptUri')]"
+          ],
+          "commandToExecute": "[parameters('scriptCmd')]"
+        }        
+      }
+    }
+  ],
+  "outputs": {}
+}
