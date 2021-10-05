@@ -29,7 +29,7 @@
                 "addressSpacePrefix": "192.168.101.0/24",
                 "subnet1Prefix": "192.168.101.0/25",
                 "gatewaySubnetPrefix": "192.168.101.128/27",
-                "asn": "65002"
+                "asn": "65001"
             }
 
         },
@@ -538,7 +538,7 @@
                         "value": "[variables('Azure').routeserverSubnetName]"
                     },
                     "AllowBranchtoBranchTraffic": {
-                        "value": "True"
+                        "value": "False"
                     }
                 }
             }
