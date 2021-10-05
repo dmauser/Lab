@@ -1,0 +1,67 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "peeringname": {
+            "type": "string"
+        },
+        "hubNetwork": {
+            "type": "string"
+        },
+        "spokeNetwork": {
+            "type": "string"
+        },
+        "HubVnetID": {
+            "type": "string",
+            "defaultValue": "null"
+        },
+        "SpokeVnetID": {
+            "type": "string",
+            "defaultValue": "null"
+        },
+        "direction": {
+            "type": "string",
+            "allowedValues": [
+                "HubToSpoke",
+                "SpoketoHub"
+            ]
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]"
+    },
+    "resources": [
+        {
+            "condition": "[equals(parameters('direction'),'HubToSpoke')]",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(parameters('hubNetwork'), '/', parameters('peeringname'))]",
+            "location": "[variables('location')]",
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": true,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                    "id": "[parameters('SpokeVnetID')]"
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('direction'),'SpoketoHub')]",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(parameters('spokeNetwork'), '/', parameters('peeringname'))]",
+            "location": "[variables('location')]",
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": true,
+                "remoteVirtualNetwork": {
+                    "id": "[parameters('HubVnetID')]"
+                }
+            }
+        }
+    ]
+}

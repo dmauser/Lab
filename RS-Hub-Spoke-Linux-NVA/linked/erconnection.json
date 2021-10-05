@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "connectionName": {
+            "type": "String"
+        },
+        "expressrouteGatewayName": {
+            "type": "String"
+        },
+        "expressRouteCircuitID": {
+            "type": "String"
+        },
+        "UseAutorizationKey": {
+            "type": "String",
+            "allowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
+        "AutorizationKey": {
+            "type": "string",
+            "defaultValue": "null"
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "2020-11-01",
+            "name": "[parameters('connectionName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('expressrouteGatewayName'))]"
+                },
+                "authorizationKey": "[if(equals(parameters('UseAutorizationKey'), 'Yes'), parameters('AutorizationKey'), json('null'))]",
+                "connectionType": "ExpressRoute",
+                "routingWeight": 0,
+                "enableBgp": false,
+                "peer": {
+                    "id": "[parameters('expressRouteCircuitID')]"
+                },
+                "expressRouteGatewayBypass": false
+            }
+        }
+    ]
+}
