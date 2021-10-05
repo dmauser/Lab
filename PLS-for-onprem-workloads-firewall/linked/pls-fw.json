@@ -1,0 +1,205 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "existingVnetName": {
+            "type": "string",
+            "defaultValue": "provider-az-vnet",
+            "metadata": {
+                "description": "vName of the existing virtual network to deploy the scale set into."
+            }
+        },
+        "existingVnetResourceGroupName": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Name of the resourceGroup for the existing virtual network to deploy the scale set into."
+            }
+        }
+    },
+    "variables": {
+        "addressSpacePrefix": "10.0.0.0/24",
+        "aznetname": "provider-az-vnet",
+        "gatewaySubnetPrefix": "10.0.0.96/27",
+        "loadBalancerBackEndName": "FwBalancerBackEnd",
+        "loadBalancerFrontEndName": "FwloadBalancerFrontEnd",
+        "loadBalancerName": "pls-std-ilb",
+        "loadBalancerNatPoolName": "loadBalancerNatPool",
+        "loadBalancerProbeName": "SSHProbe",
+        "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
+        "nsgName": "Provider-default-nsg",
+        "plsnatsubnetname": "pls-nat-subnet",
+        "Firewallsubnetname": "trusted",
+        "plsnatsubnetprefix": "10.0.0.160/28",
+        "plssubnetId": "[resourceId(parameters('existingVnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVnetName'), variables ('plsnatsubnetname'))]",
+        "privatelinkservicename": "pls-Firewall",
+        "subnetId": "[resourceId(parameters('existingVnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVnetName'), variables ('Firewallsubnetname'))]",
+        "subnetPrefix": "10.0.0.0/27",
+        "trustedPrefix": "10.0.0.32/27",
+        "untrustedPrefix": "10.0.0.64/27"
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('aznetname')]",
+            "location": "[resourceGroup().location]",
+            "comments": "Adding remain Provider Subnets",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressSpacePrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('plsnatsubnetname')]",
+                        "properties": {
+                            "addressPrefix": "[variables('plsnatsubnetprefix')]",
+                            "privateLinkServiceNetworkPolicies": "Disabled"
+                        }
+
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('gatewaySubnetPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "trusted",
+                        "properties": {
+                            "addressPrefix": "[variables('trustedPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "untrusted",
+                        "properties": {
+                            "addressPrefix": "[variables('untrustedPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "subnet1",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[variables('nsgId')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "[variables('loadBalancerName')]",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2020-07-01",
+            "dependsOn": [
+                "[variables('aznetname')]"
+            ],
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[variables('loadBalancerFrontEndName')]",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[variables('loadBalancerBackendName')]"
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "FirewallLbRule",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/', variables('loadBalancerFrontEndName'))]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/', variables('loadBalancerBackendName'))]"
+                            },
+                            "protocol": "TCP",
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/probes/', variables('loadBalancerProbeName'))]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[variables('loadBalancerProbeName')]",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "port": 22,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2
+                        }
+                    }
+                ],
+                "inboundNatPools": [
+                    {
+                        "name": "[variables('loadBalancerNatPoolName')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/', variables('loadBalancerFrontEndName'))]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPortRangeStart": 50000,
+                            "frontendPortRangeEnd": 50019,
+                            "backendPort": 443
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateLinkServices",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('privatelinkservicename')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
+                "[variables('aznetname')]"
+            ],
+            "properties": {
+                "visibility": {
+                    "subscriptions": [
+                        "*"
+                    ]
+                },
+                "enableProxyProtocol": false,
+                "loadBalancerFrontendIpConfigurations": [
+                    {
+                        "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancerName'), variables('loadBalancerFrontEndName'))]"
+                    }
+                ],
+                "ipConfigurations": [
+                    {
+                        "name": "subnet1-1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "privateIPAddressVersion": "IPv4",
+                            "subnet": {
+                                "id": "[variables('plssubnetId')]"
+                            },
+                            "primary": false
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

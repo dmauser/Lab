@@ -1,0 +1,29 @@
+rg=%1
+nva1=Provider-az-nva1
+nva2=Provider-az-nva2
+lbname=pls-std-ilb
+backendpoolname=FwBalancerBackEnd
+$hubname-vnet=provider-az-vnet
+
+az deployment group create --name $nva1 --resource-group $rg \
+--template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/azuredeploy-TwoNICs.json" \
+--parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva1 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubname-vnet existingUntrustedSubnet=Untrusted existingTrustedSubnet=Trusted PublicIPAddressSku=Standard \
+--no-wait
+
+az deployment group create --name $nva2 --resource-group $rg \
+--template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/azuredeploy-TwoNICs.json" \
+--parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva2 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubname-vnet existingUntrustedSubnet=Untrusted existingTrustedSubnet=Trusted PublicIPAddressSku=Standard \
+--no-wait
+
+sleep 10
+
+array=($nva1 $nva2)
+for vm in "${array[@]}"
+  do
+  az network nic ip-config address-pool add \
+   --address-pool $backendpoolname \
+   --ip-config-name ipconfig1 \
+   --nic-name $vm-trusted-nic \
+   --resource-group $rg \
+   --lb-name $lbname
+  done

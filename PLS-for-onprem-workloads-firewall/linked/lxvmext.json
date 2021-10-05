@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachineName": {
+            "type": "string"
+        },
+        "commandToExecute": {
+            "type": "string",
+            "defaultValue": "apt-get -y update && apt-get -y install nginx && hostname > /var/www/html/index.html",
+            "metadata": {
+                "description": "Optional in case you answer no for Lock Down Public IP, but required in case you selected yes. Please use curl ifconfig.io to get your Public IP address"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2020-12-01",
+            "name": "[concat(parameters('virtualMachineName'),'/', 'Tools')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "commandToExecute": "[parameters('commandToExecute')]"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+# Define variables
+rg=provider
+location=centralus
+vnetname=Provider-Az-vnet
+vmname=Provider-onprem-lxvm
+haproxyplsname=pls-haproxy
+firewallplsname=pls-firewall
+plsnatsubnetname=pls-nat-subnet
+
+##Create Subnet for HAproxy
+az network vnet subnet create -g $rg --vnet-name $vnetname \
+--name haproxy \
+--address-prefixes "10.0.0.128/27" \
+--nat-gateway natgw
+#Provision HA Proxy
+
+
+## Create HAProxy PLS
+# Disable-private-link-service-network-policies to true on PLS NAT subnet
+az network vnet subnet create -g $rg --vnet-name $vnetname \
+--name $plsnatsubnetname \
+--address-prefixes "10.0.0.160/28" \
+--disable-private-link-service-network-policies true
+#Create Private link Service
+az network private-link-service create -g $rg -l $location \
+--name $haproxyplsname \
+--vnet-name $vnetname \
+--subnet $plsnatsubnetname \
+--lb-name pls-std-lb \
+--lb-frontend-ip-configs HAProxyloadBalancerFrontEnd
+
+# Changing Visibility to Anyone with your alias
+az network private-link-service update -g $rg \
+--name $haproxyplsname \
+--visibility "*"
+
+# List PLS Alias and create Private Endpoint on Customer A and Customer B.
+az network private-link-service show -g $rg --name $haproxyplsname --query alias
+
+
+##### FIREWALL ######
+
+## Create Firewall PLS
+
+#Create Private link Service
+az network private-link-service create -g $rg -l $location \
+--name $firewallplsname \
+--vnet-name $vnetname \
+--subnet $plsnatsubnetname \
+--lb-name pls-std-lb \
+--lb-frontend-ip-configs FwloadBalancerFrontEnd
+
+# Changing Visibility to Anyone with your alias
+az network private-link-service update -g $rg \
+--name $firewallplsname \
+--visibility "*"

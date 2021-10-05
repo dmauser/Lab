@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "name": {
+        "type": "string",
+        "defaultValue": "\\\"John Dole\\\""
+      },
+      "utcValue": {
+        "type": "string",
+        "defaultValue": "[utcNow()]"
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deploymentScripts",
+        "apiVersion": "2020-10-01",
+        "name": "runopncli",
+        "location": "[resourceGroup().location]",
+        "kind": "AzureCLI",
+        "properties": {
+          "forceUpdateTag": "[parameters('utcValue')]",
+          "azCliVersion": "2.15.0",
+          "primaryScriptUri": ""
+
+          "arguments": "[concat(' ', parameters('rg'))]",
+          "timeout": "PT1H",
+          "cleanupPreference": "OnSuccess",
+          "retentionInterval": "P1D"
+        }
+      }
+    ],
+    "outputs": {
+      "result": {
+        "value": "[reference('runPowerShellInlineWithOutput').outputs.text]",
+        "type": "string"
+      }
+    }
+  }
