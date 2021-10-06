@@ -17,7 +17,7 @@
         "rssubnetPrefix": {
             "type": "string"
         },
-        "AzureFirewallPrefix": {
+        "NVAPrefix": {
             "type": "string"
         },
         "gatewaySubnetPrefix": {
@@ -56,9 +56,12 @@
                         }
                     },
                     {
-                        "name": "AzureFirewallSubnet",
+                        "name": "NVASubnet",
                         "properties": {
-                            "addressPrefix": "[parameters('AzureFirewallPrefix')]"
+                            "addressPrefix": "[parameters('NVAPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
+                            }
                         }
                     },
                     {
