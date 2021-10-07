@@ -17,7 +17,7 @@
         "rssubnetPrefix": {
             "type": "string"
         },
-        "NVAPrefix": {
+        "nvaprefix": {
             "type": "string"
         },
         "gatewaySubnetPrefix": {
@@ -58,7 +58,7 @@
                     {
                         "name": "NVASubnet",
                         "properties": {
-                            "addressPrefix": "[parameters('NVAPrefix')]",
+                            "addressPrefix": "[parameters('nvaprefix')]",
                             "networkSecurityGroup": {
                                 "id": "[reference(resourceId('Microsoft.Resources/deployments', 'NSG'), '2020-05-01').outputs.nsgResourceID.value]"
                             }
