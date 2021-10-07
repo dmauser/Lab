@@ -15,6 +15,17 @@
                 "description": "The default is to allow SSH access from any source Public IP (*). To restric access it, please specify your Public IP address with CIDR. For single IP add 1.1.1.1/32."
             }
         },
+        "DeployOn-Premises": {   
+            "type": "string", 
+            "allowedValues": [
+              "Yes",
+              "No"
+            ],
+            "defaultValue": "No",
+            "metadata": {
+                "description": "Deploy VPN Gateway and OnPremises emulated network - default no"
+            }
+        },
         "gatewaySku": {
             "type": "string",
             "defaultValue": "VpnGw1",
@@ -44,7 +55,8 @@
             "type": "securestring",
             "metadata": {
                 "description": "The shared key used to VPN tunnel between the two Azure and OnPrem VPN Gateways."
-            }
+            },
+            "defaultValue": "@Password@"
         },
         "location": {
             "type": "string",
@@ -143,6 +155,7 @@
             }
         },
         {
+            "condition": "[equals(parameters('DeployOn-Premises'),'yes')]",
             "name": "[concat(parameters('Onprem').name,'-vnet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
@@ -409,6 +422,7 @@
             }
         },
         {
+            "condition": "[equals(parameters('DeployOn-Premises'),'yes')]",
             "name": "[variables('OnPrem').gatewayName]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
@@ -442,6 +456,7 @@
             }
         },
         {
+            "condition": "[equals(parameters('DeployOn-Premises'),'yes')]",
             "name": "[variables('Azure').gatewayName]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
@@ -475,6 +490,7 @@
             }
         },
         {
+            "condition": "[equals(parameters('DeployOn-Premises'),'yes')]",
             "name": "vpnconnections",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
@@ -642,6 +658,7 @@
             }
         },
         {
+            "condition": "[equals(parameters('DeployOn-Premises'),'yes')]",
             "name": "[concat(parameters('Onprem').name,'-vm')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
