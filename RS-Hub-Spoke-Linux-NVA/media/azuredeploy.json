@@ -84,7 +84,7 @@
     },
     "variables": {
         "nsgname": "Default-NSG",
-        "artifactsLocation": "https://github.com/dmauser/Lab/tree/master/RS-Hub-Spoke-Linux-NVA/linked",
+        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/RS-Hub-Spoke-Linux-NVA/linked/",
         "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
         "onpremvnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-onprem.json'))]",
         "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
