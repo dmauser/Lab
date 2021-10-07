@@ -71,7 +71,7 @@
                 "subnetName": "subnet1",
                 "subnet1Prefix": "10.0.1.0/27",
                 "gatewaySubnetPrefix": "10.0.1.32/27",
-                "NVAPrefix": "10.0.1.64/26",
+                "nvaprefix": "10.0.1.64/26",
                 "rssubnetPrefix": "10.0.1.128/27",
                 "spoke1Name": "Az-Spk1",
                 "spoke1AddressSpacePrefix": "10.0.2.0/24",
@@ -203,8 +203,8 @@
                     "rssubnetPrefix": {
                         "value": "[parameters('Azure').rssubnetPrefix]"
                     },
-                    "NVAPrefix": {
-                        "value": "[parameters('Azure').NVAPrefix]"
+                    "nvaprefix": {
+                        "value": "[parameters('Azure').nvaprefix]"
                     },
                     "gatewaySubnetPrefix": {
                         "value": "[parameters('Azure').gatewaySubnetPrefix]"
