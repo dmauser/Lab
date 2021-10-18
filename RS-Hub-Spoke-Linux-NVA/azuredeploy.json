@@ -65,6 +65,24 @@
             },
             "defaultValue": "[resourceGroup().location]"
         },
+        "Azure": {
+            "type": "object",
+            "defaultValue": {
+                "hubName": "Az-Hub",
+                "addressSpacePrefix": "10.0.0.0/24",
+                "subnetName": "subnet1",
+                "subnet1Prefix": "10.0.0.0/27",
+                "gatewaySubnetPrefix": "10.0.0.32/27",
+                "nvaprefix": "10.0.0.64/27",
+                "rssubnetPrefix": "10.0.0.96/27",
+                "spoke1Name": "Az-Spk1",
+                "spoke1AddressSpacePrefix": "10.0.1.0/24",
+                "spoke1Subnet1Prefix": "10.0.1.0/27",
+                "spoke2Name": "Az-Spk2",
+                "spoke2AddressSpacePrefix": "10.0.2.0/24",
+                "spoke2Subnet1Prefix": "10.0.2.0/27"
+            }
+        },
         "Onprem": {
             "type": "object",
             "defaultValue": {
@@ -74,30 +92,11 @@
                 "gatewaySubnetPrefix": "192.168.101.128/27",
                 "asn": "65002"
             }
-
-        },
-        "Azure": {
-            "type": "object",
-            "defaultValue": {
-                "hubName": "Az-Hub",
-                "addressSpacePrefix": "10.0.1.0/24",
-                "subnetName": "subnet1",
-                "subnet1Prefix": "10.0.1.0/27",
-                "gatewaySubnetPrefix": "10.0.1.32/27",
-                "AzureFirewallPrefix": "10.0.1.64/26",
-                "rssubnetPrefix": "10.0.1.128/27",
-                "spoke1Name": "Az-Spk1",
-                "spoke1AddressSpacePrefix": "10.0.2.0/24",
-                "spoke1Subnet1Prefix": "10.0.2.0/27",
-                "spoke2Name": "Az-Spk2",
-                "spoke2AddressSpacePrefix": "10.0.3.0/24",
-                "spoke2Subnet1Prefix": "10.0.3.0/27"
-            }
         }
     },
     "variables": {
         "nsgname": "Default-NSG",
-        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/linked/",
+        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/RS-Hub-Spoke-Linux-NVA/linked/",
         "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
         "onpremvnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-onprem.json'))]",
         "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
@@ -217,8 +216,8 @@
                     "rssubnetPrefix": {
                         "value": "[parameters('Azure').rssubnetPrefix]"
                     },
-                    "AzureFirewallPrefix": {
-                        "value": "[parameters('Azure').AzureFirewallPrefix]"
+                    "nvaprefix": {
+                        "value": "[parameters('Azure').nvaprefix]"
                     },
                     "gatewaySubnetPrefix": {
                         "value": "[parameters('Azure').gatewaySubnetPrefix]"
@@ -292,7 +291,8 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]"
+                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]",
+                "[resourceId('Microsoft.Resources/deployments', 'routeServer')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -325,7 +325,8 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]"
+                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]",
+                "[resourceId('Microsoft.Resources/deployments', 'routeServer')]"
             ],
             "properties": {
                 "mode": "Incremental",
