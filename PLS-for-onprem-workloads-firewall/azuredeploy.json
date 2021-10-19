@@ -67,7 +67,7 @@
         }
     },
     "variables": {
-        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads-haproxy/linked/",
+        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/PLS-for-onprem-workloads-firewall/linked/",
         "Azure": {
             "name": "[concat(parameters('Environment'),'-Az-vnet')]",
             "addressSpacePrefix": "10.0.0.0/24",
