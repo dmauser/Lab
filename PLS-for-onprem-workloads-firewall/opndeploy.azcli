@@ -1,21 +1,25 @@
-rg=%1
+#Parameters
+rg=PLS-Provider-FW  #Set Resource Group where Provider has been provisioned.
+
+#Variables
 nva1=Provider-az-nva1
 nva2=Provider-az-nva2
 lbname=pls-std-ilb
 backendpoolname=FwBalancerBackEnd
-$hubname-vnet=provider-az-vnet
+hubvnetname=provider-az-vnet
 
+#Deploy OPNSense NVA
 az deployment group create --name $nva1 --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/azuredeploy-TwoNICs.json" \
---parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva1 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubname-vnet existingUntrustedSubnet=Untrusted existingTrustedSubnet=Trusted PublicIPAddressSku=Standard \
+--parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva1 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubvnetname existingUntrustedSubnet=Untrusted existingTrustedSubnet=Trusted PublicIPAddressSku=Standard \
 --no-wait
 
 az deployment group create --name $nva2 --resource-group $rg \
 --template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/azuredeploy-TwoNICs.json" \
---parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva2 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubname-vnet existingUntrustedSubnet=Untrusted existingTrustedSubnet=Trusted PublicIPAddressSku=Standard \
+--parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva2 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubvnetname existingUntrustedSubnet=Untrusted existingTrustedSubnet=Trusted PublicIPAddressSku=Standard \
 --no-wait
 
-sleep 10
+sleep 20
 
 array=($nva1 $nva2)
 for vm in "${array[@]}"
