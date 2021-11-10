@@ -159,12 +159,12 @@ az network lb rule create -g $rg --lb-name nvahalb --name haportrule --protocol 
 
 ```Bash
 az deployment group create --name $nva1 --resource-group $rg \
---template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/azuredeploy-TwoNICs.json" \
+--template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/ARM/main-two-nics.json" \
 --parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva1 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubname-vnet existingUntrustedSubnet=external existingTrustedSubnet=internal PublicIPAddressSku=Standard \
 --no-wait
 
 az deployment group create --name $nva2 --resource-group $rg \
---template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/azuredeploy-TwoNICs.json" \
+--template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/ARM/main-two-nics.json" \
 --parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva2 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubname-vnet existingUntrustedSubnet=external existingTrustedSubnet=internal PublicIPAddressSku=Standard \
 --no-wait
 ```

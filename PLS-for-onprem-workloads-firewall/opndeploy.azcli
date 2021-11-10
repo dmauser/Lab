@@ -7,6 +7,7 @@ nva2=Provider-az-nva2
 lbname=pls-std-ilb
 backendpoolname=FwBalancerBackEnd
 hubvnetname=provider-az-vnet
+location=$(az group show -g $rg --query location -o tsv)
 
 #Deploy OPNSense NVA
 az deployment group create --name $nva1 --resource-group $rg \
@@ -19,8 +20,7 @@ az deployment group create --name $nva2 --resource-group $rg \
 --parameters virtualMachineSize=Standard_B2s virtualMachineName=$nva2 TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$hubvnetname existingUntrustedSubnet=Untrusted existingTrustedSubnet=Trusted PublicIPAddressSku=Standard \
 --no-wait
 
-sleep 20
-
+#Attach NVAs to Azure Load Balancer
 array=($nva1 $nva2)
 for vm in "${array[@]}"
   do
@@ -31,3 +31,17 @@ for vm in "${array[@]}"
    --resource-group $rg \
    --lb-name $lbname
   done
+
+# Deploy UDRs to ensure symmetric traffic towards published resources
+## This assumes DNAT Firewall rule preserves original client IP. In this case PLS NAT Subnet.
+## Full NAT with Firewall IP instance removes this UDR setup requirement.
+
+# Gateway Subnet UDR
+az network route-table create --name provider-az-gw-rt --resource-group $rg --location $location
+az network route-table route create --resource-group RSLAB-NCUS --name Default-to-RouteNVA --route-table-name provider-az-gw-rt \
+--address-prefix 10.0.0.160/28 \
+--next-hop-type VirtualAppliance \ 
+--next-hop-ip-address $(az network lb show -g $rg --name $lbname --query "frontendIpConfigurations[].privateIpAddress" -o tsv)
+az network vnet subnet update -n GatewaySubnet -g $rg --vnet-name $hubvnetname --route-table provider-az-gw-rt
+
+# BONUS - Spoke VNET published workload UDR
