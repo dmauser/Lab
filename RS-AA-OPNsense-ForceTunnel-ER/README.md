@@ -315,8 +315,10 @@ fi
 2) Create Route Server
 
 ```Bash
+az network public-ip create --resource-group $rg --name $hubname-rs-pip --allocation-method Static --sku Standard
 az network routeserver create --resource-group $rg --name $hubname-rs \
---hosted-subnet $(az network vnet subnet show --resource-group $rg --vnet-name $hubname-vnet --name RouteServerSubnet --query id --out tsv)
+--hosted-subnet $(az network vnet subnet show --resource-group $rg --vnet-name $hubname-vnet --name RouteServerSubnet --query id --out tsv) \
+--public-ip-address $hubname-rs-pip
 ```
 
 3) Build Route Server BGP Peering with NVAs
