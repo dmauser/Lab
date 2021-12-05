@@ -53,6 +53,14 @@
             "metadata": {
                 "description": "Existing Virtual Nework Name"
             }
+        },
+        "enableBgp": {
+            "type": "string",
+            "defaultValue": "true",
+            "allowedValues": [
+                "true",
+                "false" 
+            ]           
         }
     },
     "variables": {
@@ -104,7 +112,7 @@
                     "tier": "[parameters('gatewaySku')]"
                 },
                 "vpnType": "RouteBased",
-                "enableBgp": true,
+                "enableBgp": "[parameters(enableBgp)]",
                 "activeActive": false,
                 "bgpSettings": {
                     "asn": "[parameters('asn')]",
