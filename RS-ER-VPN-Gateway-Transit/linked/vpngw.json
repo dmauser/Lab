@@ -112,7 +112,7 @@
                     "tier": "[parameters('gatewaySku')]"
                 },
                 "vpnType": "RouteBased",
-                "enableBgp": "[parameters(enableBgp)]",
+                "enableBgp": "[parameters('enableBgp')]",
                 "activeActive": false,
                 "bgpSettings": {
                     "asn": "[parameters('asn')]",
