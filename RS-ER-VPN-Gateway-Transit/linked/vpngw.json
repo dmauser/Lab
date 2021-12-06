@@ -34,6 +34,14 @@
                 "description": "Select VPN Gateway Generation."
             }
         },
+        "enableBgp": {
+            "type": "string",
+            "defaultValue": "true",
+            "allowedValues": [
+                "true",
+                "false" 
+            ]           
+        },
         "asn": {
             "type": "string",
             "metadata": {
@@ -53,14 +61,6 @@
             "metadata": {
                 "description": "Existing Virtual Nework Name"
             }
-        },
-        "enableBgp": {
-            "type": "string",
-            "defaultValue": "true",
-            "allowedValues": [
-                "true",
-                "false" 
-            ]           
         }
     },
     "variables": {
