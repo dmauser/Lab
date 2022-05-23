@@ -1,4 +1,4 @@
-# Azure Virtual Network Gateway IKE Logs
+# Troubleshooting IPSec by using IKE Logs
 
 # Contents
 
