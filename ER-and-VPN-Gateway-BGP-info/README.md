@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a simple script that dump all BGP routing information for VPN or ExpressRoute Virtual Network Gateways (VNGs). Please note, this script is not applicable for Virtual WAN VPN or ExpressRoute Gateways.
+This is a simple script that dump all BGP routing information for VPN or ExpressRoute Virtual Network Gateways (VNGs). Please note, this script is not applicable for both Virtual WAN VPN and ExpressRoute Gateways.
 
 ## Known issues
 
