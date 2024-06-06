@@ -76,9 +76,10 @@ az deployment group create --name $hubname-vpngw --resource-group $rg \
 --no-wait
 
 #Deploy OPNSense On-Premises
+az vm image terms accept --urn thefreebsdfoundation:freebsd-13_1:13_1-release:13.1.0 -o none
 az deployment group create --name $onpremname-nva --resource-group $rg \
---template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/azuredeploy-TwoNICs.json" \
---parameters virtualMachineSize=Standard_B2s virtualMachineName=$onpremname-nva TempUsername=azureuser TempPassword=Msft123Msft123 existingVirtualNetworkName=$onpremname-vnet existingUntrustedSubnet=external existingTrustedSubnet=internal PublicIPAddressSku=Standard \
+--template-uri "https://raw.githubusercontent.com/dmauser/opnazure/master/ARM/main.json" \
+--parameters scenarioOption=TwoNics virtualMachineName=$onpremname-nva virtualMachineSize=Standard_B2s existingvirtualNetwork=existing virtualNetworkName=$onpremname-vnet existingUntrustedSubnetName=external existingTrustedSubnetName=internal Location=$location \
 --no-wait
 
 #Create vWAN VPN gateway
