@@ -67,10 +67,10 @@
             "apiVersion": "2019-02-01",
             "location": "[parameters('location')]",
             "properties": {
-                "publicIPAllocationMethod": "Dynamic"
+                "publicIPAllocationMethod": "Static"
             },
             "sku": {
-                "name": "Basic"
+                "name": "Standard"
             }
         },
         {
