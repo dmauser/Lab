@@ -114,7 +114,7 @@
     },
     "variables": {
         "nsgname": "Default-NSG",
-        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/linked/",
+        "artifactsLocation": "https://raw.githubusercontent.com/dmauser/azure-hub-spoke-base-lab/main/linked/",
         "erconnURI": "[concat(uri(variables('artifactsLocation'),'erconnection.json'))]",
         "ergwtemplateURI": "[concat(uri(variables('artifactsLocation'),'ergw.json'))]",
         "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
