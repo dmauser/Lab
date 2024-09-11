@@ -8,60 +8,12 @@
         "VmAdminPassword": {
             "type": "secureString"
         },
-
-        "virtualMachineSize": {
-            "type": "string",
-            "defaultValue": "Standard_B1ms"
-        },
-        "virtualMachinePublicIP": {
-            "type": "string",
-            "defaultValue": "true",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
-        },
-        "deployBastion": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
-        },
         "Restrict_SSH_VM_AccessByPublicIP": {
             "type": "string",
             "defaultValue": "*",
             "metadata": {
                 "description": "The default is to allow SSH access from any source Public IP (*). To restric access it, please specify your Public IP address with CIDR. For single IP add 1.1.1.1/32."
             }
-        },
-        "deployHubVPNGateway": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
-        },
-        "HubVPNGatewaytype": {
-            "type": "string",
-            "defaultValue": "Active-Active",
-            "allowedValues": [
-                "Active-Active",
-                "Active-Passive"
-            ],
-            "metadata": {
-                "description": "Define when Hub VPN Gateway is Active-Active or Active-Passive"
-            }
-        },
-        "deployOnpremisesVPNGateway": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
         },
         "gatewaySku": {
             "type": "string",
@@ -88,86 +40,39 @@
                 "description": "Select VPN Gateway Generation."
             }
         },
-        "enableBgp": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
-        },
         "sharedKey": {
             "type": "securestring",
-            "defaultValue": "P@assw@d",
             "metadata": {
                 "description": "The shared key used to VPN tunnel between the two Azure and OnPrem VPN Gateways."
             }
         },
-        "deployHubERGateway": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
-        },
-        "connect-to-ExpressRouteCircuit": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
-        },
         "ExpressRouteEnvironmentName": {
             "type": "String",
-            "defaultValue": "null",
             "metadata": {
                 "description": "Add the environment name such as AVS, HLI, Skytap, RemoteLab representing On-premises location"
             }
         },
         "expressRouteCircuitID": {
             "type": "String",
-            "defaultValue": "null",
             "metadata": {
                 "description": "Specify ExpressRoute Circuit Resource ID"
             }
         },
         "UseAutorizationKey": {
             "type": "String",
-            "defaultValue": "false",
             "allowedValues": [
                 "true",
                 "false"
             ],
             "metadata": {
-                "description": "Select true or falset for ExpressRoute Authorization Key"
+                "description": "Select Yes or Not for ExpressRoute Authorization Key"
             }
         },
         "AutorizationKey": {
             "type": "string",
             "defaultValue": "null",
             "metadata": {
-                "description": "Add your ExpressRoute Authorization Key in case you have answered true on Use Authorization Key"
-            }
-        },
-        "deployAzureRouteServer": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ]
-        },
-        "RouteServerB2B": {
-            "type": "string",
-            "defaultValue": "false",
-            "allowedValues": [
-                "true",
-                "false"
-            ],
-            "metadata": {
-                "description": "Allow RouterServer Branch to Branch Traffic"
+                "description": "Add your ExpressRoute Authorization Key in case you have answered Yes on Use Authorization Key"
             }
         },
         "location": {
@@ -180,11 +85,10 @@
         "Onprem": {
             "type": "object",
             "defaultValue": {
-                "name": "onprem",
-                "addressSpacePrefix": "192.168.100.0/24",
-                "subnet1Prefix": "192.168.100.0/27",
-                "gatewaySubnetPrefix": "192.168.100.128/27",
-                "bastionSubnetPrefix": "192.168.100.192/26",
+                "name": "OnPrem",
+                "addressSpacePrefix": "192.168.101.0/24",
+                "subnet1Prefix": "192.168.101.0/25",
+                "gatewaySubnetPrefix": "192.168.101.128/27",
                 "asn": "65002"
             }
 
@@ -192,43 +96,40 @@
         "Azure": {
             "type": "object",
             "defaultValue": {
-                "hubName": "az-hub",
-                "addressSpacePrefix": "10.0.0.0/24",
+                "hubName": "Az-Hub",
+                "addressSpacePrefix": "10.0.1.0/24",
                 "subnetName": "subnet1",
-                "subnet1Prefix": "10.0.0.0/27",
-                "gatewaySubnetPrefix": "10.0.0.32/27",
-                "rssubnetPrefix": "10.0.0.128/27",
-                "bastionSubnetPrefix": "10.0.0.192/26",
-                "spoke1Name": "az-spk1",
-                "spoke1AddressSpacePrefix": "10.0.1.0/24",
-                "spoke1Subnet1Prefix": "10.0.1.0/27",
-                "spoke2Name": "az-spk2",
-                "spoke2AddressSpacePrefix": "10.0.2.0/24",
-                "spoke2Subnet1Prefix": "10.0.2.0/27"
+                "subnet1Prefix": "10.0.1.0/27",
+                "gatewaySubnetPrefix": "10.0.1.32/27",
+                "AzureFirewallPrefix": "10.0.1.64/26",
+                "rssubnetPrefix": "10.0.1.128/27",
+                "spoke1Name": "Az-Spk1",
+                "spoke1AddressSpacePrefix": "10.0.2.0/24",
+                "spoke1Subnet1Prefix": "10.0.2.0/27",
+                "spoke2Name": "Az-Spk2",
+                "spoke2AddressSpacePrefix": "10.0.3.0/24",
+                "spoke2Subnet1Prefix": "10.0.3.0/27"
             }
         }
     },
     "variables": {
-        "nsgname": "[concat(resourceGroup().location,'-default-nsg')]",
+        "nsgname": "Default-NSG",
         "artifactsLocation": "https://raw.githubusercontent.com/dmauser/azure-hub-spoke-base-lab/main/linked/",
         "erconnURI": "[concat(uri(variables('artifactsLocation'),'erconnection.json'))]",
         "ergwtemplateURI": "[concat(uri(variables('artifactsLocation'),'ergw.json'))]",
-        "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg2.json'))]",
+        "nsgtemplateURI": "[concat(uri(variables('artifactsLocation'),'nsg.json'))]",
         "onpremvnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-onprem.json'))]",
-        "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azurev3.json'))]",
-        "spokevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-spokev2.json'))]",
-        "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'new-vpngw.json'))]",
+        "azurevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-azure.json'))]",
+        "spokevnettemplateURI": "[concat(uri(variables('artifactsLocation'),'vnet-spoke.json'))]",
+        "vpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'vpngw.json'))]",
+        "aavpngwtemplateURI": "[concat(uri(variables('artifactsLocation'),'aa-vpngw.json'))]",
         "vpnconnURI": "[concat(uri(variables('artifactsLocation'),'vpnconnection.json'))]",
         "routeServerURI": "[concat(uri(variables('artifactsLocation'),'routeserver.json'))]",
-        "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vmv2.json'))]",
-        "vmnopiptemplateURI": "[concat(uri(variables('artifactsLocation'),'vm-nopip.json'))]",
+        "vmtemplateURI": "[concat(uri(variables('artifactsLocation'),'vm.json'))]",
         "vnetpeeringURI": "[concat(uri(variables('artifactsLocation'),'vnet-peering.json'))]",
-        "subnettemplateURI": "[concat(uri(variables('artifactsLocation'),'subnet.json'))]",
-        "bastiontemplateURI": "[concat(uri(variables('artifactsLocation'),'bastion.json'))]",
         "OnPrem": {
             "subnetName": "subnet1",
             "gatewayName": "[concat(parameters('Onprem').name,'-vpngw')]",
-            "HubVPNGatewaytype": "Active-Passive",
             "gatewayPublicIPName": "[concat(parameters('Onprem').name,'-vpngw-pip')]",
             "connectionName": "[concat(parameters('Onprem').name,'-to-',concat(parameters('Azure').hubname))]"
         },
@@ -240,7 +141,7 @@
             "gatewayPublicIPName2": "[concat(parameters('Azure').hubname,'-vpngw-pip2')]",
             "connectionName": "[concat(parameters('Azure').hubname,'-to-',concat(parameters('Onprem').name))]",
             "asn": "65515",
-            "routeserverName": "[concat(parameters('Azure').hubname,'-rs')]",
+            "routeserverName": "[concat(parameters('Azure').hubname,'-routeserver')]",
             "routeserverSubnetName": "RouteServerSubnet",
             "AzureFirewallSubnetName": "AzureFirewallSubnet",
             "spoke1subnetName": "subnet1",
@@ -249,7 +150,7 @@
     },
     "resources": [
         {
-            "name": "[concat(resourceGroup().location,'-default-nsg')]",
+            "name": "NSG",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "properties": {
@@ -262,9 +163,6 @@
                     "networkSecurityGroupName": {
                         "value": "[variables('nsgname')]"
                     },
-                    "virtualMachinePublicIP": {
-                        "value": "[parameters('virtualMachinePublicIP')]"
-                    },
                     "RestrictSshAccessByPublicIP": {
                         "value": "[parameters('Restrict_SSH_VM_AccessByPublicIP')]"
                     },
@@ -276,12 +174,11 @@
             }
         },
         {
-            "condition": "[equals(parameters('deployOnpremisesVPNGateway'),'true')]",
             "name": "[concat(parameters('Onprem').name,'-vnet')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(resourceGroup().location,'-default-nsg'))]"
+                "[resourceId('Microsoft.Resources/deployments', 'NSG')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -314,7 +211,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(resourceGroup().location,'-default-nsg'))]"
+                "[resourceId('Microsoft.Resources/deployments', 'NSG')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -338,6 +235,9 @@
                     "rssubnetPrefix": {
                         "value": "[parameters('Azure').rssubnetPrefix]"
                     },
+                    "AzureFirewallPrefix": {
+                        "value": "[parameters('Azure').AzureFirewallPrefix]"
+                    },
                     "gatewaySubnetPrefix": {
                         "value": "[parameters('Azure').gatewaySubnetPrefix]"
                     }
@@ -350,7 +250,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(resourceGroup().location,'-default-nsg'))]"
+                "[resourceId('Microsoft.Resources/deployments', 'NSG')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -380,7 +280,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(resourceGroup().location,'-default-nsg'))]"
+                "[resourceId('Microsoft.Resources/deployments', 'NSG')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -406,13 +306,11 @@
             }
         },
         {
-            "name": "[concat(parameters('Azure').spoke1Name, '-to-hub-peering')]",
+            "name": "[concat(parameters('Azure').spoke1Name, '-to-HUB-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]",
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').ergatewayName)]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').Hubname,'-rs'))]"
+                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -441,13 +339,11 @@
             }
         },
         {
-            "name": "[concat(parameters('Azure').spoke2Name, '-to-hub-peering')]",
+            "name": "[concat(parameters('Azure').spoke2Name, '-to-HUB-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]",
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').ergatewayName)]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').Hubname,'-rs'))]"
+                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -476,14 +372,12 @@
             }
         },
         {
-            "name": "[concat(parameters('Azure').hubName, '-to-spoke1-peering')]",
+            "name": "[concat(parameters('Azure').hubName, '-to-Spoke1-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').spoke1Name,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-bastionsubnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').Hubname,'-rs'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -512,14 +406,12 @@
             }
         },
         {
-            "name": "[concat(parameters('Azure').hubName, '-to-spoke2-peering')]",
+            "name": "[concat(parameters('Azure').hubName, '-to-Spoke2-Peering')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').spoke2Name,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-bastionsubnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').Hubname,'-rs'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -548,13 +440,11 @@
             }
         },
         {
-            "condition": "[equals(parameters('deployOnpremisesVPNGateway'),'true')]",
-            "name": "[concat(parameters('Onprem').name,'-vpngw')]",
+            "name": "[variables('OnPrem').gatewayName]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Onprem').name,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Onprem').name,'-bastionsubnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Onprem').name,'-vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -572,35 +462,27 @@
                     "vpnGatewayGeneration": {
                         "value": "[parameters('vpnGatewayGeneration')]"
                     },
-                    "enableBgp": {
-                        "value": "[parameters('enableBgp')]"
-                    },
                     "asn": {
                         "value": "[parameters('Onprem').asn]"
                     },
                     "vnetName": {
                         "value": "[concat(parameters('Onprem').name,'-vnet')]"
-                    },
-                    "HubVPNGatewaytype": {
-                        "value": "[variables('OnPrem').HubVPNGatewaytype]"
                     }
                 }
 
             }
         },
         {
-            "condition": "[equals(parameters('deployHubVPNGateway'),'true')]",
-            "name": "[concat(parameters('Azure').Hubname,'-vpngw')]",
+            "name": "[variables('Azure').gatewayName]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-vnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-bastionsubnet'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-vnet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('vpngwtemplateURI')]",
+                    "uri": "[variables('aavpngwtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -613,25 +495,18 @@
                     "vpnGatewayGeneration": {
                         "value": "[parameters('vpnGatewayGeneration')]"
                     },
-                    "enableBgp": {
-                        "value": "[parameters('enableBgp')]"
-                    },
                     "asn": {
                         "value": "[variables('Azure').asn]"
                     },
                     "vnetName": {
                         "value": "[concat(parameters('Azure').hubName, '-vnet')]"
-                    },
-                    "HubVPNGatewaytype": {
-                        "value": "[parameters('HubVPNGatewaytype')]"
                     }
                 }
 
             }
         },
         {
-            "condition": "[equals(parameters('deployOnpremisesVPNGateway'),'true')]",
-            "name": "[concat(parameters('Azure').Hubname,'-vpnconnections')]",
+            "name": "vpnconnections",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -659,13 +534,12 @@
                     },
                     "AzureConnectionName": {
                         "value": "[variables('Azure').connectionName]"
-                    }
+                    }                    
                 }
             }
         },
         {
-            "condition": "[equals(parameters('deployHubERGateway'),'true')]",
-            "name": "[concat(parameters('Azure').Hubname,'-ergw')]",
+            "name": "[variables('Azure').ergatewayName]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -689,8 +563,7 @@
             }
         },
         {
-            "condition": "[equals(parameters( 'connect-to-ExpressRouteCircuit'),'true')]",
-            "name": "[concat(parameters('Azure').Hubname,'-erconnections')]",
+            "name": "erconnections",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
@@ -722,12 +595,11 @@
             }
         },
         {
-            "condition": "[equals(parameters('deployAzureRouteServer'),'true')]",
-            "name": "[concat(parameters('Azure').Hubname,'-rs')]",
+            "name": "routeServer",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').Hubname,'-vpnconnections'))]"
+                "[resourceId('Microsoft.Resources/deployments', 'vpnconnections')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -746,7 +618,7 @@
                         "value": "[variables('Azure').routeserverSubnetName]"
                     },
                     "AllowBranchtoBranchTraffic": {
-                        "value": "[parameters('RouteServerB2B')]"
+                        "value": "True"
                     }
                 }
             }
@@ -761,7 +633,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[if(equals(parameters('virtualMachinePublicIP'), 'true'), variables('vmtemplateURI'), variables('vmnopiptemplateURI'))]",
+                    "uri": "[variables('vmtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -770,9 +642,6 @@
                     },
                     "adminPassword": {
                         "value": "[parameters('VmAdminPassword')]"
-                    },
-                    "virtualMachineSize": {
-                        "value": "[parameters('virtualMachineSize')]"
                     },
                     "subnetName": {
                         "value": "[variables('Azure').subnetName]"
@@ -799,7 +668,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[if(equals(parameters('virtualMachinePublicIP'), 'true'), variables('vmtemplateURI'), variables('vmnopiptemplateURI'))]",
+                    "uri": "[variables('vmtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -808,9 +677,6 @@
                     },
                     "adminPassword": {
                         "value": "[parameters('VmAdminPassword')]"
-                    },
-                    "virtualMachineSize": {
-                        "value": "[parameters('virtualMachineSize')]"
                     },
                     "subnetName": {
                         "value": "[variables('Azure').spoke1subnetName]"
@@ -837,7 +703,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[if(equals(parameters('virtualMachinePublicIP'), 'true'), variables('vmtemplateURI'), variables('vmnopiptemplateURI'))]",
+                    "uri": "[variables('vmtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -846,9 +712,6 @@
                     },
                     "adminPassword": {
                         "value": "[parameters('VmAdminPassword')]"
-                    },
-                    "virtualMachineSize": {
-                        "value": "[parameters('virtualMachineSize')]"
                     },
                     "subnetName": {
                         "value": "[variables('Azure').spoke2subnetName]"
@@ -866,7 +729,6 @@
             }
         },
         {
-            "condition": "[equals(parameters('deployOnpremisesVPNGateway'),'true')]",
             "name": "[concat(parameters('Onprem').name,'-vm')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
@@ -876,7 +738,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[if(equals(parameters('virtualMachinePublicIP'), 'true'), variables('vmtemplateURI'), variables('vmnopiptemplateURI'))]",
+                    "uri": "[variables('vmtemplateURI')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -885,9 +747,6 @@
                     },
                     "adminPassword": {
                         "value": "[parameters('VmAdminPassword')]"
-                    },
-                    "virtualMachineSize": {
-                        "value": "[parameters('virtualMachineSize')]"
                     },
                     "subnetName": {
                         "value": "[variables('OnPrem').subnetName]"
@@ -900,116 +759,6 @@
                     },
                     "location": {
                         "value": "[parameters('location')]"
-                    }
-                }
-            }
-        },
-        {
-            "condition": "[and(equals(parameters('deployOnpremisesVPNGateway'),'true'), equals(parameters('deployBastion'),'true'))]",
-            "name": "[concat(parameters('Onprem').name,'-bastionsubnet')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Onprem').name,'-vnet'))]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('subnettemplateURI')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "vnetName": {
-                        "value": "[concat(parameters('Onprem').name,'-vnet')]"
-                    },
-                    "subnetName": {
-                        "value": "AzureBastionSubnet"
-                    },
-                    "addressPrefix": {
-                        "value": "[parameters('OnPrem').bastionSubnetPrefix]"
-                    }
-                }
-            }
-        },
-        {
-            "condition": "[and(equals(parameters('deployOnpremisesVPNGateway'),'true'), equals(parameters('deployBastion'),'true'))]",
-            "name": "[concat(parameters('Onprem').name,'-bastion')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Onprem').name,'-bastionsubnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', variables('OnPrem').gatewayName)]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('bastiontemplateURI')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "location": {
-                        "value": "[parameters('location')]"
-                    },
-                    "bastionHostName": {
-                        "value": "[concat(parameters('Onprem').name, '-bastion')]"
-                    },
-                    "virtualNetworkId": {
-                        "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(parameters('Onprem').name, '-vnet'))]"
-                    }
-                }
-            }
-        },
-        {
-            "condition": "[equals(parameters('deployBastion'),'true')]",
-            "name": "[concat(parameters('Azure').hubName,'-bastionsubnet')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-vnet'))]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('subnettemplateURI')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "vnetName": {
-                        "value": "[concat(parameters('Azure').hubName,'-vnet')]"
-                    },
-                    "subnetName": {
-                        "value": "AzureBastionSubnet"
-                    },
-                    "addressPrefix": {
-                        "value": "[parameters('Azure').bastionSubnetPrefix]"
-                    }
-                }
-            }
-        },
-        {
-            "condition": "[equals(parameters('deployBastion'),'true')]",
-            "name": "[concat(parameters('Azure').hubName,'-bastion')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(parameters('Azure').hubName,'-bastionsubnet'))]",
-                "[resourceId('Microsoft.Resources/deployments', variables('Azure').gatewayName)]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('bastiontemplateURI')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "location": {
-                        "value": "[parameters('location')]"
-                    },
-                    "bastionHostName": {
-                        "value": "[concat(parameters('Azure').hubName, '-bastion')]"
-                    },
-                    "virtualNetworkId": {
-                        "value": "[resourceId('Microsoft.Network/virtualNetworks/', concat(parameters('Azure').hubName, '-vnet'))]"
                     }
                 }
             }
