@@ -23,7 +23,7 @@
         },
         "deployBastion": {
             "type": "string",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
@@ -38,7 +38,7 @@
         },
         "deployHubVPNGateway": {
             "type": "string",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
@@ -57,7 +57,7 @@
         },
         "deployOnpremisesVPNGateway": {
             "type": "string",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
@@ -90,7 +90,7 @@
         },
         "enableBgp": {
             "type": "string",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
@@ -98,14 +98,14 @@
         },
         "sharedKey": {
             "type": "securestring",
-            "defaultValue": "P@assw@d",
+            "defaultValue": "abc123",
             "metadata": {
                 "description": "The shared key used to VPN tunnel between the two Azure and OnPrem VPN Gateways."
             }
         },
         "deployHubERGateway": {
             "type": "string",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
@@ -153,7 +153,7 @@
         },
         "deployAzureRouteServer": {
             "type": "string",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
@@ -161,7 +161,7 @@
         },
         "RouteServerB2B": {
             "type": "string",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
