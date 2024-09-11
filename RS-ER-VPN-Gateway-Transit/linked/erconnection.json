@@ -14,8 +14,8 @@
         "UseAutorizationKey": {
             "type": "String",
             "allowedValues": [
-                "Yes",
-                "No"
+                "true",
+                "false"
             ]
         },
         "AutorizationKey": {
