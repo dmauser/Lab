@@ -15,8 +15,6 @@ AzurehubName=Az-Hub
 AzurehubaddressSpacePrefix=$(az network vnet show -g $rg -n $AzurehubName-vnet --query "addressSpace.addressPrefixes" -o tsv)
 ##Azure Hub Subnet address prefix
 Azurehubsubnet1Prefix=$(az network vnet subnet show -g $rg -n subnet1 --vnet-name $AzurehubName-vnet --query addressPrefix -o tsv)
-## Azure Hub Firewall Subnet address prefix
-AzurehubFirewallPrefix=$(az network vnet subnet show -g $rg -n AzureFirewallSubnet --vnet-name $AzurehubName-vnet --query addressPrefix -o tsv) 
 ##Azure Spoke 1 name
 Azurespoke1Name=Az-Spk1
 ## Azure Spoke 1 VNET address space
@@ -31,6 +29,12 @@ OnPremName=OnPrem
 OnPremVnetAddressSpace=$(az network vnet show -g $rg -n $OnPremName-vnet --query "addressSpace.addressPrefixes" -o tsv)
 ## Log Analytics workspace name. 
 Workspacename=$AzurehubName-Firewall-Logs 
+
+
+## Azure Hub Firewall Subnet address prefix
+# Create Azure Hub Firewall Subnet
+az network vnet subnet create -g $rg --vnet-name $AzurehubName-vnet -n AzureFirewallSubnet --address-prefixes 10.0.0.64/26 -o none
+AzurehubFirewallPrefix=$(az network vnet subnet show -g $rg -n AzureFirewallSubnet --vnet-name $AzurehubName-vnet --query addressPrefix -o tsv) 
 
 #Build Azure Firewall / Note this section takes few minutes to complete.
 az network public-ip create --name $AzurehubName-azfw-pip --resource-group $rg --location $location --allocation-method static --sku standard
@@ -67,17 +71,17 @@ az network route-table create --name RT-Hub-to-AzFW --resource-group $rg --locat
 az network route-table route create --resource-group $rg --name Default-to-AzFw --route-table-name RT-Hub-to-AzFW  \
 --address-prefix 0.0.0.0/0 \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## Traffic to Spoke1 via AzFW
 az network route-table route create --resource-group $rg --name Spk1-to-AzFw --route-table-name RT-Hub-to-AzFW  \
 --address-prefix $Azurespoke1AddressSpacePrefix \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## Traffic to Spoke2 via AzFW
 az network route-table route create --resource-group $rg --name Spk2-to-AzFw --route-table-name RT-Hub-to-AzFW  \
 --address-prefix $Azurespoke2AddressSpacePrefix \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 mypip=$(curl ifconfig.io -s) #adding Public IP allow access to the VMs after enable UDR.
 az network route-table route create --resource-group $rg --name Exception --route-table-name RT-Hub-to-AzFW  \
 --address-prefix $mypip/32 \
@@ -92,12 +96,12 @@ az network route-table create --name RT-Spoke-to-AzFW  --resource-group $rg --lo
 az network route-table route create --resource-group $rg --name Default-to-AzFw --route-table-name RT-Spoke-to-AzFW   \
 --address-prefix 0.0.0.0/0 \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## Traffic to Hub to AzFW
 az network route-table route create --resource-group $rg --name Hub-to-AzFw --route-table-name RT-Spoke-to-AzFW   \
 --address-prefix $AzurehubaddressSpacePrefix \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## Remote Public IP exception to remote SSH 
 mypip=$(curl ifconfig.io -s) #adding Public IP allow access to the VMs after enable UDR.
 az network route-table route create --resource-group $rg --name Exception --route-table-name RT-Spoke-to-AzFW   \
@@ -113,43 +117,43 @@ az network route-table create --name RT-GWSubnet-to-AzFW --resource-group $rg --
 az network route-table route create --resource-group $rg --name HubSubnet1-to-AzFw --route-table-name RT-GWSubnet-to-AzFW \
 --address-prefix $Azurehubsubnet1Prefix \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## Azure Spoke 1
 az network route-table route create --resource-group $rg --name Spoke1-to-AzFw --route-table-name RT-GWSubnet-to-AzFW \
 --address-prefix $Azurespoke1AddressSpacePrefix \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## Azure Spoke 2
 az network route-table route create --resource-group $rg --name Spok2-to-AzFw --route-table-name RT-GWSubnet-to-AzFW \
 --address-prefix $Azurespoke2AddressSpacePrefix \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## OnPrem VPN
 az network route-table route create --resource-group $rg --name OnPremVPN-to-AzFw --route-table-name RT-GWSubnet-to-AzFW \
 --address-prefix $OnPremVnetAddressSpace \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## ExpressRoute Env
 az network route-table route create --resource-group $rg --name EREvn-to-AzFw --route-table-name RT-GWSubnet-to-AzFW \
 --address-prefix $EREnvironmentAddressSpace \
 --next-hop-type VirtualAppliance \
---next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIpAddress" -o tsv)
+--next-hop-ip-address $(az network firewall show --name $AzurehubName-azfw --resource-group $rg --query "ipConfigurations[].privateIPAddress" -o tsv)
 ## Associating RT-to-GWSubnet to GatewaySubnet
 az network vnet subnet update -n GatewaySubnet -g $rg --vnet-name $AzurehubName-vnet --route-table RT-GWSubnet-to-AzFW
 
 # Validations
 # 1) Dump VMs IP and Effective Routes
 ## Azure Hub VM 
-az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $AzurehubName-lxvm-nic -o table
 ## Onpremises VM
-az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $OnPremName-lxvm-nic -o table
 ## Azure Spoke1 VM 
-az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $Azurespoke1Name-lxvm-nic -o table
 ## Azure Spoke2 VM
-az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv
+az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv
 az network nic show-effective-route-table --resource-group $rg -n $Azurespoke2Name-lxvm-nic -o table
 
 # 2) Leaving Ping or run port connectivity check below and check the Firewall Logs
@@ -157,13 +161,13 @@ az network nic show-effective-route-table --resource-group $rg -n $Azurespoke2Na
 # 3) Generate netcat command to check connectivity and review activity on Azure Firewall logs:
 
 #Hub VM
-echo nc -z -v $(az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+echo nc -z -v $(az network nic show --resource-group $rg -n $AzurehubName-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv) 22 &&
 #Spoke 1 VM 
-echo nc -z -v $(az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+echo nc -z -v $(az network nic show --resource-group $rg -n $Azurespoke1Name-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv) 22 &&
 #Spoke 2 VM 
-echo nc -z -v $(az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+echo nc -z -v $(az network nic show --resource-group $rg -n $Azurespoke2Name-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv) 22 &&
 #Remove VPN Branch VM 
-echo nc -z -v $(az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIpAddress" -o tsv) 22 &&
+echo nc -z -v $(az network nic show --resource-group $rg -n $OnPremName-lxvm-nic --query "ipConfigurations[].privateIPAddress" -o tsv) 22 &&
 # Replace with the remote Environment connected via ER (not in Azure) \
 echo nc -z -v 172.16.0.2 22
 
